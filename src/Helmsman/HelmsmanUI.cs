@@ -15,6 +15,7 @@ public sealed class HelmsmanUI : MonoBehaviour
     private bool adjustingView, inputBlocked;
     private bool editing, onboard, rebuild, naming;
     private Ship? namingShip;
+    private GullCall? calledGull;
     private string shipName="";
     private int tab, page;
     private DockMarker? dock;
@@ -45,8 +46,13 @@ public sealed class HelmsmanUI : MonoBehaviour
     }
     internal void OpenVoyage()
     {
-        if(!Plugin.Instance.Voyage)return;
+        if(!Plugin.Instance.Voyage || !Plugin.Instance.Voyage.GullReady)return;
         Close();onboard=true;tab=2;Plugin.Instance.Voyage.CallGull();Open();
+    }
+    internal void OpenCalledGull(GullCall call)
+    {
+        if(!call.Ready || !Player.m_localPlayer || !call.Ship.IsPlayerInBoat(Player.m_localPlayer))return;
+        Close();calledGull=call;onboard=true;tab=2;Open();
     }
     internal void OpenShipName(Ship ship)
     {
@@ -83,7 +89,7 @@ public sealed class HelmsmanUI : MonoBehaviour
     internal void Close()
     {
         BlockInput(false);adjustingView=false;
-        IsOpen=false;naming=false;namingShip=null;editing=false;onboard=false;rebuild=false;dock=null;draft=null;selectedShip=null;notice="";page=0;
+        IsOpen=false;calledGull=null;naming=false;namingShip=null;editing=false;onboard=false;rebuild=false;dock=null;draft=null;selectedShip=null;notice="";page=0;
         controls.Clear();refreshLabels.Clear();
         if(EventSystem.current && modal && EventSystem.current.currentSelectedGameObject &&
             EventSystem.current.currentSelectedGameObject.transform.IsChildOf(modal.transform))
@@ -109,7 +115,9 @@ public sealed class HelmsmanUI : MonoBehaviour
         UpdateHud();
         if(!IsOpen)return;
         if(!Player.m_localPlayer || Player.m_localPlayer.IsDead() || !GUIManager.CustomGUIFront ||
-            (!onboard && !dock && !naming) || (naming && !namingShip) || (onboard && !Plugin.Instance.Voyage)){Close();return;}
+            (!onboard && !dock && !naming) || (naming && !namingShip) ||
+            (onboard && !Plugin.Instance.Voyage && !calledGull) ||
+            (calledGull && (!calledGull.Ready || !calledGull.Ship.IsPlayerInBoat(Player.m_localPlayer)))){Close();return;}
         if(adjustingView)
         {
             UpdatePreview();
@@ -135,7 +143,7 @@ public sealed class HelmsmanUI : MonoBehaviour
         {
             nextLabels=Time.unscaledTime+.2f;
             foreach(var update in refreshLabels)update();
-            if(status)status.text=notice.Length>0 ? notice : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
+            if(status)status.text=notice.Length>0 ? notice : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
                 naming ? "Ship names are saved with the world." : tab==3 ? "Choose an empty named ship to summon." :
                 editing && tab<2 ? (valid ? "Clearance: " : "Advisory: ")+validation : "Select a named dock to set sail.";
         }
@@ -166,7 +174,7 @@ public sealed class HelmsmanUI : MonoBehaviour
             });
             status=theme.Text(rect,"",24,-280,672,70,19,MenuTheme.Gold);FitModal();return;
         }
-        theme.Text(rect,onboard ? "Speak to the gull to change course or end the voyage." : tab>=2 ? "Sail to a dock or summon a named ship" : "Ghost setup · No ship required",24,-60,onboard ? 672 : 482,28,18,MenuTheme.Muted);
+        theme.Text(rect,calledGull ? "Where shall we sail? Choose a named dock below." : onboard ? "Speak to the gull to change course or end the voyage." : tab>=2 ? "Sail to a dock or summon a named ship" : "Ghost setup · No ship required",24,-60,onboard ? 672 : 482,28,18,MenuTheme.Muted);
         if(!onboard && tab<2)Button(rect,"Adjust view",522,-58,174,AdjustView);
         var tabs=onboard ? new[]{"Destination"} : new[]{"Berth","Departure","Destinations","Summon ship"};
         for(int i=0;i<tabs.Length;i++)
@@ -286,7 +294,12 @@ public sealed class HelmsmanUI : MonoBehaviour
     }
     private void BuildDestinations()
     {
-        if(onboard)
+        if(calledGull)
+        {
+            var call=calledGull;
+            Button(body!,"Dismiss the gull",0,0,672,()=>{call.Dismiss("The gull is flying away.");Close();});
+        }
+        else if(onboard)
         {
             Button(body!,"Stop voyage / release autopilot",0,0,672,()=>{var voyage=Plugin.Instance.Voyage;if(voyage)voyage.Cancel("Voyage cancelled.");Close();});
         }
@@ -294,7 +307,7 @@ public sealed class HelmsmanUI : MonoBehaviour
         {
             ShipButton(0,0,442);Button(body!,"Refresh ships",460,0,212,()=>RefreshShips());
         }
-        theme!.Text(body!,onboard ? "Choose a dock to change destination or replot the course." : "Choose a named dock. Departure allows time to board.",0,-52,672,35,18,MenuTheme.Muted);
+        theme!.Text(body!,calledGull ? "Choose a dock to start your voyage." : onboard ? "Choose a dock to change destination or replot the course." : "Choose a named dock. Departure allows time to board.",0,-52,672,35,18,MenuTheme.Muted);
         var destinations=Plugin.Instance.Directory.Records.Where(d=>!dock || d.Id!=dock.Id).OrderBy(d=>d.Berth.name).ToList();
         int pages=Math.Max(1,(destinations.Count+3)/4);page=Mathf.Clamp(page,0,pages-1);
         for(int i=0;i<4 && page*4+i<destinations.Count;i++)
@@ -337,6 +350,11 @@ public sealed class HelmsmanUI : MonoBehaviour
     {
         var fresh=DockDirectory.Resolve(destination.Id);
         if(fresh==null){notice="That destination is no longer available.";return;}
+        if(calledGull)
+        {
+            if(calledGull.Sail(fresh,out var message)){Close();Plugin.Message(message);}else notice=message;
+            return;
+        }
         if(onboard)
         {
             var voyage=Plugin.Instance.Voyage;
@@ -382,7 +400,8 @@ public sealed class HelmsmanUI : MonoBehaviour
     private void UpdateHud()
     {
         var voyage=Plugin.Instance.Voyage;
-        if((!voyage && !adjustingView) || !Player.m_localPlayer){Remove(ref hud);hudStatus=null;return;}
+        var call=Plugin.Instance.CalledGull;
+        if((!voyage && !call && !adjustingView) || !Player.m_localPlayer){Remove(ref hud);hudStatus=null;return;}
         if(!hud)
         {
             var font=MenuTheme.FindFont();if(!font || !GUIManager.CustomGUIFront)return;
@@ -395,6 +414,7 @@ public sealed class HelmsmanUI : MonoBehaviour
         }
         hud.SetActive(!IsOpen || adjustingView);
         if(hudStatus)hudStatus.text=adjustingView ? "Adjust the camera · Berth settings kept\n["+Plugin.Instance.CallKey.Value+"] / Esc / B: return to menu" :
+            call ? call.Status+"\n["+Plugin.Instance.CallKey.Value+"] Speak after landing" :
             voyage ? voyage.Status+"\n["+Plugin.Instance.CallKey.Value+"] Call gull" : "";
     }
 

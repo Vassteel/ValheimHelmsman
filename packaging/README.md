@@ -1,6 +1,6 @@
 # Valheim Helmsman
 
-<img src="assets/helmsman-icon-v1.png" alt="Viking gull sailing through rough seas" width="320">
+<img src="https://raw.githubusercontent.com/Vassteel/ValheimHelmsman/master/assets/helmsman-icon-v1.png" alt="Viking gull sailing through rough seas" width="320">
 
 **SKRAAA! One careful captain. Several inattentive rocks.**
 
@@ -18,6 +18,6 @@ Supports Karve, Longship and compatible OdinShip boats. Rowboats need two seats.
 
 **Multiplayer untested.** Take the helm to cancel autopilot. Boat sold pre-scratched.
 
-[GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/abN7R2tWyK) · [Guide](GUIDE.md) · [Compatibility](COMPATIBILITY.md)
+[GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/abN7R2tWyK) · [Guide](https://github.com/Vassteel/ValheimHelmsman/blob/master/GUIDE.md) · [Compatibility](https://github.com/Vassteel/ValheimHelmsman/blob/master/COMPATIBILITY.md)
 
 Code, artwork and documentation developed with generative AI.

@@ -11,6 +11,9 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     private ZDOID? homeDock;
     private DockMarker? dock;
     private Voyage? voyage;
+    private Ship? visitingShip;
+    private Ship? PerchShip=>voyage && voyage.Ship ? voyage.Ship : visitingShip;
+    internal bool ReadyOn(Ship ship)=>perched && !leaving && !fetching && PerchShip==ship;
     private GameObject? landed, flying;
     private Transform? pose;
     private readonly List<BirdAnimator> animators=new List<BirdAnimator>();
@@ -27,7 +30,7 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     private bool displayFlight;
     private Vector3 flightOrigin, flightBase, threatPosition;
     private Quaternion flightRestRotation;
-    internal bool IsTravelling=>voyage || leaving || fetching;
+    internal bool IsTravelling=>voyage || visitingShip || leaving || fetching;
     internal static GullGuide? Traveller(ZDOID id)=>travellers.TryGetValue(id,out var guide) && guide ? guide : null;
     internal void ReserveDock(ZDOID id){homeDock=id;travellers[id]=this;}
 
@@ -63,6 +66,7 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
                 var standing=guide.landed ? guide.landed.GetComponentInChildren<Renderer>() : null;
                 var airborne=guide.flying.GetComponentInChildren<Renderer>();
                 if(standing && airborne)guide.flightBase=Vector3.up*(standing.bounds.center.y-airborne.bounds.center.y);
+                VikingGull.GullHelmet.FitFlying(guide.flying,root.transform);
             }
         }
         guide.moodStarted=Time.time-guide.idleOffset;
@@ -80,12 +84,13 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
 
     private void ResolvePerch()
     {
-        if(voyage && voyage.Ship)
+        var ship=PerchShip;
+        if(ship)
         {
-            perchParent=voyage.Ship.transform;
+            perchParent=ship.transform;
             var requested=Plugin.Instance.GullSternPerch.Value;
-            if(ShipProfile.PrefabName(voyage.Ship)!="Karve")
-            {var profile=ShipProfile.For(voyage.Ship);requested.z=profile.Center.z-profile.Length*.43f;}
+            if(ShipProfile.PrefabName(ship)!="Karve")
+            {var profile=ShipProfile.For(ship);requested.z=profile.Center.z-profile.Length*.43f;}
             perchLocal=SurfacePerch(perchParent,requested,true)+Vector3.up*Plugin.Instance.GullPerchLift.Value;
         }
         else if(dock)
@@ -122,12 +127,19 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         dock=null;fetching=true;perched=false;fetchPosition=target;
         transform.SetParent(null,true);flightOrigin=transform.position;flightStarted=Time.time;SetModels(true);
     }
+    internal void Visit(Ship ship)
+    {
+        dock=null;voyage=null;visitingShip=ship;perched=false;leaving=false;fetching=false;
+        transform.SetParent(null,true);flightOrigin=transform.position;flightStarted=Time.time;
+        ResolvePerch();SetModels(true);
+    }
     internal void Board(Voyage trip)
     {
         // Transfer this actor: leave its source ward reference alive until this voyage gull despawns.
-        dock=null;voyage=trip;perched=false;leaving=false;fetching=false;
-        transform.SetParent(null,true);flightOrigin=transform.position;flightStarted=Time.time;
-        ResolvePerch();SetModels(true);
+        bool stayPerched=ReadyOn(trip.Ship);
+        dock=null;voyage=trip;visitingShip=null;perched=stayPerched;leaving=false;fetching=false;
+        if(!stayPerched){transform.SetParent(null,true);flightOrigin=transform.position;flightStarted=Time.time;}
+        ResolvePerch();SetModels(!stayPerched);
     }
 
     internal void CallDown() {greetUntil=Time.time+6;}
@@ -141,7 +153,7 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
 
     private void LateUpdate()
     {
-        if(!leaving && !fetching && (!perchParent || (!dock && (!voyage || !voyage.Ship)))) {Destroy(gameObject);return;}
+        if(!leaving && !fetching && (!perchParent || (!dock && !PerchShip))) {Destroy(gameObject);return;}
         if(leaving && Time.time>=disappearAt) {Destroy(gameObject);return;}
         var target=leaving ? flightTarget : fetching ? fetchPosition : perchParent!.TransformPoint(perchLocal);
         if(!perched)
@@ -200,10 +212,11 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         bool storm=weather.Contains("thunder") || weather.Contains("storm") || (env!=null && env.m_isWet && wind>.8f);
         bool fog=weather.Contains("fog") || RenderSettings.fogDensity>.025f || ParticleMist.IsInMist(transform.position);
         bool rough=wind>.65f;
-        if(voyage && voyage.Ship)
+        var ship=PerchShip;
+        if(ship)
         {
-            var body=voyage.Ship.GetComponent<Rigidbody>();
-            rough |= Vector3.Angle(voyage.Ship.transform.up,Vector3.up)>8 || (body && Mathf.Abs(body.linearVelocity.y)>.65f);
+            var body=ship.GetComponent<Rigidbody>();
+            rough |= Vector3.Angle(ship.transform.up,Vector3.up)>8 || (body && Mathf.Abs(body.linearVelocity.y)>.65f);
         }
         mood.Update(Time.time,combat,storm,fog,rough);
     }
@@ -214,8 +227,8 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         if(animatedMood!=mood.Current){animatedMood=mood.Current;moodStarted=Time.time;}
         float threatYaw=LocalYaw(threatPosition-transform.position);
         float windYaw=EnvMan.instance ? LocalYaw(-EnvMan.instance.GetWindDir()) : 0;
-        float roll=voyage && voyage.Ship ? Mathf.DeltaAngle(0,voyage.Ship.transform.eulerAngles.z) : 0;
-        float pitch=voyage && voyage.Ship ? Mathf.DeltaAngle(0,voyage.Ship.transform.eulerAngles.x) : 0;
+        float roll=PerchShip ? Mathf.DeltaAngle(0,PerchShip!.transform.eulerAngles.z) : 0;
+        float pitch=PerchShip ? Mathf.DeltaAngle(0,PerchShip!.transform.eulerAngles.x) : 0;
         var gesture=GullPerformance.Sample(mood.Current,Time.time-moodStarted,threatYaw,windYaw,roll,pitch);
         if(Time.time<greetUntil && Player.m_localPlayer && mood.Current!=GullMood.Combat)
             gesture.HeadYaw=Mathf.Clamp(LocalYaw(Player.m_localPlayer.transform.position-transform.position),-65,65);
@@ -287,12 +300,16 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     }
     public string GetHoverName()=>"Helmsman gull";
     public float GetHoverOffset()=>.25f;
-    public string GetHoverText()=>Localization.instance.Localize(GetHoverName()+"\n[<color=yellow><b>$KEY_Use</b></color>] Choose destination");
+    public string GetHoverText()=>Localization.instance.Localize(GetHoverName()+(leaving ? "\nFlying away" : !perched ? "\nLanding…" : "\n[<color=yellow><b>$KEY_Use</b></color>] Choose destination"));
     public bool Interact(Humanoid user,bool hold,bool alt)
     {
-        if(hold || leaving)return false;
+        if(hold || leaving || user!=Player.m_localPlayer)return false;
+        if(!perched){Plugin.Message("Wait for the gull to land.");return false;}
         CallDown();
-        if(voyage)Plugin.Instance.UI.OpenVoyage();else if(dock)Plugin.Instance.UI.OpenDestinations(dock);
+        if(voyage)Plugin.Instance.UI.OpenVoyage();
+        else if(visitingShip && Plugin.Instance.CalledGull && Plugin.Instance.CalledGull.Ship==visitingShip)
+            Plugin.Instance.UI.OpenCalledGull(Plugin.Instance.CalledGull);
+        else if(dock)Plugin.Instance.UI.OpenDestinations(dock);
         return true;
     }
     public bool UseItem(Humanoid user,ItemDrop.ItemData item)=>false;

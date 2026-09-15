@@ -105,6 +105,11 @@ public sealed class DockMarker : MonoBehaviour, Interactable, Hoverable
             yield return new WaitForSeconds(1);
         }
     }
+    internal GullGuide CallGuide(Ship ship)
+    {
+        if(!gull)gull=GullGuide.Create(transform.position+Vector3.up*2,this,null);
+        gull.ReserveDock(Id);gull.Visit(ship);return gull;
+    }
     internal GullGuide FetchGuide(Vector3 target)
     {
         if(!gull)gull=GullGuide.Create(transform.position+Vector3.up*2,this,null);

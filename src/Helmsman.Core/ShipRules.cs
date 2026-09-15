@@ -11,6 +11,7 @@ public static class ShipRules
         return hasSail && sailForce>0.0001f && !name.Contains("rowboat") &&
             !name.Contains("rowing") && !name.Contains("canoe");
     }
+    public static bool IsMast(string animation)=>string.Equals(animation,"attach_mast",StringComparison.OrdinalIgnoreCase);
     public static bool IsSeat(string animation)=>!string.IsNullOrEmpty(animation) &&
         (animation.IndexOf("sit",StringComparison.OrdinalIgnoreCase)>=0 ||
          animation.IndexOf("chair",StringComparison.OrdinalIgnoreCase)>=0 ||

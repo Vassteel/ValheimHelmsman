@@ -1,3 +1,9 @@
+## Helmet checks for 0.2.7
+
+Release build passes with zero warnings/errors; all 123 existing core/interaction checks pass. Helmet mesh/material ownership is local to each gull; seated deformation follows the same head and body rotations as the mesh. Flight placement measures the posed head and attaches to the body bone.
+
+Manual acceptance pending: inspect the helmet from front/side while idle, looking, pecking, taking off, flying, landing and hopping in rough weather; dismiss gull and unload/reload the area. Confirm horns stay attached, do not obscure eyes, and leave no accessories behind.
+
 # Prototype validation
 
 ## Completed outside the game
@@ -9,11 +15,17 @@
 
 These checks do **not** run Unity physics or prove that Harmony patches, the ghost, the gull, or ship control work during play. In-game results below are pending until observed.
 
+## Mast-call checks for 0.2.6
+
+- Production-code interaction harness: 38 checks passed for tap/hold timing, single-action selection, interrupted presses, mast/seat/Shift routing, vanilla hold-fast reentry, duplicate-call prevention, landing gate, failed/successful voyage handoff, dock-guide reservation and cleanup. Game and Unity hosts are test doubles; voyage physics and visual landing are not simulated.
+- Existing 85 core assertions pass. Release compilation against installed assemblies completes with zero warnings/errors.
+- Prepared locally; in-game tap/hold and flight verification remains pending. See INSTALLATION.md for the latest completed installation.
+
 ## In-game acceptance checklist — pending
 
 | Test | Expected result |
 |---|---|
-| Launch | Log reports `Helmsman 0.2.1 loaded` and `Registered Dock Ward`; no Helmsman exception. |
+| Launch | Log reports `Helmsman 0.2.7 loaded` and `Registered Dock Ward`; no Helmsman exception. |
 | Build ward | Dock Ward appears in its own **Helmsman** hammer category; placing one provides a gull and an interaction menu. |
 | Theme | Dock/gull menus and voyage status use Quartermaster's charcoal/gold theme and Valheim font. Verify no missing-font warnings and readable sizing on Steam Deck. |
 | Menu input | Mouse and controller can select ships/destinations, edit the name, adjust sliders, switch tabs, save and close. A activates once; B closes; no gameplay input leaks while editing. |
@@ -37,6 +49,10 @@ These checks do **not** run Unity physics or prove that Harmony patches, the gho
 | Island route | Generated waypoints pass around the island and the actual hull follows without grounding. |
 | New obstruction | Slow and attempt a bounded replan when a cruise obstacle appears; terminate retries after three failures. |
 | Manual takeover | Using the helm cancels autopilot before ordinary control is granted. |
+| Mast tap/hold | At the mast on Karve and Longship, tap Use: hold fast on release. Hold for 0.6 seconds: call one gull without attaching or opening a mast menu. Releasing after the call does nothing extra. Test keyboard and controller, remapped Use, look-away/range/menu interruption, and Shift + Use naming. Passenger seats remain unchanged. |
+| Call before voyage | From a stationary ship, call the gull. He visibly flies from a nearby ward (or approaches from the air at sea), lands on the stern, then accepts destination interaction. Calls during flight create no duplicate and no destination menu. |
+| Called voyage | Speak after landing and choose a dock. At a source berth, retain boarding/reverse departure checks; out at sea, plot from the actual ship position. The same gull remains perched while starting. Release-helm, low-speed and removed-destination failures keep him available for retry. |
+| Visit cleanup | Dismiss, step ashore, die, lose ownership, leave the world, or destroy the ship during flight and after landing. End the visit and remove its guide; a source ward must not duplicate the traveller during fly-away. Repeat calls, including from another ship. |
 | Onboard interaction | F8 gets the stern gull's attention and exposes stop/change-destination controls. |
 | Gull perch | Dock gull feet rest on the ward top. Travelling gull settles on the aft centreline tip, clear of the mast and rudder interaction. It stays perched through waves without hovering or flapping each frame. Fine-tune Gull config if the visual stern tip differs from its collider. |
 | Gull idle | Calm: separate head looks, two pecks, preening and tail flick. Rough: counter-roll, tail spread, flutter-hop. Storm: tuck, feather shake, brief peek. Fog: alternating held horizon scans, head tilts, lookout-hop. Combat: face threat, large wingbeat hop, forward jabs, second hop. Feet remain planted outside intentional hops. No torn neck/tail, mesh drift or model-height pop. Flight uses native wing animation. |

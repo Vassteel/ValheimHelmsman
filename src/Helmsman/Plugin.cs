@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.1")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.7")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
 public sealed class Plugin : BaseUnityPlugin
@@ -23,6 +23,7 @@ public sealed class Plugin : BaseUnityPlugin
     internal Voyage? Voyage;
     internal ShipDirectory Ships=null!;
     internal SummonRequest? Summon;
+    internal GullCall? CalledGull;
     internal ConfigEntry<float> BoardingSeconds = null!;
     internal ConfigEntry<KeyCode> CallKey = null!;
     internal ConfigEntry<bool> DebugRoute = null!;
@@ -31,13 +32,15 @@ public sealed class Plugin : BaseUnityPlugin
     internal ConfigEntry<Vector3> GullSternPerch = null!;
     internal ConfigEntry<float> GullPerchLift = null!;
     private Harmony? harmony;
+    private static readonly Func<Player,bool> PlayerAcceptsInput=AccessTools.MethodDelegate<Func<Player,bool>>(
+        AccessTools.Method(typeof(Player),"TakeInput"));
 
     private void Awake()
     {
         Instance = this;
         BoardingSeconds = Config.Bind("Voyages", "BoardingGraceSeconds", 10f,
             new ConfigDescription("Minimum boarding grace period.", new AcceptableValueRange<float>(3,60)));
-        CallKey = Config.Bind("Controls", "CallGullKey", KeyCode.F8, "Open the onboard gull menu.");
+        CallKey = Config.Bind("Controls", "CallGullKey", KeyCode.F8, "Call the gull aboard, or speak to him after he lands.");
         DebugRoute = Config.Bind("Diagnostics", "ShowRoute", true, "Draw the prototype route while a voyage is active.");
         MinimumWaterDepth = Config.Bind("Navigation", "MinimumWaterDepth", 1f,
             new ConfigDescription("Minimum water depth in metres for navigation checks. Berth settings can be saved even when clearance checks fail.",
@@ -52,7 +55,7 @@ public sealed class Plugin : BaseUnityPlugin
         harmony = new Harmony(Guid);
         harmony.PatchAll();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.1 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.7 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
@@ -89,13 +92,32 @@ public sealed class Plugin : BaseUnityPlugin
 
     private void Update()
     {
-        if (Input.GetKeyDown(CallKey.Value) && !UI.IsOpen && Voyage && Player.m_localPlayer &&
-            Voyage.Ship && Voyage.Ship.IsPlayerInBoat(Player.m_localPlayer)) UI.OpenVoyage();
+        if (Input.GetKeyDown(CallKey.Value) && !UI.IsOpen && Player.m_localPlayer &&
+            (!Chat.instance || !Chat.instance.HasFocus()) && !Console.IsVisible() && !TextInput.IsVisible() && !InventoryGui.IsVisible() && !Menu.IsVisible())
+        {
+            foreach(var ship in FindObjectsByType<Ship>(FindObjectsSortMode.None))
+                if(ship.IsPlayerInBoat(Player.m_localPlayer)){GullCall.Call(ship);break;}
+        }
         if (Voyage && !Solo) Voyage.Cancel("Voyage stopped: this prototype supports solo worlds.");
+    }
+
+    private void LateUpdate()
+    {
+        if(!MastInteraction.Pending)return;
+        var player=Player.m_localPlayer;
+        var hover=player ? player.GetHoverObject() : null;
+        bool alt=ZInput.IsNonClassicFunctionality() && ZInput.IsGamepadActive() ? ZInput.GetButton("JoyAltKeys") :
+            ZInput.GetButton("AltPlace") || ZInput.GetButton("JoyAltPlace");
+        bool accepts=player && PlayerAcceptsInput(player) && !player.InAttack() && !player.InDodge() &&
+            !UI.IsOpen && !Hud.InRadial() && !alt;
+        MastInteraction.Tick(Time.unscaledTime,ZInput.GetButton("Use") || ZInput.GetButton("JoyUse"),
+            player,hover ? hover.GetComponentInParent<Chair>() : null,accepts);
     }
 
     private void OnDestroy()
     {
+        MastInteraction.Cancel();
+        if(CalledGull)CalledGull.Dismiss("Helmsman unloaded.");
         if(Summon)Summon.Cancel("Helmsman unloaded.");
         if (Voyage) Voyage.Cancel("Helmsman unloaded.");
         if (UI) UI.Close();

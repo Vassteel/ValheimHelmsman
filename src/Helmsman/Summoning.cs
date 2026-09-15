@@ -26,7 +26,7 @@ public sealed class SummonRequest : MonoBehaviour
     {
         if(!Plugin.Solo){reason="Ship summoning currently supports solo worlds.";return false;}
         if(!UnattendedShipPhysics.Installed){reason="Empty-ship control is incompatible with this game/mod setup.";return false;}
-        if(Plugin.Instance.Voyage || Plugin.Instance.Summon){reason="Finish or cancel the current voyage first.";return false;}
+        if(Plugin.Instance.Voyage || Plugin.Instance.Summon || Plugin.Instance.CalledGull){reason="Finish or cancel the current voyage or gull visit first.";return false;}
         if(!ward.Settings.configured || DockDirectory.Resolve(ward.Id)==null){reason="Configure this dock's arrival berth first.";return false;}
         if(GullGuide.Traveller(ward.Id)){reason="The gull is finishing its last trip.";return false;}
         var zdo=ZDOMan.instance.GetZDO(record.Id);

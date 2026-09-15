@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using Helmsman.Core;
 using UnityEngine;
@@ -43,11 +44,11 @@ public sealed class Voyage : MonoBehaviour
     private int automaticReplans;
     private const float Deceleration=.25f; // Conservative starting estimate, awaiting measured calibration.
 
-    internal static bool Begin(Ship ship,DockRecord from,DockRecord to,out string reason)
+    internal static bool Begin(Ship ship,DockRecord from,DockRecord to,out string reason,GullGuide? aboardGuide=null)
     {
         if(!Plugin.Solo) {reason="This prototype supports solo worlds.";return false;}
-        if(Plugin.Instance.Voyage || Plugin.Instance.Summon) {reason="Cancel the current voyage or summon first.";return false;}
-        if(GullGuide.Traveller(from.Id)) {reason="The dock gull is finishing its previous trip; try again in a moment.";return false;}
+        if(Plugin.Instance.Voyage || Plugin.Instance.Summon || (Plugin.Instance.CalledGull && !aboardGuide)) {reason="Cancel the current voyage, summon or gull visit first.";return false;}
+        if(GullGuide.Traveller(from.Id) && GullGuide.Traveller(from.Id)!=aboardGuide) {reason="The dock gull is finishing its previous trip; try again in a moment.";return false;}
         if(!ShipProfile.Supports(ship) || !ship.IsOwner()) {reason="Select a locally owned supported ship.";return false;}
         if(ship.m_shipControlls.HaveValidUser()) {reason="Release the helm before choosing a voyage.";return false;}
         var initialVelocity=ship.GetComponent<Rigidbody>().linearVelocity;
@@ -66,12 +67,42 @@ public sealed class Voyage : MonoBehaviour
         DockMarker? sourceMarker=null;
         foreach(var marker in FindObjectsByType<DockMarker>(FindObjectsSortMode.None))
             if(marker.Ready && marker.Id==from.Id){sourceMarker=marker;break;}
-        voyage.gull=sourceMarker ? sourceMarker.BoardGuide(voyage) :
-            GullGuide.Create(from.MarkerPosition+Vector3.up*2,null,voyage);
-        voyage.gull.ReserveDock(from.Id);
+        if(aboardGuide){voyage.gull=aboardGuide;aboardGuide.Board(voyage);}
+        else
+        {
+            voyage.gull=sourceMarker ? sourceMarker.BoardGuide(voyage) : GullGuide.Create(from.MarkerPosition+Vector3.up*2,null,voyage);
+            voyage.gull.ReserveDock(from.Id);
+        }
         voyage.routeLine=Visuals.Line(voyage.transform,new Color(.3f,.8f,1,.8f));
         Plugin.Instance.Record("Voyage selected: "+from.Berth.name+" -> "+to.Berth.name+"; reverse departure="+from.Berth.reverseDeparture);
         reason="Boarding countdown started.";return true;
+    }
+
+    internal static bool BeginAboard(Ship ship,DockRecord to,GullGuide guide,out string reason)
+    {
+        if(!Plugin.Solo || Plugin.Instance.Voyage || Plugin.Instance.Summon || !ShipProfile.Supports(ship) || !ship.IsOwner())
+        {reason="Board a locally owned supported ship with no other voyage active.";return false;}
+        if(!ship.IsPlayerInBoat(Player.m_localPlayer) || Player.m_localPlayer.IsDead() || !guide.ReadyOn(ship))
+        {reason="Stay aboard and wait for the gull to land.";return false;}
+        if(ship.m_shipControlls.HaveValidUser()){reason="Release the helm before choosing a dock.";return false;}
+        var velocity=ship.GetComponent<Rigidbody>().linearVelocity;
+        if(new Vector2(velocity.x,velocity.z).magnitude>.5f){reason="Slow the ship before starting a voyage.";return false;}
+        var fresh=DockDirectory.Resolve(to.Id);
+        if(fresh==null){reason="That destination is no longer available.";return false;}
+        if(Vector3.Distance(WaterChart.AtSea(ship.transform.position),WaterChart.AtSea(fresh.Berth.position))<6)
+        {reason="You are already at that dock.";return false;}
+        var from=Plugin.Instance.Directory.Records
+            .Select(d=>DockDirectory.Resolve(d.Id)).Where(d=>d!=null &&
+                Vector3.Distance(WaterChart.AtSea(ship.transform.position),WaterChart.AtSea(d.Berth.position))<20)
+            .OrderBy(d=>Vector3.Distance(ship.transform.position,d!.Berth.position)).FirstOrDefault();
+        if(from!=null)return Begin(ship,from,fresh,out reason,guide);
+        // Already at sea: plan from the actual ship pose; no artificial source ward or dock exit.
+        var trip=ship.gameObject.AddComponent<Voyage>();trip.Ship=ship;trip.passenger=Player.m_localPlayer;
+        trip.destination=fresh;trip.chart=new WaterChart(ship);trip.phase=VoyagePhase.Planning;trip.rerouting=true;
+        trip.gull=guide;guide.Board(trip);trip.routeLine=Visuals.Line(trip.transform,new Color(.3f,.8f,1,.8f));
+        Plugin.Instance.Voyage=trip;trip.planning=trip.StartCoroutine(trip.Plan(WaterChart.AtSea(ship.transform.position)));
+        Plugin.Instance.Record("Onboard voyage selected: "+ShipDirectory.Display(ship)+" -> "+fresh.Berth.name);
+        reason="The gull is plotting the course.";return true;
     }
 
     internal static bool BeginSummoned(Ship ship,DockRecord to,GullGuide guide,out string reason)
@@ -94,6 +125,7 @@ public sealed class Voyage : MonoBehaviour
         reason="Ship on its way.";return true;
     }
 
+    internal bool GullReady=>gull && gull.ReadyOn(Ship);
     internal void CallGull() {if(gull) gull.CallDown();}
 
     private IEnumerator Plan(Vector3 start)

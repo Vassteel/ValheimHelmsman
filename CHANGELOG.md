@@ -1,4 +1,37 @@
+## 0.2.7
+
+- Added a faceted iron helmet with bronze trim and curved horns to the gull, matching the package artwork. The accessory follows perched head/body gestures and the flying body rig.
+
 # Changelog
+
+## 0.2.6
+
+- Replace the mast menu with tap Use to hold fast and hold Use for 0.6 seconds to call the gull. Keep Shift + Use naming.
+- Resolve each press once, preserve vanilla hold-fast checks, and cancel pending input when the target, player or input context changes.
+- Update README controls and verify tap/hold handling with the production interaction harness.
+
+## 0.2.5
+
+- Updated README testing-status wording.
+
+
+## 0.2.4
+
+- Shortened the README and gave the gull a pitch specific to this mod.
+
+
+## 0.2.3
+
+- Rewrote the README in the voice of a Viking gull selling a well-used longship. Installation, controls and testing status remain documented.
+
+
+## 0.2.2 — 2026-09-14
+
+- Add a mast menu with Call the gull, Hold fast and Name ship. Preserve Shift + Use naming and ordinary passenger seats.
+- Let the gull fly aboard before accepting a destination; reuse the same actor for repeat calls and the ensuing voyage. Nearby Dock Wards lend their guide without spawning a duplicate.
+- Allow attended voyages to a configured dock from open water, retaining source-berth departure checks when near a dock.
+- F8 now calls the gull before a voyage and opens orders after landing. Add visit dismissal and cleanup on disembarking, death and ownership/world changes.
+- Build and automated checks pass; new mast menus, flight/landing and open-water trips await in-game verification.
 
 ## 0.2.1 — 2026-09-14
 

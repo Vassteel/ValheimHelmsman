@@ -4,6 +4,14 @@ A gull-guided ship autopilot between named Dock Wards, with ship naming and empt
 
 **Status:** builds against the locally installed Valheim 1.0.12 / Unity 6 assemblies, BepInEx 5.4.2350, and Jötunn 2.30.0. Automated core checks pass. The user has reported successful Karve departure and land avoidance. Arrival and the new naming, summoning, and larger-ship features still require in-game validation. This is a prototype for a disposable test world, not a proven unattended navigator.
 
+## Call the gull from your ship
+
+At the mast, **tap Use to hold fast** or **hold Use for 0.6 seconds to call the gull**. A tap attaches when you release the button; a long press calls once without attaching. Both keyboard and controller Use bindings work. Looking away, moving out of reach or opening another interface cancels a pending press. **Shift + Use** still opens ship naming directly. Passenger seats keep their ordinary interaction.
+
+Stay aboard while the gull flies to the stern. Once he lands, interact with him and choose a configured dock. F8 can also call him, then reopen his destination menu after landing. Repeated calls reuse the same gull. A nearby ward lends its existing guide; its replacement waits until that guide flies away. **Dismiss the gull** sends him away without starting a voyage.
+
+Release the helm and slow below 0.5 m/s before selecting a destination. Near a configured source berth, the existing boarding and forward/reverse departure checks apply. In open water, the route starts at the ship's current position. Choosing a destination transfers the perched gull directly into the voyage. Leaving the ship, dying, losing ownership or leaving solo play ends an idle visit.
+
 ## Included
 
 - A separate Dock Ward in its own **Helmsman** hammer category, using the ward appearance and recipe. It does not provide ordinary ward protection.

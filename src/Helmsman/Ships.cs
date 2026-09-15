@@ -135,13 +135,20 @@ public sealed class ShipDirectory : MonoBehaviour
 internal static class NameAtMastHover
 {
     internal static void Postfix(Chair __instance,ref string __result)
-    {var ship=__instance.GetComponentInParent<Ship>();if(ShipProfile.Supports(ship))__result+=ShipNameInteraction.Hint(ship);}
+    {
+        var ship=__instance.GetComponentInParent<Ship>();
+        if(MastInteraction.IsMast(__instance))__result=Localization.instance.Localize("Mast\n[<color=yellow><b>$KEY_Use</b></color>] Hold fast\n[<color=yellow>Hold $KEY_Use</color>] Call the gull");
+        if(ShipProfile.Supports(ship))__result+=ShipNameInteraction.Hint(ship);
+    }
 }
 [HarmonyPatch(typeof(Chair),nameof(Chair.Interact))]
 internal static class NameAtMastUse
 {
-    internal static bool Prefix(Chair __instance,Humanoid __0,bool __1,bool __2,ref bool __result)=>
-        ShipNameInteraction.Intercept(__instance.GetComponentInParent<Ship>(),__0,__1,__2,ref __result);
+    internal static bool Prefix(Chair __instance,Humanoid __0,bool __1,bool __2,ref bool __result)
+    {
+        if(!MastInteraction.Intercept(__instance,__0,__1,__2,ref __result))return false;
+        return ShipNameInteraction.Intercept(__instance.GetComponentInParent<Ship>(),__0,__1,__2,ref __result);
+    }
 }
 [HarmonyPatch(typeof(ShipControlls),nameof(ShipControlls.GetHoverText))]
 internal static class NameAtHelmHover

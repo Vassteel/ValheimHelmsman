@@ -1,0 +1,66 @@
+using System;
+using System.Reflection;
+using UnityEngine;
+using Helmsman;
+int checks=0;
+void Check(bool condition,string why){checks++;if(!condition)throw new Exception(why);}
+void Reset(){MastInteraction.Cancel();Time.unscaledTime=0;Plugin.Instance=new Plugin();Plugin.Solo=true;Player.m_localPlayer=new Player();UnityEngine.Object.All.Clear();GullGuide.Created=0;GullGuide.Homes.Clear();Voyage.Allow=true;Voyage.Transferred=null;}
+GullGuide Guide(GullCall call)=>(GullGuide)typeof(GullCall).GetField("guide",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(call)!;
+void Tick(GullCall call)=>typeof(GullCall).GetMethod("Update",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(call,null);
+Reset();var ship=new Ship();var chair=new Chair{Ship=ship};bool result=false;
+void Press()=>MastInteraction.Intercept(chair,Player.m_localPlayer,false,false,ref result);
+void Step(float now,bool down=true,bool allowed=true,Chair target=null)=>MastInteraction.Tick(now,down,Player.m_localPlayer,target??chair,allowed);
+Press();Check(MastInteraction.Pending && chair.VanillaUses==0 && GullGuide.Created==0,"Press-down must defer both actions");
+Step(.1f);Check(chair.VanillaUses==0 && GullGuide.Created==0,"Brief held press must not choose either action");
+Step(.2f,false);Check(!MastInteraction.Pending && chair.VanillaUses==1 && GullGuide.Created==0,"Quick release must hold fast without calling gull");
+Step(.3f,false);Check(chair.VanillaUses==1,"Release must not attach twice");
+Press();Step(.59f);Check(GullGuide.Created==0,"Gull must wait for the long-press threshold");
+Step(.6f);Check(GullGuide.Created==1 && chair.VanillaUses==1,"Long press must call gull without attaching");
+Guide(Plugin.Instance.CalledGull).Landed=true;
+MastInteraction.Intercept(chair,Player.m_localPlayer,true,false,ref result);Step(1.2f);Step(1.3f,false);
+Check(GullGuide.Created==1 && Plugin.Instance.UI.VisitOpens==0 && chair.VanillaUses==1,"Repeat callbacks and release after a hold must not repeat either action");
+Reset();ship=new Ship();chair=new Chair{Ship=ship};Press();Step(.7f,false);
+Check(GullGuide.Created==1 && chair.VanillaUses==0,"Release on first frame past threshold still counts as one long press");
+Reset();ship=new Ship();chair=new Chair{Ship=ship};Press();
+Check(MastInteraction.Intercept(chair,Player.m_localPlayer,false,true,ref result) && !MastInteraction.Pending,"Shift+Use must cancel pending tap and reach ship naming");
+Check(MastInteraction.Intercept(chair,new Humanoid(),false,false,ref result),"Remote user must retain original interaction");
+chair.m_attachAnimation="attach_sitship";Check(MastInteraction.Intercept(chair,Player.m_localPlayer,false,false,ref result) && !MastInteraction.Pending,"Passenger seats must remain immediate vanilla interactions");chair.m_attachAnimation="attach_mast";
+foreach(var cause in new[]{"look away","too far","menu opened","death","mast removed","player changed"})
+{
+ Reset();ship=new Ship();chair=new Chair{Ship=ship};Press();
+ if(cause=="too far")Player.m_localPlayer.transform.position=new Vector3(3,0,0);
+ if(cause=="death")Player.m_localPlayer.Dead=true;
+ if(cause=="mast removed")chair.destroyed=true;
+ if(cause=="player changed")Player.m_localPlayer=new Player();
+ var hovered=cause=="look away" ? new Chair{Ship=ship} : chair;
+ MastInteraction.Tick(.2f,true,Player.m_localPlayer,hovered,cause!="menu opened");
+ Step(.8f,false);
+ Check(!MastInteraction.Pending && chair.VanillaUses==0 && GullGuide.Created==0,"Cancelled gesture must perform no action: "+cause);
+}
+Reset();ship=new Ship();chair=new Chair{Ship=ship};Press();MastInteraction.Tick(.1f,true,Player.m_localPlayer,null,true);Step(.2f,false);
+Check(chair.VanillaUses==0 && !MastInteraction.Pending,"Looking at empty space cancels the pending gesture");
+Press();chair.Throw=true;try{Step(.2f,false);}catch(InvalidOperationException){}chair.Throw=false;
+Check(!MastInteraction.Pending,"Vanilla hold-fast exception must clear the gesture");
+Press();Check(MastInteraction.Pending,"Vanilla exception must reset the reentry guard");Step(.2f,false);
+Check(chair.VanillaUses==2 && GullGuide.Created==0,"Next tap after a failed attachment must still reach vanilla");
+Reset();ship=new Ship();GullCall.Call(ship);var call=Plugin.Instance.CalledGull;var gull=Guide(call);
+Check(call&&!call.Ready&&GullGuide.Created==1,"Initial call must fly one gull aboard");
+GullCall.Call(ship);Check(Plugin.Instance.CalledGull==call&&GullGuide.Created==1&&Plugin.Instance.UI.VisitOpens==0,"Repeat call during flight must neither duplicate gull nor open orders");
+Check(!call.Sail(new DockRecord(),out _)&&Voyage.Transferred==null,"Cannot sail before landing");
+gull.Landed=true;GullCall.Call(ship);Check(call.Ready&&Plugin.Instance.UI.VisitOpens==1&&GullGuide.Created==1,"Landed gull must accept destination menu without duplication");
+Voyage.Allow=false;Check(!call.Sail(new DockRecord(),out _)&&Plugin.Instance.CalledGull==call&&gull.FlyAwayCount==0,"Rejected voyage must leave the same gull ready to retry");
+Voyage.Allow=true;Check(call.Sail(new DockRecord(),out _)&&Voyage.Transferred==gull&&!Plugin.Instance.CalledGull&&gull.FlyAwayCount==0,"Successful voyage must take ownership of the same gull without dismissing it");
+call.Dismiss("stale callback");Check(gull.FlyAwayCount==0,"Old visit cleanup must not dismiss the voyage gull");
+Reset();ship=new Ship();GullCall.Call(ship);call=Plugin.Instance.CalledGull;gull=Guide(call);ship.Aboard=false;Tick(call);
+Check(!Plugin.Instance.CalledGull&&gull.FlyAwayCount==1,"Leaving ship must cancel the visit and dismiss the gull");
+Tick(call);Check(gull.FlyAwayCount==1,"Repeated cleanup must not dismiss twice");
+Reset();ship=new Ship();var home=new DockMarker{Guide=new GullGuide()};UnityEngine.Object.All.Add(home);GullCall.Call(ship);
+Check(Guide(Plugin.Instance.CalledGull)==home.Guide&&GullGuide.Created==0&&GullGuide.Traveller(home.Id)==home.Guide,"Nearby dock must lend and reserve its existing gull");
+Reset();ship=new Ship();Plugin.Instance.Summon=new SummonRequest();GullCall.Call(ship);Check(!Plugin.Instance.CalledGull&&GullGuide.Created==0,"Cannot duplicate a gull during a ship summon");
+Reset();ship=new Ship();Plugin.Instance.Voyage=new Voyage{Ship=ship};GullCall.Call(ship);Check(GullGuide.Created==0&&Plugin.Instance.UI.OrdersOpens==0,"Active voyage gull must land before orders");
+Plugin.Instance.Voyage.GullReady=true;GullCall.Call(ship);Check(Plugin.Instance.UI.OrdersOpens==1&&GullGuide.Created==0,"Active voyage reuses landed gull");
+Reset();ship=new Ship();GullCall.Call(ship);call=Plugin.Instance.CalledGull;GullCall.Call(new Ship());Check(Plugin.Instance.CalledGull==call&&GullGuide.Created==1,"Calling from a second ship must not steal/duplicate existing gull");
+Reset();Plugin.Solo=false;GullCall.Call(new Ship());Check(!Plugin.Instance.CalledGull,"Multiplayer must retain existing support boundary");
+Reset();GullCall.Call(new Ship{Owned=false});Check(!Plugin.Instance.CalledGull,"Must not attach a guide to an unowned ship");
+Reset();GullCall.Call(new Ship{Aboard=false});Check(!Plugin.Instance.CalledGull,"Calling requires player aboard");
+Console.WriteLine($"PASS: {checks} mast interaction and gull visit checks using production code with game test doubles.");
