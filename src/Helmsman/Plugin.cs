@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.0")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.1")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
 public sealed class Plugin : BaseUnityPlugin
@@ -52,7 +52,7 @@ public sealed class Plugin : BaseUnityPlugin
         harmony = new Harmony(Guid);
         harmony.PatchAll();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.0 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.1 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()

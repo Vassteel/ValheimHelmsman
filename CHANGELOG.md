@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-09-14
+
+- Broaden ship discovery to the live registered prefab names plus the original scene list; resolve previews from the same live registry and log detected/excluded ships.
+- Check compatibility against installed OdinShip 0.7.9 ship metadata. Include its sailing ships and Double Rowing Canoe; exclude the single Rowing Canoe.
+- Require more than one seat for rowboats, counting a seated helm and ignoring beds, hold-fast points and duplicate positions. Keep eligible rowing boats in rowing propulsion despite favorable wind or dummy sail objects.
+- Keep rowboat clearance from inheriting a tall dummy mast envelope.
+- Build passes without warnings; 85 core checks pass. OdinShip voyages, summoning and live detection still require in-game verification.
+
 ## 0.2.0 — 2026-09-14
 
 - Add persistent ship naming through Shift + Use at mast hold-fast and helm interactions.

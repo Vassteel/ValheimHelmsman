@@ -4,7 +4,7 @@
 
 - Compiled both libraries against the installed Valheim 1.0.12 assemblies and local BepInEx/Jötunn.
 - Build completed with zero warnings and zero errors.
-- 66 automated core assertions passed: early/late boarding, absence after countdown, countdown reset on disembarking, island routing, exact endpoints, per-edge clearance, blocked starts/goals, search budget, speed-dependent stopping margin, reverse steering sign, seven turn-mode/hysteresis checks, and eleven mood-priority/settling checks, twelve gesture/transition/bounds checks, and fourteen ship-name/compass checks.
+- 85 automated core assertions passed: early/late boarding, absence after countdown, countdown reset on disembarking, island routing, exact endpoints, per-edge clearance, blocked starts/goals, search budget, speed-dependent stopping margin, reverse steering sign, seven turn-mode/hysteresis checks, and eleven mood-priority/settling checks, twelve gesture/transition/bounds checks, fourteen ship-name/compass checks, and nineteen ship-eligibility/seat/rowing checks.
 - Inspected the installed ship implementation to confirm the owner simulation path, speed/rudder fields, wind factor, manual controls, and the occupied-control requirement for rowing/reversing.
 
 These checks do **not** run Unity physics or prove that Harmony patches, the ghost, the gull, or ship control work during play. In-game results below are pending until observed.
@@ -13,7 +13,7 @@ These checks do **not** run Unity physics or prove that Harmony patches, the gho
 
 | Test | Expected result |
 |---|---|
-| Launch | Log reports `Helmsman 0.2.0 loaded` and `Registered Dock Ward`; no Helmsman exception. |
+| Launch | Log reports `Helmsman 0.2.1 loaded` and `Registered Dock Ward`; no Helmsman exception. |
 | Build ward | Dock Ward appears in its own **Helmsman** hammer category; placing one provides a gull and an interaction menu. |
 | Theme | Dock/gull menus and voyage status use Quartermaster's charcoal/gold theme and Valheim font. Verify no missing-font warnings and readable sizing on Steam Deck. |
 | Menu input | Mouse and controller can select ships/destinations, edit the name, adjust sliders, switch tabs, save and close. A activates once; B closes; no gameplay input leaks while editing. |
@@ -53,6 +53,9 @@ These checks do **not** run Unity physics or prove that Harmony patches, the gho
 | Unloaded summon | Walk far enough to unload the named ship, then summon it. The gull reaches it; terrain and objects load before propulsion; the ship travels continuously rather than teleporting. Check for errors and frame-time spikes. |
 | Totem status | Ship name, distance, compass direction and status update above the destination totem. Status disappears on completion/cancel and returns after leaving/reloading the ward area during a summon. |
 | Summon cancellation | Cancel from the menu, board the ship, remove the ship/destination or die: propulsion stops, guide flies away and extra simulation area is released. An occupied ship cannot be selected for summoning. |
+| OdinShip discovery | After restarting into 0.2.1, the detection log and ghost selector include MercantShip, CargoShip, BigCargoShip, LittleBoat, WarShip and DoubleRowingCanoe. Nearby eligible boats appear in voyage selection; named ones appear in summon selection, including after unloading. RowingCanoe is excluded everywhere. |
+| Rowing boats | DoubleRowingCanoe counts passenger seat plus seated helm. Cruise always selects rowing in favorable wind and headwind. Reverse/braking still work. Single-seat rowboats and beds/mast-only capacity are rejected. Repeat a short solo voyage and empty summon. |
+| Late registration | A ship registered in the live name registry after initial scene registration appears on the next directory scan, and its preview resolves from that same registry. |
 | Ship compatibility | Repeat departure, island avoidance, overhead clearance, reverse exit and arrival with Longship and each modded ship. Ships overriding standard movement are excluded with an explanatory message. |
 | Repeat trip | Guide available at each dock; another voyage can be selected without rebuilding wards. |
 
@@ -91,3 +94,7 @@ Inspected the actual vanilla gull hierarchy: the sitting model is a readable 344
 ## Local API verification for 0.2.0
 
 Seven checks against the installed assembly passed: the two empty-boat crew-count branches used by the physics patch and the six method signatures used by naming and remote-area hooks. The empty-ship patch declines to activate if the expected two branches are not found. These are structural checks, not a runtime Harmony or remote-world simulation test.
+
+## OdinShip inspection for 0.2.1
+
+Inspected the installed OdinShip 0.7.9 assembly and seven ship prefabs. All seven use vanilla Ship/ShipControlls; the two rowing canoes have zero sail force despite retaining dummy sail objects. Counted actual seat/helm attachment points, excluding beds and hold-fast points. Tests capture these metadata facts; the bundle and game assets are not distributed. The current log at inspection time showed the previous 0.1.7 build, so this does not establish an in-game discovery regression in 0.2.0. New live-registry discovery, seat filtering and rowing behavior need a fresh 0.2.1 playtest.

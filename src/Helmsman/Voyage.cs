@@ -293,7 +293,7 @@ public sealed class Voyage : MonoBehaviour
             {
                 phase=VoyagePhase.Cruising;
                 float wind=Ship.GetWindAngleFactor();
-                bool sail=wind>(command==Ship.Speed.Half || command==Ship.Speed.Full ? .15f : .35f);
+                bool sail=ShipProfile.CanSail(Ship) && wind>(command==Ship.Speed.Half || command==Ship.Speed.Full ? .15f : .35f);
                 SetMode(sail ? Ship.Speed.Half : Ship.Speed.Slow,!sail);
                 Status=sail ? "Sailing to "+DestinationName : "Paddling to "+DestinationName;
             }

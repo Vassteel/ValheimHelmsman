@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using Helmsman.Core;
 using UnityEngine;
 
 namespace Helmsman;
@@ -14,13 +15,32 @@ internal sealed class ShipProfile
     internal float TurnRadius=>Mathf.Max(16,Length*1.6f);
     internal Vector3 Center,MastCenter;
     internal static string PrefabName(Ship ship)=>ship.name.Replace("(Clone)","").Trim();
-    internal static bool Supports(Ship ship)=>ship && ship.m_floatCollider && ship.m_shipControlls &&
+    internal static bool CanSail(Ship ship)=>ship && ShipRules.CanSail(PrefabName(ship),ship.m_sailObject,ship.m_sailForceFactor);
+    internal static int SeatCount(Ship ship)
+    {
+        var seats=new List<Vector3>();
+        void Add(Transform point,string animation)
+        {
+            if(!point || !ShipRules.IsSeat(animation))return;
+            var position=ship.transform.InverseTransformPoint(point.position);
+            if(!seats.Any(p=>(p-position).sqrMagnitude<.0625f))seats.Add(position);
+        }
+        foreach(var chair in ship.GetComponentsInChildren<Chair>(true))
+            if(chair.m_inShip && chair.GetComponentInParent<Ship>()==ship)Add(chair.m_attachPoint,chair.m_attachAnimation);
+        var helm=ship.m_shipControlls;
+        if(helm)Add(helm.m_attachPoint,helm.m_attachAnimation);
+        return seats.Count;
+    }
+    internal static bool Supports(Ship? ship)=>ship && ship.m_floatCollider && ship.m_shipControlls &&
         ship.GetComponent<Rigidbody>() && ship.m_backwardForce>0 &&
-        ship.GetType().GetMethod(nameof(Ship.CustomFixedUpdate),new[]{typeof(float)})?.DeclaringType==typeof(Ship);
+        ship.GetType().GetMethod(nameof(Ship.CustomFixedUpdate),new[]{typeof(float)})?.DeclaringType==typeof(Ship) &&
+        ShipRules.Eligible(CanSail(ship),CanSail(ship) ? 0 : SeatCount(ship));
     internal static ShipProfile For(Ship? ship)
     {
         var p=new ShipProfile {Draft=Plugin.Instance.MinimumWaterDepth.Value};
         if(!ship || PrefabName(ship)=="Karve")return p;
+        bool sailing=CanSail(ship);
+        if(!sailing)p.AirHeight=3;
         var box=ship.m_floatCollider;
         if(box)
         {
@@ -30,13 +50,13 @@ internal sealed class ShipProfile
             p.Width=Mathf.Max(2,bounds.size.x);p.Length=Mathf.Max(4,bounds.size.z);p.Center=new Vector3(bounds.center.x,0,bounds.center.z);
             p.Draft=Mathf.Max(p.Draft,Mathf.Min(3,bounds.size.y*.5f));
         }
-        if(ship.m_mastObject)
+        if(sailing && ship.m_mastObject)
         {
             p.MastCenter=ship.transform.InverseTransformPoint(ship.m_mastObject.transform.position);p.MastCenter.y=0;
             foreach(var renderer in ship.m_mastObject.GetComponentsInChildren<Renderer>())
                 p.AirHeight=Mathf.Max(p.AirHeight,ship.transform.InverseTransformPoint(renderer.bounds.max).y);
         }
-        p.AirHeight=Mathf.Max(p.AirHeight,ship.m_mastObject ? Mathf.Max(8,ship.transform.InverseTransformPoint(ship.m_mastObject.transform.position).y+8) : 4);
+        if(sailing)p.AirHeight=Mathf.Max(p.AirHeight,ship.m_mastObject ? Mathf.Max(8,ship.transform.InverseTransformPoint(ship.m_mastObject.transform.position).y+8) : 4);
         if(PrefabName(ship)=="VikingShip") {p.Width=Mathf.Max(p.Width,6);p.Length=Mathf.Max(p.Length,22);p.AirHeight=Mathf.Max(p.AirHeight,20);p.Draft=Mathf.Max(p.Draft,1.5f);}
         return p;
     }
@@ -55,6 +75,20 @@ public sealed class ShipDirectory : MonoBehaviour
     internal static readonly int NameKey="helmsman_ship_name_v1".GetStableHashCode();
     internal List<ShipRecord> Records=new List<ShipRecord>();
     internal readonly List<GameObject> Prefabs=new List<GameObject>();
+    private string catalogSummary="";
+    internal static GameObject? FindPrefab(string name)=>ZNetScene.instance ? ZNetScene.instance.GetPrefab(name) :
+        Jotunn.Managers.PrefabManager.Instance.GetPrefab(name);
+    private void RefreshPrefabs()
+    {
+        var scene=ZNetScene.instance;
+        // The name registry also contains mods registered after the scene's original prefab list.
+        var candidates=scene.GetPrefabNames().Select(scene.GetPrefab).Concat(scene.m_prefabs)
+            .Where(p=>p && p.GetComponent<Ship>()).GroupBy(p=>p.name).Select(g=>g.First()).OrderBy(p=>p.name).ToArray();
+        Prefabs.Clear();Prefabs.AddRange(candidates.Where(p=>ShipProfile.Supports(p.GetComponent<Ship>())));
+        var summary="Detected ships: "+string.Join(", ",Prefabs.Select(p=>p.name))+". Excluded: "+
+            string.Join(", ",candidates.Except(Prefabs).Select(p=>p.name));
+        if(summary!=catalogSummary){catalogSummary=summary;Plugin.Instance.Record(summary);}
+    }
     internal static string Display(Ship ship)
     {
         var view=ship.GetComponent<ZNetView>();var name=view && view.IsValid() ? view.GetZDO().GetString(NameKey,"") : "";
@@ -75,10 +109,9 @@ public sealed class ShipDirectory : MonoBehaviour
         while(true)
         {
             if(!Plugin.Solo || !ZNetScene.instance || ZDOMan.instance==null)
-            {Records.Clear();Prefabs.Clear();yield return new WaitForSeconds(1);continue;}
+            {Records.Clear();Prefabs.Clear();catalogSummary="";yield return new WaitForSeconds(1);continue;}
             long world=ZNet.instance.GetWorldUID();
-            Prefabs.Clear();
-            Prefabs.AddRange(ZNetScene.instance.m_prefabs.Where(p=>p && ShipProfile.Supports(p.GetComponent<Ship>())).OrderBy(p=>p.name));
+            RefreshPrefabs();
             var next=new List<ShipRecord>();
             foreach(var prefab in Prefabs.ToArray())
             {

@@ -400,7 +400,7 @@ public sealed class HelmsmanUI : MonoBehaviour
 
     private ShipProfile PreviewProfile()
     {
-        var prefab=PrefabManager.Instance.GetPrefab(draft?.shipType ?? "Karve") ?? PrefabManager.Instance.GetPrefab("Karve");
+        var prefab=ShipDirectory.FindPrefab(draft?.shipType ?? "Karve") ?? ShipDirectory.FindPrefab("Karve");
         return ShipProfile.For(prefab ? prefab.GetComponent<Ship>() : null);
     }
     private void ResetPreview()
@@ -411,7 +411,7 @@ public sealed class HelmsmanUI : MonoBehaviour
     private void CreatePreview()
     {
         preview=new GameObject("Helmsman berth preview");
-        var prefab=PrefabManager.Instance.GetPrefab(draft?.shipType ?? "Karve") ?? PrefabManager.Instance.GetPrefab("Karve");
+        var prefab=ShipDirectory.FindPrefab(draft?.shipType ?? "Karve") ?? ShipDirectory.FindPrefab("Karve");
         if(prefab)ghost=Visuals.Clone(prefab,preview.transform,true);
         for(int i=0;i<5;i++)lines.Add(Visuals.Line(preview.transform,Color.cyan,overlay:true));
     }

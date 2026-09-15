@@ -105,4 +105,28 @@ for(int i=0;i<8;i++)
     Check(ShipText.Bearing(Math.Sin(angle)*100,Math.Cos(angle)*100)==bearings[i],"Summon bearing "+bearings[i]);
 }
 Check(ShipText.Bearing(0,0)=="Here","Zero-distance ship bearing is explicit");
+// Installed OdinShip 0.7.9 prefab metadata: seated helm counts, beds and hold-fast points do not.
+var odinShips=new[]{
+    (Name:"BigCargoShip",Force:.04f,Seats:5,Expected:true),
+    (Name:"CargoShip",Force:.04f,Seats:5,Expected:true),
+    (Name:"DoubleRowingCanoe",Force:0f,Seats:2,Expected:true),
+    (Name:"LittleBoat",Force:.03f,Seats:0,Expected:true),
+    (Name:"MercantShip",Force:.05f,Seats:6,Expected:true),
+    (Name:"RowingCanoe",Force:0f,Seats:1,Expected:false),
+    (Name:"WarShip",Force:.06f,Seats:13,Expected:true)
+};
+foreach(var ship in odinShips)
+    Check(ShipRules.Eligible(ShipRules.CanSail(ship.Name,true,ship.Force),ship.Seats)==ship.Expected,"OdinShip eligibility: "+ship.Name);
+Check(!ShipRules.Eligible(false,0),"Seatless rowing boats are excluded");
+Check(!ShipRules.Eligible(false,1),"Single-seat rowing boats are excluded");
+Check(ShipRules.Eligible(false,2),"Two-seat rowing boats remain eligible");
+Check(ShipRules.CanSail("VikingShip",true,.1f),"Longship remains eligible for sailing");
+Check(ShipRules.CanSail("CustomSailingShip",true,.1f),"Sailing ships do not need a prefab whitelist");
+Check(!ShipRules.CanSail("DoubleRowingCanoe",true,0),"Canoe dummy sails never select wind propulsion");
+Check(!ShipRules.CanSail("Mod_Row_Boat",true,.1f),"Named rowboats with template sail settings still row");
+Check(!ShipRules.CanSail("CustomBoat",false,.1f),"Missing sail forces rowing mode");
+Check(!ShipRules.IsSeat("attach_mast") && !ShipRules.IsSeat("attach_dragon"),"Hold-fast points do not inflate seat counts");
+Check(!ShipRules.IsSeat("attach_bed") && !ShipRules.IsSeat(""),"Beds and standing helms do not count as seats");
+Check(ShipRules.IsSeat("attach_sitship") && ShipRules.IsSeat("attach_chair"),"Passenger and seated helm animations count");
+Check(ShipRules.IsSeat("attach_lox"),"Odin single-canoe seated helm is recognized");
 Console.WriteLine($"{passed} checks passed.");
