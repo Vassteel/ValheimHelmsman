@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+.build/
+dist/
+*.user
+Environment.props
+
+
+**/__pycache__/
+*.pyc
+/.agents/
+/.codex/
+.env
+.env.*

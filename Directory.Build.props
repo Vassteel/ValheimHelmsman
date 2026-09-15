@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <ValheimDir Condition="'$(ValheimDir)' == ''">/home/deck/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
+  </PropertyGroup>
+  <Import Project="Environment.props" Condition="Exists('Environment.props')" />
+</Project>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ValheimHelmsman</AssemblyName>
+    <Version>0.2.0</Version>
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <FindDependenciesOfExternallyResolvedReferences>false</FindDependenciesOfExternallyResolvedReferences>
+  </PropertyGroup>
+  <!-- Resolve explicitly against the installed Unity/Mono runtime, not SDK substitutes. -->
+  <ItemDefinitionGroup>
+    <Reference><ExternallyResolved>true</ExternallyResolved></Reference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Helmsman.Core/Helmsman.Core.csproj" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/assembly_*.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/UnityEngine*.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/Unity.TextMeshPro.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/mscorlib.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/netstandard.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/System*.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/BepInEx/core/BepInEx.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/BepInEx/core/0Harmony.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/BepInEx/plugins/ValheimModding-Jotunn/Jotunn.dll" Private="false" />
+  </ItemGroup>
+  <Target Name="CheckGame" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(ValheimDir)/valheim_Data/Managed/assembly_valheim.dll')" Text="Set ValheimDir to your installed Valheim directory." />
+  </Target>
+</Project>
