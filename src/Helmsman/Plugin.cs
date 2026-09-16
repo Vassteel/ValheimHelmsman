@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.12")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.13")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
@@ -57,12 +57,13 @@ public sealed class Plugin : BaseUnityPlugin
         harmony = new Harmony(Guid);
         harmony.PatchAll();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.12 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.13 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
     {
-        GullcallWhistle.Register();
+        try { GullcallWhistle.Register(); }
+        catch(Exception error){Logger.LogError("Gullcall Whistle registration failed: "+error);}
         var prefab = PrefabManager.Instance.CreateClonedPrefab(DockPrefab, "guard_stone");
         var area = prefab.GetComponent<PrivateArea>();
         if (area)

@@ -1,3 +1,9 @@
+## 0.2.13
+
+- Fix the missing Gullcall Whistle by cloning the native BoneFragments material instead of looking up bundled shaders by name.
+- Isolate whistle registration errors so Dock Ward setup still runs.
+- Use native gull material references for the ship gull's helmet; remove the unlit fallback.
+
 ## 0.2.12
 
 - Native gull squawks and local chat explanations for blocked/shallow routes, longer planning delays and arrival; ask “What's happening?” during a voyage.

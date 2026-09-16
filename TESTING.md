@@ -1,3 +1,9 @@
+## Missing whistle / dock setup fix — 0.2.13
+
+The live 0.2.12 log showed `No supported lit shader for Gullcall Whistle` escaping RegisterDock. The whistle now clones the native BoneFragments material, and whistle errors cannot prevent Dock Ward registration. The gull helmet also uses native material references rather than shader-name lookups.
+
+Release checks: 105 core, 64 interaction/cargo and 28 whistle checks pass. Restart and verify both registration log messages, Dock Ward availability and the Gullcall Whistle in hand crafting after discovering its recipe materials. Verify both gulls and their helmets in daylight and darkness. Live acceptance remains pending.
+
 ## Gull feedback — 0.2.12
 
 - 105 core, 64 interaction/cargo and 28 whistle checks pass. New arrival checks cover actor reuse, further orders, disembarkation, waiting for a shore caller, expiry and leaving the area.

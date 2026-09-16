@@ -35,15 +35,19 @@ internal static class GullcallAssets
     }
     internal static void Attach(GameObject prefab)
     {
+        // Capture the cloned BoneFragments material before replacing its renderers.
+        // Its actual shader reference works even when Shader.Find cannot find bundled shaders.
+        Material? native=null;
+        foreach(var renderer in prefab.GetComponentsInChildren<MeshRenderer>(true))
+            foreach(var material in renderer.sharedMaterials)
+                if(material && material.shader){native=material;break;}
+        if(!native)throw new InvalidOperationException("BoneFragments material is not loaded yet.");
         prefab.transform.localScale=Vector3.one;
         // Retain ItemDrop/network/physics from the cloned material item; replace only its visuals.
         foreach(var renderer in prefab.GetComponentsInChildren<Renderer>(true)) UnityEngine.Object.DestroyImmediate(renderer);
         foreach(var filter in prefab.GetComponentsInChildren<MeshFilter>(true)) UnityEngine.Object.DestroyImmediate(filter);
         foreach(var light in prefab.GetComponentsInChildren<Light>(true)) UnityEngine.Object.DestroyImmediate(light);
         foreach(var collider in prefab.GetComponentsInChildren<Collider>(true)) UnityEngine.Object.DestroyImmediate(collider);
-        var shader=Shader.Find("Custom/Piece");
-        if(!shader || !shader.isSupported)shader=Shader.Find("Standard");
-        if(!shader || !shader.isSupported)throw new InvalidOperationException("No supported lit shader for Gullcall Whistle.");
         var model=JsonUtility.FromJson<Model>(System.Text.Encoding.UTF8.GetString(Read("model.json")));
         var bounds=new Bounds(model.parts[0].vertices[0],Vector3.zero);
         var root=new GameObject("Gullcall carved model");root.transform.SetParent(prefab.transform,false);
@@ -52,7 +56,8 @@ internal static class GullcallAssets
             foreach(var vertex in part.vertices)bounds.Encapsulate(vertex);
             var mesh=new Mesh {name="Gullcall "+part.name,vertices=part.vertices,triangles=part.triangles};
             mesh.RecalculateNormals();mesh.RecalculateBounds();assets.Add(mesh);
-            var material=new Material(shader) {name="Gullcall "+part.name,color=part.color};
+            var material=new Material(native!) {name="Gullcall "+part.name,color=part.color};
+            if(material.HasProperty("_MainTex"))material.SetTexture("_MainTex",Texture2D.whiteTexture);
             foreach(var property in new[]{"_EmissionColor","_NoiseGlowColor"})
                 if(material.HasProperty(property))material.SetColor(property,Color.black);
             foreach(var property in new[]{"_Glossiness","_Metallic","_ValueNoise","_ValueNoiseVertex","_AddRain","_AddSnow","_NoiseGlowEnabled"})

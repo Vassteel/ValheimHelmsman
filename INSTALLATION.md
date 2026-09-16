@@ -1,3 +1,15 @@
+# Local installation — Helmsman 0.2.13
+
+Installed the native-material repair with Valheim closed. Both DLLs match the release archive byte-for-byte.
+
+- Backup: `/home/deck/Documents/ChatGPT/Valheim stýrimaður (Valheim Helmsman)/.build/installed-backup-0.2.13-20260915-200832`
+- Package: `dist/Local-ValheimHelmsman-0.2.13.zip`
+- 105 core, 64 interaction/cargo and 28 whistle checks pass; 464 API members resolve. Zero build warnings/errors.
+
+Restart to verify whistle and Dock Ward registration, then gull/helmet rendering. Live acceptance pending.
+
+## Previous installation
+
 # Local installation — Helmsman 0.2.12
 
 Installed with Valheim closed. Both DLLs match the release package byte-for-byte.
