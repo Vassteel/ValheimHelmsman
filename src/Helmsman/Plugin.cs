@@ -10,10 +10,10 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.15")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.16")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
-[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
+[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
 public sealed class Plugin : BaseUnityPlugin
 {
     public const string Guid = "local.valheim.helmsman";
@@ -41,16 +41,18 @@ public sealed class Plugin : BaseUnityPlugin
     {
         Instance = this;
         BoardingSeconds = Config.Bind("Voyages", "BoardingGraceSeconds", 10f,
-            new ConfigDescription("Minimum boarding grace period.", new AcceptableValueRange<float>(3,60)));
+            new ConfigDescription("Minimum boarding grace period.", new AcceptableValueRange<float>(3,60), new ConfigurationManagerAttributes { IsAdminOnly=true }));
         CallKey = Config.Bind("Controls", "CallGullKey", KeyCode.F8, "Call the gull aboard, or speak to him after he lands.");
         DebugRoute = Config.Bind("Diagnostics", "ShowRoute", true, "Show blue route wisps four metres above the navigation path. Also toggled from the gull, dock or whistle menu.");
         MinimumWaterDepth = Config.Bind("Navigation", "MinimumWaterDepth", 1f,
             new ConfigDescription("Minimum water depth in metres for navigation checks. Berth settings can be saved even when clearance checks fail.",
-                new AcceptableValueRange<float>(.25f,5f)));
+                new AcceptableValueRange<float>(.25f,5f), new ConfigurationManagerAttributes { IsAdminOnly=true }));
         RelaxedDockChecks = Config.Bind("Navigation", "RelaxedDockChecks", true,
-            "Allow nearby departure from the actual ship pose; treat built dock pieces and full turning-disk checks as advisories during slow dock maneuvers. Terrain and other ships still block. Disable for strict clearance checks.");
+            new ConfigDescription("Allow nearby departure from the actual ship pose; treat built dock pieces and full turning-disk checks as advisories during slow dock maneuvers. Terrain and other ships still block. Disable for strict clearance checks.",null,new ConfigurationManagerAttributes { IsAdminOnly=true }));
         GullSternPerch = Config.Bind("Gull", "SternPerch", new Vector3(0,1.7f,-4.3f), "Ship-local stern perch. X/Z select a surface to probe; Y is the fallback height.");
         GullPerchLift = Config.Bind("Gull", "PerchHeightAdjustment", 0f, new ConfigDescription("Additional ship-perch height adjustment after surface probing.", new AcceptableValueRange<float>(-2,2)));
+        Shipyard.Configure(Config);
+        FishingDock.Configure(Config);
         harmony = new Harmony(Guid);
         try { harmony.PatchAll(typeof(Plugin).Assembly); }
         catch (Exception error)
@@ -63,12 +65,15 @@ public sealed class Plugin : BaseUnityPlugin
         Directory = gameObject.AddComponent<DockDirectory>();
         UI = gameObject.AddComponent<HelmsmanUI>();
         Ships=gameObject.AddComponent<ShipDirectory>();
+        gameObject.AddComponent<NetworkNavigation>();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.15 loaded. Solo ship voyages and summoning; multiplayer disabled; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.16 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
     {
+        try { ImportedHulls.Register(); }
+        catch(Exception error){Logger.LogError("Shipyard model registration failed: "+error);}
         try { GullcallWhistle.Register(); }
         catch(Exception error){Logger.LogError("Gullcall Whistle registration failed: "+error);}
         var prefab = PrefabManager.Instance.CreateClonedPrefab(DockPrefab, "guard_stone");
@@ -82,6 +87,7 @@ public sealed class Plugin : BaseUnityPlugin
         }
         foreach (var guide in prefab.GetComponentsInChildren<GuidePoint>(true)) DestroyImmediate(guide);
         prefab.AddComponent<DockMarker>();
+        prefab.AddComponent<WorkstationLease>();
         var config = new PieceConfig
         {
             Name = "Dock Ward", Description = "Name and configure a ship berth. Speak to its gull to sail.",
@@ -93,7 +99,7 @@ public sealed class Plugin : BaseUnityPlugin
         Logger.LogInfo("Registered Dock Ward.");
     }
 
-    internal static bool Solo => ZNet.instance && ZNet.IsSinglePlayer && Player.m_localPlayer;
+    internal static bool LocalSession => ZNet.instance && Player.m_localPlayer;
     internal static void Message(string text)
     {
         if (Player.m_localPlayer) Player.m_localPlayer.Message(MessageHud.MessageType.Center, text);
@@ -109,7 +115,7 @@ public sealed class Plugin : BaseUnityPlugin
             foreach(var ship in FindObjectsByType<Ship>(FindObjectsSortMode.None))
                 if(ship.IsPlayerInBoat(Player.m_localPlayer)){GullCall.Call(ship);break;}
         }
-        if (Voyage && !Solo) Voyage.Cancel("Voyage stopped: multiplayer operation is disabled.");
+        if (Voyage && !LocalSession) Voyage.Cancel("Voyage stopped: player session ended.");
     }
 
     private void LateUpdate()
@@ -136,6 +142,8 @@ public sealed class Plugin : BaseUnityPlugin
         PrefabManager.OnVanillaPrefabsAvailable -= RegisterDock;
         harmony?.UnpatchSelf();
         GullcallAssets.Release();
+        ShipwrightAssets.Release();
+        ImportedShipMaterials.Release();
     }
 }
 

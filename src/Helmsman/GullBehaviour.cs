@@ -256,6 +256,9 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         float pitch=PerchShip ? Mathf.DeltaAngle(0,PerchShip!.transform.eulerAngles.x) : 0;
         var gesture=GullPerformance.Sample(mood.Current,Time.time-moodStarted,threatYaw,windYaw,roll,pitch);
         bool toss=false, sorting=SortingCargo;
+        bool nearby=Player.m_localPlayer&&(Player.m_localPlayer.transform.position-transform.position).sqrMagnitude<9;
+        bool sleeping=!sorting&&!voyage&&!fetching&&!leaving&&Time.time>=greetUntil&&!nearby&&mood.Current==GullMood.Calm&&EnvMan.instance&&!EnvMan.IsDaylight();
+        if(sleeping)gesture=new GullPose {HeadYaw=110,HeadPitch=34,HeadRoll=-12,BodyPitch=4,Crouch=.075+.004*Mathf.Sin(Time.time*1.5f)};
         if(sorting)
         {
             float t=Time.time-cargoStarted, cycle=t%.65f;

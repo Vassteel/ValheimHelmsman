@@ -4,7 +4,7 @@ using UnityEngine;
 using Helmsman;
 int checks=0;
 void Check(bool condition,string why){checks++;if(!condition)throw new Exception(why);}
-void Reset(){MastInteraction.Cancel();Time.unscaledTime=0;Plugin.Instance=new Plugin();Plugin.Solo=true;Player.m_localPlayer=new Player();UnityEngine.Object.All.Clear();GullGuide.Created=0;GullGuide.Homes.Clear();Voyage.Allow=true;Voyage.Transferred=null;}
+void Reset(){MastInteraction.Cancel();Time.unscaledTime=0;Plugin.Instance=new Plugin();Plugin.LocalSession=true;Player.m_localPlayer=new Player();UnityEngine.Object.All.Clear();GullGuide.Created=0;GullGuide.Homes.Clear();Voyage.Allow=true;Voyage.Transferred=null;}
 GullGuide Guide(GullCall call)=>(GullGuide)typeof(GullCall).GetField("guide",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(call)!;
 void Tick(GullCall call)=>typeof(GullCall).GetMethod("Update",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(call,null);
 Reset();var ship=new Ship();var chair=new Chair{Ship=ship};bool result=false;
@@ -60,7 +60,7 @@ Reset();ship=new Ship();Plugin.Instance.Summon=new SummonRequest();GullCall.Call
 Reset();ship=new Ship();Plugin.Instance.Voyage=new Voyage{Ship=ship};GullCall.Call(ship);Check(GullGuide.Created==0&&Plugin.Instance.UI.OrdersOpens==0,"Active voyage gull must land before orders");
 Plugin.Instance.Voyage.GullReady=true;GullCall.Call(ship);Check(Plugin.Instance.UI.OrdersOpens==1&&GullGuide.Created==0,"Active voyage reuses landed gull");
 Reset();ship=new Ship();GullCall.Call(ship);call=Plugin.Instance.CalledGull;GullCall.Call(new Ship());Check(Plugin.Instance.CalledGull==call&&GullGuide.Created==1,"Calling from a second ship must not steal/duplicate existing gull");
-Reset();Plugin.Solo=false;GullCall.Call(new Ship());Check(!Plugin.Instance.CalledGull,"Multiplayer must retain existing support boundary");
+Reset();Plugin.LocalSession=false;GullCall.Call(new Ship());Check(!Plugin.Instance.CalledGull,"No world session cannot call a gull");
 Reset();GullCall.Call(new Ship{Owned=false});Check(!Plugin.Instance.CalledGull,"Must not attach a guide to an unowned ship");
 Reset();GullCall.Call(new Ship{Aboard=false});Check(!Plugin.Instance.CalledGull,"Calling requires player aboard");
 Reset();ship=new Ship();gull=new GullGuide{Ship=ship,Landed=true};GullCall.AfterArrival(ship,gull);call=Plugin.Instance.CalledGull;

@@ -35,20 +35,50 @@ foreach(var patch in type.CustomAttributes.Where(a=>a.AttributeType.Name=="Harmo
  var methods=targetType.Methods.Where(m=>m.Name==methodName).ToArray();
  if(methods.Length!=1)throw new Exception("Ambiguous or missing Harmony target: "+targetType.Name+"."+methodName);
  var method=methods[0];
- foreach(var handler in type.Methods.Where(m=>m.Name is "Prefix" or "Postfix"))
+ foreach(var handler in type.Methods.Where(m=>m.Name is "Prefix" or "Postfix" or "Finalizer"))
  foreach(var parameter in handler.Parameters)
  {
   var actual=parameter.ParameterType is ByReferenceType byRef ? byRef.ElementType.FullName : parameter.ParameterType.FullName;
   if(parameter.Name=="__instance") {if(actual!=targetType.FullName)throw new Exception("Wrong __instance: "+type.Name);}
   else if(parameter.Name=="__result") {if(actual!=method.ReturnType.FullName)throw new Exception("Wrong __result: "+type.Name);}
+  else if(parameter.Name.StartsWith("___")) {if(!targetType.Fields.Any(f=>f.Name==parameter.Name.Substring(3) && f.FieldType.FullName==actual))throw new Exception("Missing injected field: "+type.Name+"."+parameter.Name);}
   else if(!parameter.Name.StartsWith("__") && !method.Parameters.Any(p=>p.Name==parameter.Name && p.ParameterType.FullName==actual))throw new Exception("Wrong injection: "+type.Name+"."+parameter.Name);
  }
  hooks++;
 }
 var api=chat.Module;
-foreach(var field in new[]{("Ship","m_speed","Ship/Speed"),("Ship","m_rudderValue","System.Single")})
+foreach(var field in new[]{("Ship","m_speed","Ship/Speed"),("Ship","m_rudderValue","System.Single"),("Inventory","m_width","System.Int32")})
  if(!api.Types.Single(t=>t.Name==field.Item1).Fields.Any(f=>f.Name==field.Item2 && f.FieldType.FullName==field.Item3))throw new Exception("Missing reflected field: "+field.Item2);
 if(!api.Types.Single(t=>t.Name=="Player").Methods.Any(m=>m.Name=="TakeInput" && m.Parameters.Count==0 && m.ReturnType.FullName=="System.Boolean"))throw new Exception("Player.TakeInput changed");
+foreach(var name in new[]{"Awake","Load"})
+ if(api.Types.Single(t=>t.Name=="Container").Methods.Count(m=>m.Name==name && m.Parameters.Count==0)!=1)throw new Exception("Cargo deserialization hook changed: "+name);
+foreach(var name in new[]{"sail-sea-flax","canopy-sea-flax","ballista-weathered","lantern-weathered"})
+{
+ var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Shipwright."+name+".png");
+ if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,"assets/shipwright",name+".png"))))throw new Exception("Stale ship texture "+name);
+}
+foreach(var file in Directory.GetFiles(Path.Combine(root,"assets/shipwright/hulls"),"*.png"))
+{
+ var name="Helmsman.Shipwright.hulls/"+Path.GetFileName(file);
+ var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name==name);
+ if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(file)))throw new Exception("Stale hull texture "+name);
+}
+// Every native cargo key/RPC access must pass through the scoped transpiler. This
+// catches added game methods, not merely the currently expected method count.
+var containerType=api.Types.Single(t=>t.Name=="Container");
+int scopedKeys=0,scopedRpcs=0;
+foreach(var method in containerType.Methods.Where(m=>m.HasBody))
+foreach(var instruction in method.Body.Instructions)
+{
+ bool key=instruction.Operand is FieldReference f && f.DeclaringType.Name=="ZDOVars" && new[]{"s_items","s_inUse","s_addedDefaultItems"}.Contains(f.Name);
+ bool rpc=instruction.OpCode==Mono.Cecil.Cil.OpCodes.Ldstr && instruction.Operand is string s && s.StartsWith("RPC_",StringComparison.Ordinal);
+ if(!key&&!rpc)continue;
+ bool covered=!method.IsStatic && (new[]{"Awake","UpdateUseVisual","Interact","Save","Load","StackAll","TakeAll"}.Contains(method.Name)||method.Name.StartsWith("RPC_",StringComparison.Ordinal));
+ if(!covered)throw new Exception("Unscoped ship-hold access in Container."+method.Name);
+ if(key)scopedKeys++;if(rpc)scopedRpcs++;
+}
+if(scopedKeys!=6 || scopedRpcs<15)throw new Exception($"Cargo key/RPC access patterns changed: {scopedKeys}/{scopedRpcs}");
+Console.WriteLine($"PASS: all {scopedKeys} cargo save keys and {scopedRpcs} RPC names are covered by hold isolation.");
 var tick=api.Types.Single(t=>t.Name=="Ship").Methods.Single(m=>m.Name=="CustomFixedUpdate");
 int crewSites=tick.Body.Instructions.Count(i=>i.Operand is MethodReference m && m.Name=="get_Count" && m.DeclaringType is GenericInstanceType g && g.ElementType.FullName=="System.Collections.Generic.List`1" && g.GenericArguments.Single().Name=="Player");
 if(crewSites!=2)throw new Exception("Empty-crew physics pattern changed: "+crewSites);

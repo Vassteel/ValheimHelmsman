@@ -54,5 +54,5 @@ public class Voyage:UnityEngine.MonoBehaviour {
  internal static bool BeginAboard(Ship ship,DockRecord to,GullGuide guide,out string reason){reason=Allow?"Sailing":"Blocked";if(!Allow)return false;Transferred=guide;Plugin.Instance.Voyage=new Voyage{Ship=ship};return true;}
 }
 public class HelmsmanUI {public int MastOpens,OrdersOpens,VisitOpens;internal void OpenMast(Chair chair,Ship ship)=>MastOpens++;internal void OpenVoyage()=>OrdersOpens++;internal void OpenCalledGull(GullCall call)=>VisitOpens++;}
-public class Plugin:UnityEngine.Object {public CargoOrder Cargo;public static Plugin Instance=new();public static bool Solo=true;public HelmsmanUI UI=new();public Voyage Voyage;public SummonRequest Summon;public GullCall CalledGull;public static string LastMessage;internal static void Message(string text)=>LastMessage=text;internal void Error(Exception error){} }
+public class Plugin:UnityEngine.Object {public CargoOrder Cargo;public static Plugin Instance=new();public static bool LocalSession=true;public HelmsmanUI UI=new();public Voyage Voyage;public SummonRequest Summon;public GullCall CalledGull;public static string LastMessage;internal static void Message(string text)=>LastMessage=text;internal void Error(Exception error){} }
 }

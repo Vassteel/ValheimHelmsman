@@ -12,3 +12,5 @@ Environment.props
 /.codex/
 .env
 .env.*
+
+/output/

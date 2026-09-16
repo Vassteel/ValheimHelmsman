@@ -1,0 +1,34 @@
+{
+  "entries": [
+    {
+      "prefab": "HerculeShip",
+      "kind": "net",
+      "path": "FishingNetSystem/CatchTrigger",
+      "container": "piece_chest",
+      "visual": "FishingNetSystem/RedePesca"
+    },
+    {
+      "prefab": "FishingDock",
+      "kind": "dock",
+      "path": "",
+      "container": "Container",
+      "visual": "FisherMan",
+      "item": "Fish1",
+      "seconds": 20.0,
+      "count": 50
+    },
+    {
+      "prefab": "OilPress",
+      "kind": "press",
+      "path": "",
+      "output": "output",
+      "visual": "_fermenting",
+      "item": "FishExtract",
+      "seconds": 600.0,
+      "count": 10,
+      "switches": [
+        "add_fishs"
+      ]
+    }
+  ]
+}

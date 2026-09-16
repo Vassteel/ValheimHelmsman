@@ -31,5 +31,5 @@ namespace Jotunn.Managers {public class ItemManager {public static ItemManager I
 namespace Helmsman {
 internal static class GullcallAssets {public static UnityEngine.GameObject Attached;public static UnityEngine.Sprite Icon()=>new();public static void Attach(UnityEngine.GameObject obj)=>Attached=obj;}
 public class HelmsmanUI {public int Opens;public ItemDrop.ItemData Last;internal void OpenWhistle(ItemDrop.ItemData item){Opens++;Last=item;}}
-public class Plugin {public static Plugin Instance=new();public static bool Solo=true;public HelmsmanUI UI=new();public static string LastMessage;internal static void Message(string text)=>LastMessage=text;internal void Record(string text){} }
+public class Plugin {public static Plugin Instance=new();public static bool LocalSession=true;public HelmsmanUI UI=new();public static string LastMessage;internal static void Message(string text)=>LastMessage=text;internal void Record(string text){} }
 }

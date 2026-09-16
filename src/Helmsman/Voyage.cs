@@ -18,7 +18,7 @@ public sealed class Voyage : MonoBehaviour
     internal bool Unattended {get;private set;}
     internal string Status {get;private set;}="Preparing voyage";
     internal string DestinationName=>destination.Berth.name;
-    internal bool CanControl=>Ship && Ship.IsOwner() && Plugin.Solo && passenger && !passenger.IsDead() &&
+    internal bool CanControl=>Ship && Ship.IsOwner() && Plugin.LocalSession && passenger && !passenger.IsDead() &&
         (Unattended || Ship.IsPlayerInBoat(passenger)) && phase!=VoyagePhase.Finished;
     private Player passenger=null!;
     private DockRecord destination=null!;
@@ -48,7 +48,7 @@ public sealed class Voyage : MonoBehaviour
 
     internal static bool Begin(Ship ship,DockRecord from,DockRecord to,out string reason,GullGuide? aboardGuide=null)
     {
-        if(!Plugin.Solo) {reason="Helmsman voyages are disabled in multiplayer.";return false;}
+        if(!Plugin.LocalSession) {reason="Join a world before requesting a voyage.";return false;}
         if(Plugin.Instance.Voyage || Plugin.Instance.Summon || (Plugin.Instance.CalledGull && !aboardGuide)) {reason="Cancel the current voyage, summon or gull visit first.";return false;}
         if(GullGuide.Traveller(from.Id) && GullGuide.Traveller(from.Id)!=aboardGuide) {reason="The dock gull is finishing its previous trip; try again in a moment.";return false;}
         if(!ShipProfile.Supports(ship) || !ship.IsOwner()) {reason="Select a locally owned supported ship.";return false;}
@@ -82,7 +82,7 @@ public sealed class Voyage : MonoBehaviour
 
     internal static bool BeginAboard(Ship ship,DockRecord to,GullGuide guide,out string reason)
     {
-        if(!Plugin.Solo || Plugin.Instance.Voyage || Plugin.Instance.Summon || !ShipProfile.Supports(ship) || !ship.IsOwner())
+        if(!Plugin.LocalSession || Plugin.Instance.Voyage || Plugin.Instance.Summon || !ShipProfile.Supports(ship) || !ship.IsOwner())
         {reason="Board a locally owned supported ship with no other voyage active.";return false;}
         if(!ship.IsPlayerInBoat(Player.m_localPlayer) || Player.m_localPlayer.IsDead() || !guide.ReadyOn(ship))
         {reason="Stay aboard and wait for the gull to land.";return false;}
@@ -109,7 +109,7 @@ public sealed class Voyage : MonoBehaviour
 
     internal static bool BeginSummoned(Ship ship,DockRecord to,GullGuide guide,out string reason)
     {
-        if(!Plugin.Solo || Plugin.Instance.Voyage || !UnattendedShipPhysics.Installed || !ShipProfile.Supports(ship) || !ship.IsOwner())
+        if(!Plugin.LocalSession || Plugin.Instance.Voyage || !UnattendedShipPhysics.Installed || !ShipProfile.Supports(ship) || !ship.IsOwner())
         {reason="This ship cannot start an unattended voyage.";return false;}
         if(ship.HasPlayerOnboard() || ship.m_shipControlls.HaveValidUser()){reason="The ship is occupied.";return false;}
         // The shore was checked when called. It may now be unloaded because the
@@ -209,7 +209,7 @@ public sealed class Voyage : MonoBehaviour
     internal void Tick(float dt)
     {
         if(phase==VoyagePhase.Finished) return;
-        if(!Ship || !Ship.IsOwner() || !Plugin.Solo) {Cancel("Autopilot lost ship authority.");return;}
+        if(!Ship || !Ship.IsOwner() || !Plugin.LocalSession) {Cancel("Autopilot lost ship authority.");return;}
         if(Ship.m_shipControlls.HaveValidUser()) {Cancel("You have the helm.");return;}
         if(!passenger || passenger.IsDead()) {Cancel("Voyage stopped.");return;}
         if(Unattended && Ship.HasPlayerOnboard()){Cancel("Summon stopped: player boarded the ship.");return;}

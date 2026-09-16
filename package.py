@@ -11,6 +11,7 @@ files={
  'BepInEx/plugins/ValheimHelmsman/Helmsman.Core.dll':root/'dist/ValheimHelmsman/Helmsman.Core.dll',
 }
 files.update({name:root/name for name in ['CHANGELOG.md','COMPATIBILITY.md','TESTING.md','GUIDE.md']})
+files['MARITIME-CREDITS.md']=root/'assets/ships/SOURCES.md'
 public={key:manifest[key] for key in ('name','version_number','website_url','description','dependencies')}
 assert len(public['description'])<=250
 for filename,metadata in [(f'Local-ValheimHelmsman-{version}.zip',manifest),(f'ValheimHelmsman-{version}-thunderstore.zip',public)]:

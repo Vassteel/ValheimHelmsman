@@ -1,12 +1,12 @@
-# Helmsman guide — 0.2.15
+# Helmsman guide — 0.2.16
 
-Helmsman works in solo/local play. **Multiplayer and dedicated-server operation are disabled by the mod.** This guide describes current controls; [Testing](https://github.com/Vassteel/ValheimHelmsman/blob/master/TESTING.md) separates observed play from remaining checks.
+Existing sailing has been used in solo/local play. **This build enables multiplayer; the new fleet and server behavior still need in-game verification.** This guide describes current controls; [Testing](https://github.com/Vassteel/ValheimHelmsman/blob/master/TESTING.md) separates observed play from remaining checks.
 
 ## Install
 
-Install BepInEx, Jötunn and Helmsman through your mod manager. For manual installation, copy both `ValheimHelmsman.dll` and `Helmsman.Core.dll` to `BepInEx/plugins/ValheimHelmsman/`. Close Valheim before replacing DLLs, then restart. Avoid duplicate copies in your active profile.
+Install BepInEx, Jötunn and Helmsman through your mod manager. For manual installation, copy both `ValheimHelmsman.dll` and `Helmsman.Core.dll` to `BepInEx/plugins/ValheimHelmsman/`. Install the same Helmsman patch version on every client and the server. Close Valheim before replacing client DLLs; restart the server after its files are updated. Remove original OdinShip/OdinShipPlus and LongshipUpgrades DLLs to avoid overlapping prefabs and refits. Keep a world backup from before replacement. Avoid duplicate copies in your active profile.
 
-Look for `Helmsman 0.2.15 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
+Look for `Helmsman 0.2.16 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
 
 ## Configure docks
 
@@ -72,3 +72,35 @@ Relaxed dock checks still respect terrain and other boats. Dock pieces still phy
 Dock settings and ship names persist. Keep a world backup and remove custom Dock Wards before uninstalling from a world you intend to keep. No trip resumes automatically on load.
 
 For a problem, include the ship type, action, visible status, berth settings and Helmsman log lines. See [Compatibility](https://github.com/Vassteel/ValheimHelmsman/blob/master/COMPATIBILITY.md) for supported physics and mod conflicts.
+
+
+## Shipwright and fleet
+
+Build the Carpenter's Table beside a configured Dock Ward (within 45 m). Speak to the puffin, choose a hull and launch berth, then pay the displayed materials from your inventory. The timer and payment are saved in the table. Bigger vessels take longer; each duration is configurable under **Construction**. Changing a duration does not change an order already paid for.
+
+The puffin cycles hammering, chiselling and needlework; rowing boats skip sails. Time continues across unloaded areas and server restarts. Launch occurs only after the timer finishes, the table is loaded and the berth passes the hull-clearance check. An obstructed launch waits without charging again. Dismantling an unfinished table returns its materials. Keep the table and launch berth accessible.
+
+The fleet includes all 15 imported player hulls, plus vanilla longship commissioning. Original prefab identifiers and material recipes are retained. Named ships remain discoverable; old cargo records are kept while native cargo holds are populated. A locked migration warning means a saved item is unavailable or unreadable: restore the missing dependency or inspect the log before using that hold.
+
+### Refits and styles
+
+Select **Refits and styles** at the puffin for a ship within 35 m. Take its helm first if another peer owns it, then stop and return to the table. Vanilla longships support a lantern, canopy, 7×3 and 7×4 cargo holds, fire/Ashlands treatment and a decorative trophy mount. The hull never grows. Costs and required nearby station levels appear in the menu. Canopy cover allows shelter/rest; lantern warmth applies under that canopy.
+
+Imported ships expose their available figurehead/deck, shield, hull and sail variants. Decorative choices do not grant boss powers or weapon attacks. Custom PNG sailcloth belongs in `BepInEx/config/Helmsman/ShipStyles/sails/`; vanilla-longship canopy textures use `canopies/`. Each client needs the same custom files; only the style name is synchronized. PNG files must be no larger than 8 MB or 4096×4096.
+
+## Fishing and harbor work
+
+Harbor decorations, dock extensions and processing pieces appear in the Hammer's **Helmsman** category. Resin wood, caulked wood, sail canvas, rope and the wind belt are crafted at the Carpenter's Table using their original recipes.
+
+- **Fishing Dock:** the pelican catches fish during daylight into the dock chest. Default interval: 20 seconds; default cap: 50 fish. Both are configurable. Full/open storage pauses production; unloaded time does not accumulate catches.
+- **Hercule fishing boat:** board and use its net interaction to lower/stow the fishing net. Nearby fish enter its cargo hold only while the net is deployed and storage has room.
+- **Oil press:** add ten fish. One bottle of fish oil ejects after ten minutes. Destroying a press mid-batch returns fish instead of skipping the timer.
+- Eel racks, fish dryers and loose harbor nets are decorations.
+
+The gull, puffin, owl and pelican have sleeping poses. Construction continues overnight; fishing waits for daylight.
+
+## Server operation
+
+The connected caller controls their voyage; the server reserves remote ships and sends the loading data needed for a summon. Another caller cannot take the same reservation. Disconnecting ends the request, and taking the helm overrides autopilot. This is not an offline ferry service. Do not mix different Helmsman patch versions.
+
+Install Quartermaster on the server and clients for requested cargo unloading. Open cargo holds, unavailable migrated cargo, ward restrictions or ownership changes stop unloading. All holds are checked; one occupied slot moves per step across the whole boat.

@@ -16,5 +16,5 @@ public static class ShipRules
         (animation.IndexOf("sit",StringComparison.OrdinalIgnoreCase)>=0 ||
          animation.IndexOf("chair",StringComparison.OrdinalIgnoreCase)>=0 ||
          animation.Equals("attach_lox",StringComparison.OrdinalIgnoreCase));
-    public static bool Eligible(bool canSail,int seats)=>canSail || seats>1;
+    public static bool Eligible(bool canSail,int seats)=>canSail || seats>=1;
 }

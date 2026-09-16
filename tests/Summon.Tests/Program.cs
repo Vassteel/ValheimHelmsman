@@ -12,7 +12,7 @@ var ship=new Ship();ship.transform.position=new Vector3(1000,0,0);ship.gameObjec
 ZNetScene.instance.Boat=ship.gameObject;ZDOMan.instance.Ship.Position=ship.transform.position;
 UnattendedShipPhysics.Installed=true;
 var record=new ShipRecord{Loaded=ship};
-Plugin.Solo=false;Check(!SummonRequest.BeginShoreline(record,out _)&&!Plugin.Instance.Summon,"Multiplayer cannot create a summon");Plugin.Solo=true;
+Plugin.LocalSession=false;Check(!SummonRequest.BeginShoreline(record,out _)&&!Plugin.Instance.Summon,"No world session cannot create a summon");Plugin.LocalSession=true;
 ship.Occupied=true;Check(!SummonRequest.BeginShoreline(record,out _),"Occupied ships are rejected before loading terrain");ship.Occupied=false;
 Player.m_localPlayer.transform.position=new Vector3(10,0,20);
 Check(SummonRequest.BeginShoreline(record,out _),"Shoreline request starts");var request=Plugin.Instance.Summon;

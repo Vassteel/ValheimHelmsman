@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Helmsman;
 
-public sealed class HelmsmanUI : MonoBehaviour
+public sealed partial class HelmsmanUI : MonoBehaviour
 {
     internal bool IsOpen {get;private set;}
     private bool adjustingView, inputBlocked;
@@ -101,7 +101,7 @@ public sealed class HelmsmanUI : MonoBehaviour
     internal void Close()
     {
         BlockInput(false);adjustingView=false;
-        IsOpen=false;calledGull=null;naming=false;namingShip=null;editing=false;onboard=false;rebuild=false;dock=null;draft=null;selectedShip=null;notice="";page=0;
+        IsOpen=false;yard=null;calledGull=null;naming=false;namingShip=null;editing=false;onboard=false;rebuild=false;dock=null;draft=null;selectedShip=null;notice="";page=0;
         cargoSpeaker=null;hadCargoTab=false;
         whistle=null;whistleRequestSnapshot=null;
         controls.Clear();refreshLabels.Clear();
@@ -129,8 +129,8 @@ public sealed class HelmsmanUI : MonoBehaviour
         UpdateHud();
         if(!IsOpen)return;
         if(!Player.m_localPlayer || Player.m_localPlayer.IsDead() || !GUIManager.CustomGUIFront ||
-            (!onboard && !dock && !naming && whistle==null) || (naming && !namingShip) ||
-            (whistle!=null && (!Plugin.Solo || !GullcallWhistle.Carried(Player.m_localPlayer,whistle))) ||
+            (!onboard && !dock && !naming && whistle==null && !yard) || (yard && !yard.Near(Player.m_localPlayer)) || (naming && !namingShip) ||
+            (whistle!=null && (!Plugin.LocalSession || !GullcallWhistle.Carried(Player.m_localPlayer,whistle))) ||
             (onboard && !Plugin.Instance.Voyage && !calledGull) ||
             (calledGull && (!calledGull.Ready || !calledGull.Ship.IsPlayerInBoat(Player.m_localPlayer)))){Close();return;}
         if(adjustingView)
@@ -160,7 +160,7 @@ public sealed class HelmsmanUI : MonoBehaviour
         {
             nextLabels=Time.unscaledTime+.2f;
             foreach(var update in refreshLabels)update();
-            if(status)status.text=notice.Length>0 ? notice : whistle!=null ? (Plugin.Instance.Summon ? Plugin.Instance.Summon.Status : "Stand near shore. The gull finds safe water nearby; no Dock Ward needed.") : tab==4 ? "Cargo moves only after your request." : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
+            if(status)status.text=notice.Length>0 ? notice : yard ? yard.Status : whistle!=null ? (Plugin.Instance.Summon ? Plugin.Instance.Summon.Status : "Stand near shore. The gull finds safe water nearby; no Dock Ward needed.") : tab==4 ? "Cargo moves only after your request." : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
                 naming ? "Ship names are saved with the world." : tab==3 ? "Choose an empty named ship to summon." :
                 editing && tab<2 ? (valid ? "Clearance: " : "Advisory: ")+validation : "Select a named dock to set sail.";
         }
@@ -178,9 +178,9 @@ public sealed class HelmsmanUI : MonoBehaviour
         var rect=MenuTheme.Rect("Helmsman_Menu",parent,0,0,720,620);modal=rect.gameObject;
         rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f);rect.anchoredPosition=Vector2.zero;
         MenuTheme.Panel(rect,MenuTheme.Background,true);
-        theme.Text(rect,whistle!=null ? "GULLCALL WHISTLE" : naming ? "SHIP NAME" : onboard ? "SHIP ORDERS" : "DOCK CONFIG",24,-16,360,38,28,MenuTheme.Gold);
+        theme.Text(rect,yard ? "CARPENTER’S TABLE" : whistle!=null ? "GULLCALL WHISTLE" : naming ? "SHIP NAME" : onboard ? "SHIP ORDERS" : "DOCK CONFIG",24,-16,360,38,28,MenuTheme.Gold);
         Button(rect,"Close",602,-18,94,Close);
-        if(!naming)
+        if(!naming && !yard)
         {
             var routeToggle=Button(rect,"",400,-18,186,()=>
             {
@@ -191,6 +191,7 @@ public sealed class HelmsmanUI : MonoBehaviour
             Action updateRouteLabel=()=>label.text=Plugin.Instance.DebugRoute.Value ? "Hide route wisps" : "Show route wisps";
             updateRouteLabel();refreshLabels.Add(updateRouteLabel);
         }
+        if(yard){BuildShipyardMenu(rect);return;}
         if(whistle!=null)
         {
             theme.Text(rect,"Give me a ship's name, Viking. I'll bring her in.",24,-68,672,45,21,MenuTheme.Muted);
@@ -328,10 +329,10 @@ public sealed class HelmsmanUI : MonoBehaviour
         // Saving configuration is independent of current water, loading and obstacle conditions.
         // Actual maneuver checks use the active relaxed/strict navigation setting.
         var saved=draft.Copy();saved.configured=true;
-        if(!dock.Save(saved)){notice="Could not save; stay near the ward in a solo world.";return;}
+        if(!dock.Save(saved)){notice="Could not save; stay near the ward.";return;}
         draft.configured=true;
-        notice=valid ? "Berth saved. Nearby departure uses the ship's actual position." :
-            "Berth saved with an advisory: "+validation;
+        notice=valid ? "Berth save requested. The ward will confirm when saved." :
+            "Berth save requested. Clearance advisory: "+validation;
     }
     private void BuildDestinations()
     {

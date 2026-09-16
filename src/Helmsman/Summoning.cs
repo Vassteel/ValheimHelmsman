@@ -83,11 +83,11 @@ public sealed class SummonRequest : MonoBehaviour
     private static bool CanRequest(ShipRecord record,out ZDO zdo,out Ship ship,out string reason)
     {
         zdo=null!;ship=null!;
-        if(!Plugin.Solo){reason="Ship summoning currently supports solo worlds.";return false;}
+        if(!Plugin.LocalSession){reason="Join a world before calling a ship.";return false;}
         if(!UnattendedShipPhysics.Installed){reason="Empty-ship control is incompatible with this game/mod setup.";return false;}
         if(Plugin.Instance.Voyage || Plugin.Instance.Summon || Plugin.Instance.CalledGull){reason="Finish or cancel the current voyage or gull visit first.";return false;}
         zdo=ZDOMan.instance.GetZDO(record.Id);
-        if(zdo==null || zdo.GetString(ShipDirectory.NameKey,"").Length==0){reason="That named ship no longer exists.";return false;}
+        if(zdo==null || ShipDirectory.SavedName(zdo).Length==0){reason="That named ship no longer exists.";return false;}
         var prefab=ZNetScene.instance.GetPrefab(zdo.GetPrefab());
         if(!prefab || !ShipProfile.Supports(prefab.GetComponent<Ship>())){reason="This ship needs a custom movement adapter.";return false;}
         var loaded=record.Loaded;
@@ -121,7 +121,7 @@ public sealed class SummonRequest : MonoBehaviour
         bool created=false;
         for(int x=-2;x<=2 && !created;x++)for(int z=-2;z<=2;z++)
             if((bool)LoadZones.Invoke(ZoneSystem.instance,new object[]{new Vector2s(center.x+x,center.y+z)})) {created=true;break;}
-        areaReady=true;
+        areaReady=NetworkNavigation.Ready(simulationCenter);
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
             if(!ZoneSystem.instance.IsZoneLoaded(simulationCenter+new Vector3(x*64,0,z*64)))areaReady=false;
         if(!areaReady)return;
@@ -139,7 +139,7 @@ public sealed class SummonRequest : MonoBehaviour
     }
     private void Advance()
     {
-        if(!Plugin.Solo || !requester || requester!=Player.m_localPlayer || requester.IsDead() || ZNet.instance.GetWorldUID()!=world){Cancel("Summon stopped: player unavailable.");return;}
+        if(!Plugin.LocalSession || !requester || requester!=Player.m_localPlayer || requester.IsDead() || ZNet.instance.GetWorldUID()!=world){Cancel("Summon stopped: player unavailable.");return;}
         if(!voyage && Time.time-started>1800){Cancel("The gull could not prepare that ship's journey in time.");return;}
         if(searchingShore){KeepAreaLoaded();return;}
         var home=shoreline ? shoreDestination : DockDirectory.Resolve(Home);var zdo=ZDOMan.instance.GetZDO(ShipId);
@@ -154,7 +154,8 @@ public sealed class SummonRequest : MonoBehaviour
         Status=Loading ? "Gull finding the ship" : "Gull flying to the ship";
         if(!ReadyArea || !ship || Vector3.Distance(gull!.transform.position,Center)>8)return;
         if(ship.HasPlayerOnboard() || ship.m_shipControlls.HaveValidUser()){Cancel("Summon stopped: ship is occupied.");return;}
-        var view=ship.GetComponent<ZNetView>();view.ClaimOwnership();
+        if(!PrivateArea.CheckAccess(ship.transform.position,0,false,true)){Cancel("Summon stopped: this ship is inside a protected ward.");return;}
+        var view=ship.GetComponent<ZNetView>();if(ZNet.instance.IsServer())view.ClaimOwnership();
         if(!view.IsOwner())return;
         if(Voyage.BeginSummoned(ship,home,gull,out var reason)){voyage=Plugin.Instance.Voyage;Status=shoreline ? "Bringing the ship to your shoreline" : "Bringing the ship to the dock";}
         else Cancel(reason);
@@ -208,7 +209,7 @@ internal static class SummonSceneObjects
     private static readonly List<ZDO> remote=new List<ZDO>();
     internal static void Prefix(List<ZDO> currentNearObjects)
     {
-        var request=Plugin.Instance.Summon;if(!request || !request.Loading || !Plugin.Solo)return;
+        var request=Plugin.Instance.Summon;if(!request || !request.Loading || !Plugin.LocalSession)return;
         remote.Clear();
         ZDOMan.instance.FindSectorObjects(ZoneSystem.GetZone(request.SimulationCenter),new SimulationDistance(2,0,true),remote);
         var seen=new HashSet<ZDO>(currentNearObjects);
@@ -222,7 +223,7 @@ internal static class SummonActiveArea
     internal static void Postfix(Vector3 point,ref bool __result)
     {
         var request=Plugin.Instance.Summon;
-        if(request && request.Loading && Plugin.Solo && Mathf.Abs(point.x-request.SimulationCenter.x)<128 && Mathf.Abs(point.z-request.SimulationCenter.z)<128)__result=true;
+        if(request && request.Loading && Plugin.LocalSession && Mathf.Abs(point.x-request.SimulationCenter.x)<128 && Mathf.Abs(point.z-request.SimulationCenter.z)<128)__result=true;
     }
 }
 [HarmonyPatch(typeof(Ship),nameof(Ship.CustomFixedUpdate))]

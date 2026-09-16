@@ -25,7 +25,7 @@ internal static class CargoTests
         Ship ship=null!;GullGuide gull=null!;
         void Reset()
         {
-            Plugin.Instance=new();Plugin.Solo=true;Player.m_localPlayer=new();ship=new();gull=new(){Ship=ship,Landed=true};
+            Plugin.Instance=new();Plugin.LocalSession=true;Player.m_localPlayer=new();ship=new();gull=new(){Ship=ship,Landed=true};
             QuartermasterBridge.Available=true;QuartermasterBridge.Done=false;QuartermasterBridge.Invalid="";
             QuartermasterBridge.Begins=QuartermasterBridge.Steps=QuartermasterBridge.Cancels=0;
         }

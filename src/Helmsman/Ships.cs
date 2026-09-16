@@ -89,26 +89,28 @@ public sealed class ShipDirectory : MonoBehaviour
             string.Join(", ",candidates.Except(Prefabs).Select(p=>p.name));
         if(summary!=catalogSummary){catalogSummary=summary;Plugin.Instance.Record(summary);}
     }
+    internal static string SavedName(ZDO data)=>ShipText.CleanName(data.GetString(NameKey,data.GetString("shipName","")));
     internal static string Display(Ship ship)
     {
-        var view=ship.GetComponent<ZNetView>();var name=view && view.IsValid() ? view.GetZDO().GetString(NameKey,"") : "";
+        var view=ship.GetComponent<ZNetView>();var name=view && view.IsValid() ? SavedName(view.GetZDO()) : "";
         return name.Length>0 ? name : ShipProfile.PrefabName(ship)=="VikingShip" ? "Longship" : ShipProfile.PrefabName(ship);
     }
     internal static bool Rename(Ship ship,string name,out string reason)
     {
         name=Helmsman.Core.ShipText.CleanName(name);
         if(name.Length==0){reason="Enter a ship name (up to 48 characters).";return false;}
-        if(!Plugin.Solo || !ship || !Player.m_localPlayer || Vector3.Distance(ship.transform.position,Player.m_localPlayer.transform.position)>30)
-        {reason="Stay near the ship in a solo world.";return false;}
+        if(!Plugin.LocalSession || !ship || !Player.m_localPlayer || Vector3.Distance(ship.transform.position,Player.m_localPlayer.transform.position)>30)
+        {reason="Stay near the ship.";return false;}
         var view=ship.GetComponent<ZNetView>();if(!view || !view.IsValid()){reason="Ship data is not ready.";return false;}
-        view.ClaimOwnership();if(!view.IsOwner()){reason="Could not claim ship ownership.";return false;}
+        if(!PrivateArea.CheckAccess(ship.transform.position,0,false,true)){reason="This ship is protected by a ward.";return false;}
+        if(!view.IsOwner()){reason="Take the helm first to name this ship.";return false;}
         view.GetZDO().Set(NameKey,name);reason="Ship named "+name+".";return true;
     }
     private IEnumerator Start()
     {
         while(true)
         {
-            if(!Plugin.Solo || !ZNetScene.instance || ZDOMan.instance==null)
+            if(!Plugin.LocalSession || !ZNetScene.instance || ZDOMan.instance==null)
             {Records.Clear();Prefabs.Clear();catalogSummary="";yield return new WaitForSeconds(1);continue;}
             long world=ZNet.instance.GetWorldUID();
             RefreshPrefabs();
@@ -117,15 +119,15 @@ public sealed class ShipDirectory : MonoBehaviour
             {
                 var found=new List<ZDO>();int index=0;
                 while(ZDOMan.instance!=null && !ZDOMan.instance.GetAllZDOsWithPrefabIterative(prefab.name,found,ref index))yield return null;
-                if(!Plugin.Solo || ZNet.instance.GetWorldUID()!=world)break;
+                if(!Plugin.LocalSession || ZNet.instance.GetWorldUID()!=world)break;
                 foreach(var zdo in found)
                 {
-                    var name=zdo.GetString(NameKey,"");
+                    var name=SavedName(zdo);
                     if(name.Length>0)next.Add(new ShipRecord {Id=zdo.m_uid,Name=name,Prefab=prefab.name,Position=zdo.GetPosition()});
                 }
                 yield return null;
             }
-            if(Plugin.Solo && ZNet.instance.GetWorldUID()==world)Records=next;
+            if(Plugin.LocalSession && ZNet.instance.GetWorldUID()==world)Records=next;
             yield return new WaitForSeconds(3);
         }
     }

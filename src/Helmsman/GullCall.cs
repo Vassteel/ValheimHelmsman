@@ -24,7 +24,7 @@ public sealed class GullCall : MonoBehaviour
 
     internal static void Call(Ship ship)
     {
-        if(!Plugin.Solo){Plugin.Message("Calling the gull currently supports solo worlds.");return;}
+        if(!Plugin.LocalSession){Plugin.Message("Join a world before calling the gull.");return;}
         if(!ShipProfile.Supports(ship) || !ship.IsOwner() || Player.m_localPlayer.IsDead() || !ship.IsPlayerInBoat(Player.m_localPlayer))
         {Plugin.Message("Board a locally owned supported ship to call the gull.");return;}
         var voyage=Plugin.Instance.Voyage;
@@ -73,7 +73,7 @@ public sealed class GullCall : MonoBehaviour
         if(arrivalVisit && Ship && requester && Ship.IsPlayerInBoat(requester))arrivalVisit=false;
         bool canWait=arrivalVisit && Time.unscaledTime<arrivalUntil && Ship && requester &&
             Vector3.Distance(requester.transform.position,Ship.transform.position)<64;
-        if(!Plugin.Solo || !Ship || !Ship.IsOwner() || !requester || requester!=Player.m_localPlayer || requester.IsDead() ||
+        if(!Plugin.LocalSession || !Ship || !Ship.IsOwner() || !requester || requester!=Player.m_localPlayer || requester.IsDead() ||
             (!Ship.IsPlayerInBoat(requester) && !canWait) || !guide)
         {Dismiss("Gull visit ended.");return;}
         if(Ready && !announced){announced=true;Plugin.Message(Status);}

@@ -112,13 +112,13 @@ var odinShips=new[]{
     (Name:"DoubleRowingCanoe",Force:0f,Seats:2,Expected:true),
     (Name:"LittleBoat",Force:.03f,Seats:0,Expected:true),
     (Name:"MercantShip",Force:.05f,Seats:6,Expected:true),
-    (Name:"RowingCanoe",Force:0f,Seats:1,Expected:false),
+    (Name:"RowingCanoe",Force:0f,Seats:1,Expected:true),
     (Name:"WarShip",Force:.06f,Seats:13,Expected:true)
 };
 foreach(var ship in odinShips)
     Check(ShipRules.Eligible(ShipRules.CanSail(ship.Name,true,ship.Force),ship.Seats)==ship.Expected,"OdinShip eligibility: "+ship.Name);
 Check(!ShipRules.Eligible(false,0),"Seatless rowing boats are excluded");
-Check(!ShipRules.Eligible(false,1),"Single-seat rowing boats are excluded");
+Check(ShipRules.Eligible(false,1),"Single-seat canoe can be recalled by its gull");
 Check(ShipRules.Eligible(false,2),"Two-seat rowing boats remain eligible");
 Check(ShipRules.CanSail("VikingShip",true,.1f),"Longship remains eligible for sailing");
 Check(ShipRules.CanSail("CustomSailingShip",true,.1f),"Sailing ships do not need a prefab whitelist");
@@ -136,4 +136,6 @@ Check(ShipRules.IsSeat("attach_lox"),"Odin single-canoe seated helm is recognize
 ShorelineTests.Run(Check);
 GullcallModelTests.Run(Check);
 GuardedStepsTests.Run(Check);
+ShipConstructionTests.Run(Check);
+        ShipwrightRulesTests.Run(Check);
 Console.WriteLine($"{passed} checks passed.");

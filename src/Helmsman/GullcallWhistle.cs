@@ -44,7 +44,7 @@ internal static class UseGullcallWhistle
         var player=__instance as Player;
         if(!player || player!=Player.m_localPlayer || !GullcallWhistle.Carried(player,item) ||
             (inventory!=null && inventory!=player.GetInventory()))return false;
-        if(!Plugin.Solo){Plugin.Message("Ship summoning is not available in multiplayer yet.");return false;}
+        if(!Plugin.LocalSession){Plugin.Message("Join a world before using the whistle.");return false;}
         if(player.InAttack() || player.InDodge()){Plugin.Message("Finish your current action before calling the gull.");return false;}
         if(InventoryGui.instance)InventoryGui.instance.Hide();
         Plugin.Instance.UI.OpenWhistle(item);

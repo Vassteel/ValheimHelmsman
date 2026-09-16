@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.16
+
+- Integrate the civilian OdinShip/OdinShipPlus fleet, harbor decorations, original prefab names and recipes; exclude autonomous enemies and naval combat. Original plugin DLLs are not included.
+- Add timed, saved ship commissions through a puffin at the Carpenter's Table, with hammer, chisel and sail-stitching work. Original costs; separate configurable durations by hull.
+- Add native-longship lantern, sheltering canopy, inventory-only cargo expansions, protective treatment and decorative trophy refits. Add saved ship styles and custom sailcloth.
+- Repaint default hull textures and fittings with coarse, muted finishes on native Valheim shaders.
+- Add daylight pelican fishing, a shipboard net, fish-oil pressing, maritime materials and sleeping bird poses.
+- Isolate multi-hold cargo saves/RPCs; preserve old Odin cargo keys during validated migration. Unreadable cargo stays locked instead of being overwritten.
+- Enable multiplayer navigation with server reservations, remote scene manifests, disconnect expiry and manual-takeover protection. Require matching Helmsman patch versions. Multiplayer still needs live acceptance.
+- Support one-seat canoe piloting and recall. Requests keep the original calling destination when the player moves away.
+- Add transactional workshop access, trophy transfer rollback and persistent launch/output receipts.
+
 ## 0.2.15
 
 - Recognize the current game's cloth sails on Karves and rafts, which no longer require the legacy sail-object reference.

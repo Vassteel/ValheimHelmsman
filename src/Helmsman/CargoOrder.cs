@@ -14,7 +14,7 @@ public sealed class CargoOrder : MonoBehaviour
     internal static bool Start(Ship ship, GullGuide gull, out string reason)
     {
         reason="Speak to the landed gull aboard a stopped boat with Quartermaster in range.";
-        if(!Plugin.Solo || !gull || !gull.ReadyOn(ship) || !QuartermasterBridge.Available) return false;
+        if(!Plugin.LocalSession || !gull || !gull.ReadyOn(ship) || !QuartermasterBridge.Available) return false;
         if(Plugin.Instance.Cargo) { reason="Finish or stop the current cargo request first.";return false; }
         try
         {
@@ -29,7 +29,7 @@ public sealed class CargoOrder : MonoBehaviour
     private void Update()
     {
         if(ended) return;
-        if(!Plugin.Solo || !QuartermasterBridge.Available || !ship || !gull || !gull.ReadyOn(ship) ||
+        if(!Plugin.LocalSession || !QuartermasterBridge.Available || !ship || !gull || !gull.ReadyOn(ship) ||
             !requester || requester!=Player.m_localPlayer || requester.IsDead() || !ship.IsPlayerInBoat(requester))
         { Stop("Cargo request ended.");return; }
         try

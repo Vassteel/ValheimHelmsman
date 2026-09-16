@@ -128,19 +128,23 @@ public sealed class DockMarker : MonoBehaviour, Interactable, Hoverable
     public string GetHoverText() => Localization.instance.Localize(GetHoverName()+"\n[<color=yellow><b>$KEY_Use</b></color>] Configure berth");
     public bool Interact(Humanoid user, bool hold, bool alt)
     {
-        if (hold || !Ready) return false;
-        if (!Plugin.Solo) { Plugin.Message("Dock configuration currently supports solo worlds."); return false; }
+        if (hold || !Ready || user!=Player.m_localPlayer || !PrivateArea.CheckAccess(transform.position,0,false,true)) return false;
+        if (!Plugin.LocalSession) { Plugin.Message("Join a world before configuring a dock."); return false; }
         Plugin.Instance.UI.OpenDock(this); return true;
     }
     public bool UseItem(Humanoid user, ItemDrop.ItemData item) => false;
 
     internal bool Save(Berth berth)
     {
-        if (!Plugin.Solo || !Ready || !berth.ValidData) return false;
+        if (!Plugin.LocalSession || !Ready || !berth.ValidData) return false;
         if (Vector3.Distance(Player.m_localPlayer.transform.position, transform.position) > 10) return false;
-        view.ClaimOwnership();
-        if (!view.IsOwner()) return false;
-        view.GetZDO().Set(DockDirectory.DataKey, JsonUtility.ToJson(berth));
+        var copy=berth.Copy();
+        var lease=GetComponent<WorkstationLease>();
+        Plugin.Message(lease.Run(()=>
+        {
+            if(!lease.Held||!PrivateArea.CheckAccess(transform.position,0,false,true))return "Dock access changed; settings were not saved.";
+            view.GetZDO().Set(DockDirectory.DataKey,JsonUtility.ToJson(copy));return "Berth saved.";
+        }));
         return true;
     }
 }

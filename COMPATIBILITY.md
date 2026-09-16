@@ -1,36 +1,28 @@
-# Ship compatibility — 0.2.15
+# Ship compatibility — 0.2.16
 
-**Solo/local operation works. Multiplayer and dedicated-server operation are disabled and untested.**
+Existing sailing has been used locally. Multiplayer is now enabled for testing; new fleet, rendering and real server behavior are not yet verified.
 
-Ships are discovered through the live Valheim prefab registry and original scene prefab list. There is no Karve-only or OdinShip-only name whitelist. Navigation currently requires standard `Ship` physics, a float collider, rigidbody, ship controls and reverse force. Custom movement implementations need an adapter.
+## Ships
 
-Sailing ships are eligible regardless of seating. Both the current cloth-sail flag (Karve/Raft) and legacy sail-object references are recognized. Rowboats need at least two distinct seats; a seated helm counts. Beds, standing helms and mast/bow hold-fast points do not count. Nearby voyage selection, naming, the berth preview list and named-ship summoning use the same eligibility rule. Only named ships appear in the summon list.
+Navigation requires native `Ship` physics, a float collider, rigidbody, controls and reverse force. Current cloth sails and legacy sail objects are supported. Rowboats need one seat, including a seated helm. One-seat canoes can be piloted and recalled; they use the native forward rowing gear. Only named ships appear in recall menus.
 
-Inspected installed **OdinShip 0.7.9** assembly and prefab metadata:
+All 15 imported player hulls use the original prefab identifiers. Cargo holds use separate native save keys and RPC names. Legacy base64 cargo is migrated only after native deserialization preserves its occupied-slot count. The original record remains. Missing items or corrupt records lock the affected hold and produce a log warning.
 
-| Boat | Prefab | Seats including seated helm | Eligible |
-|---|---|---:|---|
-| Merchant’s Boat | MercantShip | 6 | Yes, sailing |
-| Cargo Ship | CargoShip | 5 | Yes, sailing |
-| Big Cargo Ship | BigCargoShip | 5 | Yes, sailing |
-| Little Boat | LittleBoat | 0 | Yes, sailing with standing helm |
-| War Ship | WarShip | 13 | Yes, sailing |
-| Double Rowing Canoe | DoubleRowingCanoe | 2 | Yes, rowing |
-| Rowing Canoe | RowingCanoe | 1 | No |
+Hull dimensions, draft, wind handling and braking need individual server playtests. Prefab eligibility and asset inspection do not prove safe sailing for every vessel.
 
-The canoes retain dummy sail objects but have zero sail force. Helmsman keeps eligible rowboats in rowing mode. OdinShip’s ordinary canoe speed boost depends on a player being aboard; unattended summoning uses standard slow rowing and does not fake player occupancy.
+## Installation and conflicts
 
-Other OdinShip versions and compatible ship mods are discovered through the same rules without a hard dependency. The table documents local metadata checks, not verified sailing performance for every vessel. Hull dimensions, draft and braking remain estimates and require individual playtests. Restart Valheim after updating and look for `Helmsman 0.2.15 loaded` followed by `Detected ships:` in the BepInEx log.
+- Install matching Helmsman patch versions on every client and the server, with BepInEx and Jötunn.
+- Remove original **OdinShip/OdinShipPlus** plugins before this replacement. Keep world and plugin backups. The original DLLs are not bundled or required.
+- Remove **LongshipUpgrades** before using Helmsman's native-longship fittings.
+- **Quartermaster** is optional; both mods are needed for requested base unloading. Quartermaster checks every cargo hold and its ownership/access state.
+- Autonomous enemy ships, their crews, naval weapons and ammunition are deferred. Their saved objects are not migrated by this civilian import.
+- Other custom-physics or sailing mods require compatibility testing.
 
+The highest conflict risk remains `Ship.CustomFixedUpdate`: Helmsman applies navigation controls, an unattended-crew transpiler and a canoe gear correction. It also patches helm input, remote loading and ownership, native container serialization/RPC names and canopy shelter. Recall stays unavailable if the expected empty-crew branch pattern cannot be patched.
 
-## Other mods and installation
+Custom texture filenames are saved, not the PNG contents. Distribute matching custom textures to every client.
 
-Helmsman must be installed on the solo player's active client, with BepInEx and Jötunn. Quartermaster is optional and enables requested unloading only when both mods are present. A server-only installation does not provide supported operation.
+## Identity and diagnostics
 
-The highest conflict risk is with mods changing `Ship.CustomFixedUpdate`: Helmsman applies a control prefix and an unattended-crew transpiler there. It also patches controller detection, helm input and remote scene loading. Custom ship physics need an adapter; different Harmony patches can conflict even when both DLLs load. Summoning is disabled if its expected crew-count pattern is missing.
-
-The OdinShip table records inspected 0.7.9 metadata. It does not guarantee that every prefab passes the live registry's current checks or sails correctly in a combined mod pack. Karve/Raft sail detection was corrected in 0.2.15; confirm the fresh detection log and a short voyage.
-
-## Identity
-
-The public mod is Valheim Helmsman. Plugin GUID `local.valheim.helmsman` and its saved-data keys are intentionally retained for existing configs, worlds and Quartermaster integration. The Thunderstore upload manifest uses the publishing account's namespace; `Local` appears only in legacy local-import packaging.
+Plugin GUID `local.valheim.helmsman`, original imported prefab names and established saved-world keys remain stable. Plugin and Core DLL versions both report 0.2.16. Look for `Helmsman 0.2.16 loaded`, the fleet registration message and `Detected ships:`. Include the ship prefab, status text and relevant log lines in reports.

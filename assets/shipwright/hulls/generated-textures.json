@@ -1,0 +1,32 @@
+[
+  {
+    "name": "fast-skuldelev",
+    "source": "/home/deck/.codex/generated_images/01a0a33e-bb89-7921-88f4-9e541192ad89/exec-36bdd1f1-2a9f-4c60-8874-efd7087c3df7.png",
+    "prompt": "Edit the attached ship texture map for a Valheim mod. Produce ONLY a square flat diffuse/base-color texture map, no scene, no text or labels. CRITICAL: preserve every original UV island's exact silhouette, pixel position, scale and orientation; preserve background void positions and all seams, holes, rivet rows, framing and plank directions. Repaint interiors with coarse visible blocky pixel brush texture matching vanilla Valheim wooden longships: weathered dark tarred oak, muted warm chestnut timber, dull grey iron, restrained faded red and ochre paint. Matte surface, evenly lit, no glossy highlights or baked dramatic lighting. Simplify photographic fine noise to readable chunky grain. This map is fast-skuldelev.  Preserve all existing material divisions. Aim for a usable texture atlas, not a redesign of its layout."
+  },
+  {
+    "name": "goblin",
+    "source": "/home/deck/.codex/generated_images/01a0a33e-bb89-7921-88f4-9e541192ad89/exec-8b3a20e8-d78d-43ec-922e-38c77e7318e0.png",
+    "prompt": "Edit the attached ship texture map for a Valheim mod. Produce ONLY a square flat diffuse/base-color texture map, no scene, no text or labels. CRITICAL: preserve every original UV island's exact silhouette, pixel position, scale and orientation; preserve background void positions and all seams, holes, rivet rows, framing and plank directions. Repaint interiors with coarse visible blocky pixel brush texture matching vanilla Valheim wooden longships: weathered dark tarred oak, muted warm chestnut timber, dull grey iron, restrained faded red and ochre paint. Matte surface, evenly lit, no glossy highlights or baked dramatic lighting. Simplify photographic fine noise to readable chunky grain. This map is goblin.  Preserve all existing material divisions. Aim for a usable texture atlas, not a redesign of its layout."
+  },
+  {
+    "name": "taurus-front",
+    "source": "/home/deck/.codex/generated_images/01a0a33e-bb89-7921-88f4-9e541192ad89/exec-39d11135-0bf9-4d44-8152-74961da42ce2.png",
+    "prompt": "Edit the attached ship texture map for a Valheim mod. Produce ONLY a square flat diffuse/base-color texture map, no scene, no text or labels. CRITICAL: preserve every original UV island's exact silhouette, pixel position, scale and orientation; preserve background void positions and all seams, holes, rivet rows, framing and plank directions. Repaint interiors with coarse visible blocky pixel brush texture matching vanilla Valheim wooden longships: weathered dark tarred oak, muted warm chestnut timber, dull grey iron, restrained faded red and ochre paint. Matte surface, evenly lit, no glossy highlights or baked dramatic lighting. Simplify photographic fine noise to readable chunky grain. This map is taurus-front.  Preserve all existing material divisions. Aim for a usable texture atlas, not a redesign of its layout."
+  },
+  {
+    "name": "taurus-tail",
+    "source": "/home/deck/.codex/generated_images/01a0a33e-bb89-7921-88f4-9e541192ad89/exec-8fa962db-0cc8-4386-94a3-038e38d35460.png",
+    "prompt": "Edit the attached ship texture map for a Valheim mod. Produce ONLY a square flat diffuse/base-color texture map, no scene, no text or labels. CRITICAL: preserve every original UV island's exact silhouette, pixel position, scale and orientation; preserve background void positions and all seams, holes, rivet rows, framing and plank directions. Repaint interiors with coarse visible blocky pixel brush texture matching vanilla Valheim wooden longships: weathered dark tarred oak, muted warm chestnut timber, dull grey iron, restrained faded red and ochre paint. Matte surface, evenly lit, no glossy highlights or baked dramatic lighting. Simplify photographic fine noise to readable chunky grain. This map is taurus-tail.  Preserve all existing material divisions. Aim for a usable texture atlas, not a redesign of its layout."
+  },
+  {
+    "name": "taurus-sail-support",
+    "source": "/home/deck/.codex/generated_images/01a0a33e-bb89-7921-88f4-9e541192ad89/exec-ba31fff7-b35c-461c-abc7-4e941feaac7c.png",
+    "prompt": "Edit the attached ship texture map for a Valheim mod. Produce ONLY a square flat diffuse/base-color texture map, no scene, no text or labels. CRITICAL: preserve every original UV island's exact silhouette, pixel position, scale and orientation; preserve background void positions and all seams, holes, rivet rows, framing and plank directions. Repaint interiors with coarse visible blocky pixel brush texture matching vanilla Valheim wooden longships: weathered dark tarred oak, muted warm chestnut timber, dull grey iron, restrained faded red and ochre paint. Matte surface, evenly lit, no glossy highlights or baked dramatic lighting. Simplify photographic fine noise to readable chunky grain. This map is taurus-sail-support. Replace the Roman eagle/SPQR banner within its EXACT existing top-left outline with faded ochre Nordic knot decoration on dark red coarse sailcloth, no letters; keep every surrounding wood island fixed. Preserve all existing material divisions. Aim for a usable texture atlas, not a redesign of its layout."
+  },
+  {
+    "name": "skuldelev-painted",
+    "source": "/home/deck/.codex/generated_images/01a0a33e-bb89-7921-88f4-9e541192ad89/exec-48f48410-e4cc-435b-9597-018d5a92b7f2.png",
+    "prompt": "Edit the attached ship texture map for a Valheim mod. Produce ONLY a square flat diffuse/base-color texture map, no scene, no text or labels. CRITICAL: preserve every original UV island's exact silhouette, pixel position, scale and orientation; preserve background void positions and all seams, holes, rivet rows, framing and plank directions. Repaint interiors with coarse visible blocky pixel brush texture matching vanilla Valheim wooden longships: weathered dark tarred oak, muted warm chestnut timber, dull grey iron, restrained faded red and ochre paint. Matte surface, evenly lit, no glossy highlights or baked dramatic lighting. Simplify photographic fine noise to readable chunky grain. This map is skuldelev-painted.  Preserve all existing material divisions. Aim for a usable texture atlas, not a redesign of its layout."
+  }
+]

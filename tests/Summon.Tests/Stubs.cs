@@ -55,7 +55,7 @@ public class ZDOMan {
  public ZDO GetZDO(ZDOID id)=>Ship;
  public void FindSectorObjects(Vector2s center,SimulationDistance distance,List<ZDO> result){}
 }
-public class ZNet:UnityEngine.Object {public static ZNet instance=new();public long World=1;public long GetWorldUID()=>World;}
+public class ZNet:UnityEngine.Object {public static ZNet instance=new();public long World=1;public bool IsServer()=>true;public long GetWorldUID()=>World;}
 public class ZNetView:UnityEngine.MonoBehaviour {public bool Owned=true;public void ClaimOwnership(){}public bool IsOwner()=>Owned;}
 public class ZoneSystem:UnityEngine.Object {
  public static ZoneSystem instance=new();public List<Vector2s> Poked=new();
@@ -77,9 +77,10 @@ public class Ship:UnityEngine.MonoBehaviour {
 }
 namespace Helmsman.Core {public static class ShipText {public static string Bearing(float x,float z)=>"N";} }
 namespace Helmsman {
+public static class NetworkNavigation {public static bool Loaded=true;public static bool Ready(UnityEngine.Vector3 center)=>Loaded;}
 public class Config<T> {public T Value;}
 public class Plugin:UnityEngine.MonoBehaviour {
- public static Plugin Instance=new();public static bool Solo=true;public SummonRequest Summon;public Voyage Voyage;public GullGuide CalledGull;
+ public static Plugin Instance=new();public static bool LocalSession=true;public SummonRequest Summon;public Voyage Voyage;public GullGuide CalledGull;
  public static string LastMessage;public static void Message(string text)=>LastMessage=text;public void Error(Exception error)=>throw new Exception("Unexpected request failure",error);
 }
 public class Berth {public string name;public bool configured;public UnityEngine.Vector3 position;}
@@ -87,7 +88,7 @@ public class DockRecord {public bool Temporary;public ZDOID Id;public Berth Bert
 public class DockMarker:UnityEngine.MonoBehaviour {public bool Ready=true;public ZDOID Id=new(9);public GullGuide FetchGuide(UnityEngine.Vector3 target){var g=GullGuide.Create(target,this,null);g.Fetch(target);return g;} }
 public static class DockDirectory {public static DockRecord Home;public static DockRecord Resolve(ZDOID id)=>Home;}
 public class ShipRecord {public ZDOID Id=new(1);public string Name="Test boat",Prefab="Karve";public Ship Loaded;}
-public static class ShipDirectory {public const int NameKey=7;}
+public static class ShipDirectory {public const int NameKey=7;public static string SavedName(ZDO data)=>data.Name;}
 public class ShipProfile {public static ShipProfile For(Ship ship)=>new();public static bool Supports(Ship ship)=>ship;}
 public class WaterChart {
  public WaterChart(Ship ship,ShipProfile profile){}
@@ -114,3 +115,4 @@ public class Voyage:UnityEngine.MonoBehaviour {
 }
 public class MenuTheme {public static UnityEngine.Object FindFont()=>new();}
 }
+public static class PrivateArea {public static bool Allowed=true;public static bool CheckAccess(UnityEngine.Vector3 point,float radius,bool flash,bool ward)=>Allowed;}
