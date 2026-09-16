@@ -48,7 +48,7 @@ public sealed class Voyage : MonoBehaviour
 
     internal static bool Begin(Ship ship,DockRecord from,DockRecord to,out string reason,GullGuide? aboardGuide=null)
     {
-        if(!Plugin.Solo) {reason="This prototype supports solo worlds.";return false;}
+        if(!Plugin.Solo) {reason="Helmsman voyages are disabled in multiplayer.";return false;}
         if(Plugin.Instance.Voyage || Plugin.Instance.Summon || (Plugin.Instance.CalledGull && !aboardGuide)) {reason="Cancel the current voyage, summon or gull visit first.";return false;}
         if(GullGuide.Traveller(from.Id) && GullGuide.Traveller(from.Id)!=aboardGuide) {reason="The dock gull is finishing its previous trip; try again in a moment.";return false;}
         if(!ShipProfile.Supports(ship) || !ship.IsOwner()) {reason="Select a locally owned supported ship.";return false;}
@@ -112,7 +112,8 @@ public sealed class Voyage : MonoBehaviour
         if(!Plugin.Solo || Plugin.Instance.Voyage || !UnattendedShipPhysics.Installed || !ShipProfile.Supports(ship) || !ship.IsOwner())
         {reason="This ship cannot start an unattended voyage.";return false;}
         if(ship.HasPlayerOnboard() || ship.m_shipControlls.HaveValidUser()){reason="The ship is occupied.";return false;}
-        if(to.Temporary && !ShorelineArrival.Validate(to.MarkerPosition,to.Berth,new WaterChart(ship),out reason))return false;
+        // The shore was checked when called. It may now be unloaded because the
+        // caller moved away; recheck it when the travelling ship reaches the approach.
         var trip=ship.gameObject.AddComponent<Voyage>();trip.Ship=ship;trip.passenger=Player.m_localPlayer;
         trip.Unattended=true;trip.destination=to;trip.sourceId=to.Id;trip.chart=new WaterChart(ship);
         trip.departure=new Berth {name="Summoned ship",position=WaterChart.AtSea(ship.transform.position),heading=ship.transform.eulerAngles.y,configured=true};
@@ -131,7 +132,14 @@ public sealed class Voyage : MonoBehaviour
     internal bool GullReady=>gull && gull.ReadyOn(Ship);
     internal void CallGull() {if(gull) gull.CallDown();}
 
-    private IEnumerator Plan(Vector3 start)
+    private IEnumerator Plan(Vector3 start) => GuardedSteps.Run(BuildPlan(start), error =>
+    {
+        planning=null;
+        Plugin.Instance.Error(error);
+        Pause("Course planning failed. Choose the destination again or take the helm.");
+    });
+
+    private IEnumerator BuildPlan(Vector3 start)
     {
         // Yield once so the coroutine handle is assigned before it can complete or fail.
         yield return null;
@@ -314,7 +322,11 @@ public sealed class Voyage : MonoBehaviour
             if(distance<6 && waypoint<route.Count-1) {waypoint++;target=route[waypoint];distance=Vector3.Distance(position,target);}
             if(waypoint==route.Count-1 && distance<5)
             {
-                if(!chart.ValidateArrival(destination.Berth,out var reason,Relaxed && !destination.Temporary)) {Pause("Destination unavailable: "+reason);return;}
+                string reason;
+                bool clear=destination.Temporary
+                    ? ShorelineArrival.Validate(destination.MarkerPosition,destination.Berth,chart,out reason)
+                    : chart.ValidateArrival(destination.Berth,out reason,Relaxed);
+                if(!clear) {Pause("Destination unavailable: "+reason);return;}
                 phase=VoyagePhase.Approaching;ResetProgress();return;
             }
             var delta=target-position;

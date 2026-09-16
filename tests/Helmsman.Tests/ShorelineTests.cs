@@ -28,8 +28,5 @@ internal static class ShorelineTests
         check(!ShorelineSearch.ShoreAccess(caller,bow,30,p=>p.X<2 ? 45 : 27),"Cliff-top calls cannot pass shoreline access");
         check(ShorelineSearch.ShoreAccess(caller,bow,30,p=>27),"A separately validated caller on a low pier can start above water");
         check(!ShorelineSearch.ShoreAccess(caller,new Point(100,0),30,p=>27),"Distant shoreline samples are rejected");
-        check(ShorelineSearch.CallerInRange(caller,new Point(64,0))&&!ShorelineSearch.CallerInRange(caller,new Point(64.1,0)),"Caller leash has a fixed inclusive 64m boundary");
-        check(!ShorelineSearch.CallerInRange(caller,new Point(double.NaN,0)),"Invalid player location cannot keep a summon active");
-        check(!ShorelineSearch.CallerInRange(caller,new Point(300,0)),"Teleporting away invalidates the shoreline request");
     }
 }

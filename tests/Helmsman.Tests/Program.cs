@@ -125,10 +125,15 @@ Check(ShipRules.CanSail("CustomSailingShip",true,.1f),"Sailing ships do not need
 Check(!ShipRules.CanSail("DoubleRowingCanoe",true,0),"Canoe dummy sails never select wind propulsion");
 Check(!ShipRules.CanSail("Mod_Row_Boat",true,.1f),"Named rowboats with template sail settings still row");
 Check(!ShipRules.CanSail("CustomBoat",false,.1f),"Missing sail forces rowing mode");
+Check(ShipRules.CanSail("Karve",false,.03f,true),"Installed Karve cloth sail works without the retired sail object");
+Check(ShipRules.CanSail("Raft",false,.05f,true),"Installed Raft cloth sail remains eligible");
+Check(!ShipRules.CanSail("DoubleRowingCanoe",true,0,true),"Cloth or legacy flags do not turn a powerless canoe into a sailing boat");
+Check(!ShipRules.CanSail("Mod_Row_Boat",false,.1f,true),"Rowboat exclusions also apply to cloth sails");
 Check(!ShipRules.IsSeat("attach_mast") && !ShipRules.IsSeat("attach_dragon"),"Hold-fast points do not inflate seat counts");
 Check(!ShipRules.IsSeat("attach_bed") && !ShipRules.IsSeat(""),"Beds and standing helms do not count as seats");
 Check(ShipRules.IsSeat("attach_sitship") && ShipRules.IsSeat("attach_chair"),"Passenger and seated helm animations count");
 Check(ShipRules.IsSeat("attach_lox"),"Odin single-canoe seated helm is recognized");
 ShorelineTests.Run(Check);
 GullcallModelTests.Run(Check);
+GuardedStepsTests.Run(Check);
 Console.WriteLine($"{passed} checks passed.");

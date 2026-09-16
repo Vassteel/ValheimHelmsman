@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.14")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.15")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
@@ -51,13 +51,20 @@ public sealed class Plugin : BaseUnityPlugin
             "Allow nearby departure from the actual ship pose; treat built dock pieces and full turning-disk checks as advisories during slow dock maneuvers. Terrain and other ships still block. Disable for strict clearance checks.");
         GullSternPerch = Config.Bind("Gull", "SternPerch", new Vector3(0,1.7f,-4.3f), "Ship-local stern perch. X/Z select a surface to probe; Y is the fallback height.");
         GullPerchLift = Config.Bind("Gull", "PerchHeightAdjustment", 0f, new ConfigDescription("Additional ship-perch height adjustment after surface probing.", new AcceptableValueRange<float>(-2,2)));
+        harmony = new Harmony(Guid);
+        try { harmony.PatchAll(typeof(Plugin).Assembly); }
+        catch (Exception error)
+        {
+            harmony.UnpatchSelf();
+            Logger.LogError("Helmsman disabled: game hooks did not match. " + error);
+            enabled=false;
+            return;
+        }
         Directory = gameObject.AddComponent<DockDirectory>();
         UI = gameObject.AddComponent<HelmsmanUI>();
         Ships=gameObject.AddComponent<ShipDirectory>();
-        harmony = new Harmony(Guid);
-        harmony.PatchAll();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.14 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.15 loaded. Solo ship voyages and summoning; multiplayer disabled; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
@@ -80,7 +87,7 @@ public sealed class Plugin : BaseUnityPlugin
             Name = "Dock Ward", Description = "Name and configure a ship berth. Speak to its gull to sail.",
             PieceTable = "Hammer", Category = "Helmsman"
         };
-        // Retain the vanilla ward recipe for the prototype.
+        // Retain the vanilla ward recipe.
         PieceManager.Instance.AddPiece(new CustomPiece(prefab, false, config));
         PrefabManager.OnVanillaPrefabsAvailable -= RegisterDock;
         Logger.LogInfo("Registered Dock Ward.");
@@ -102,7 +109,7 @@ public sealed class Plugin : BaseUnityPlugin
             foreach(var ship in FindObjectsByType<Ship>(FindObjectsSortMode.None))
                 if(ship.IsPlayerInBoat(Player.m_localPlayer)){GullCall.Call(ship);break;}
         }
-        if (Voyage && !Solo) Voyage.Cancel("Voyage stopped: this prototype supports solo worlds.");
+        if (Voyage && !Solo) Voyage.Cancel("Voyage stopped: multiplayer operation is disabled.");
     }
 
     private void LateUpdate()

@@ -15,7 +15,7 @@ internal sealed class ShipProfile
     internal float TurnRadius=>Mathf.Max(16,Length*1.6f);
     internal Vector3 Center,MastCenter;
     internal static string PrefabName(Ship ship)=>ship.name.Replace("(Clone)","").Trim();
-    internal static bool CanSail(Ship ship)=>ship && ShipRules.CanSail(PrefabName(ship),ship.m_sailObject,ship.m_sailForceFactor);
+    internal static bool CanSail(Ship ship)=>ship && ShipRules.CanSail(PrefabName(ship),ship.m_sailObject,ship.m_sailForceFactor,ship.m_hasSail);
     internal static int SeatCount(Ship ship)
     {
         var seats=new List<Vector3>();

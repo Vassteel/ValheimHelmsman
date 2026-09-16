@@ -1,7 +1,7 @@
 {
   "name": "ValheimHelmsman",
   "author": "Local",
-  "version_number": "0.2.14",
+  "version_number": "0.2.15",
   "website_url": "https://github.com/Vassteel/ValheimHelmsman",
   "description": "Gull-guided voyages, named-ship summons, a craftable shoreline whistle, blue route wisps and requested cargo unloading with Quartermaster.",
   "dependencies": [

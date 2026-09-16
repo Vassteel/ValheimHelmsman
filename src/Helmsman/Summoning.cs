@@ -16,6 +16,7 @@ public sealed class SummonRequest : MonoBehaviour
     internal ZDOID Home,ShipId;
     internal string Status {get;private set;}="Sending the gull";
     internal Vector3 Center {get;private set;}
+    internal Vector3 SimulationCenter=>searchingShore ? shoreOrigin : Center;
     internal bool Loading {get;private set;}
     private GullGuide? gull;
     private Voyage? voyage;
@@ -37,12 +38,12 @@ public sealed class SummonRequest : MonoBehaviour
         if(!CanRequest(record,out var zdo,out var ship,out reason))return false;
         if(!ShorelineArrival.CallerReady(Player.m_localPlayer,out reason))return false;
         var request=Plugin.Instance.gameObject.AddComponent<SummonRequest>();
-        request.shoreline=true;request.searchingShore=true;request.shoreOrigin=Player.m_localPlayer.transform.position;
+        request.shoreline=true;request.searchingShore=true;request.Loading=true;request.shoreOrigin=Player.m_localPlayer.transform.position;
         request.ShipId=record.Id;request.requester=Player.m_localPlayer;request.Center=zdo.GetPosition();request.started=Time.time;
         request.world=ZNet.instance.GetWorldUID();request.Status="Finding safe water near your shoreline";
         Plugin.Instance.Summon=request;
         request.StartCoroutine(request.FindShoreline(record,ship));
-        reason="The gull is checking for a safe landing nearby. Stay near this shoreline.";return true;
+        reason="The gull is checking for a safe landing. He'll sail the ship to this calling spot; you can move on.";return true;
     }
     private IEnumerator FindShoreline(ShipRecord record,Ship ship)
     {
@@ -50,6 +51,9 @@ public sealed class SummonRequest : MonoBehaviour
         int checkedSpots=0;
         foreach(var berth in ShorelineArrival.Candidates(shoreOrigin,profile,record.Prefab))
         {
+            // Keep the original calling area loaded while checking it, including if
+            // the player teleports away before this incremental search completes.
+            while(!ReadyArea && !finishing)yield return null;
             if(finishing)yield break;
             bool clear;
             try {clear=ShorelineArrival.Validate(shoreOrigin,berth,chart,out _);}
@@ -59,7 +63,7 @@ public sealed class SummonRequest : MonoBehaviour
                 if(Vector3.Distance(WaterChart.AtSea(Center),WaterChart.AtSea(berth.position))<6)
                 {Cancel("That ship is already beside this shoreline.");yield break;}
                 shoreDestination=new DockRecord {Temporary=true,Berth=berth,MarkerPosition=shoreOrigin};
-                searchingShore=false;
+                searchingShore=false;Loading=false;areaReady=false;
                 try
                 {
                     gull=GullGuide.Create(shoreOrigin+Vector3.up*3,null,null);
@@ -112,18 +116,19 @@ public sealed class SummonRequest : MonoBehaviour
     internal bool ReadyArea=>Loading && areaReady;
     private void KeepAreaLoaded()
     {
-        var center=ZoneSystem.GetZone(Center);
+        var simulationCenter=SimulationCenter;
+        var center=ZoneSystem.GetZone(simulationCenter);
         bool created=false;
         for(int x=-2;x<=2 && !created;x++)for(int z=-2;z<=2;z++)
             if((bool)LoadZones.Invoke(ZoneSystem.instance,new object[]{new Vector2s(center.x+x,center.y+z)})) {created=true;break;}
         areaReady=true;
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
-            if(!ZoneSystem.instance.IsZoneLoaded(Center+new Vector3(x*64,0,z*64)))areaReady=false;
+            if(!ZoneSystem.instance.IsZoneLoaded(simulationCenter+new Vector3(x*64,0,z*64)))areaReady=false;
         if(!areaReady)return;
         checkedObjects.Clear();
         ZDOMan.instance.FindSectorObjects(center,new SimulationDistance(2,0,true),checkedObjects);
         foreach(var zdo in checkedObjects)
-            if(Vector3.Distance(WaterChart.AtSea(zdo.GetPosition()),WaterChart.AtSea(Center))<80 &&
+            if(Vector3.Distance(WaterChart.AtSea(zdo.GetPosition()),WaterChart.AtSea(simulationCenter))<80 &&
                 ZNetScene.instance.GetPrefab(zdo.GetPrefab()) && !ZNetScene.instance.HaveInstance(zdo))
             {areaReady=false;break;}
     }
@@ -135,9 +140,8 @@ public sealed class SummonRequest : MonoBehaviour
     private void Advance()
     {
         if(!Plugin.Solo || !requester || requester!=Player.m_localPlayer || requester.IsDead() || ZNet.instance.GetWorldUID()!=world){Cancel("Summon stopped: player unavailable.");return;}
-        if(shoreline && !ShorelineSearch.CallerInRange(WaterChart.Point(shoreOrigin),WaterChart.Point(requester.transform.position)))
-        {Cancel("Shoreline summon cancelled: you left the calling area. Use the whistle again near the shore.");return;}
-        if(searchingShore)return;
+        if(!voyage && Time.time-started>1800){Cancel("The gull could not prepare that ship's journey in time.");return;}
+        if(searchingShore){KeepAreaLoaded();return;}
         var home=shoreline ? shoreDestination : DockDirectory.Resolve(Home);var zdo=ZDOMan.instance.GetZDO(ShipId);
         if(home==null || zdo==null){Cancel("Summon stopped: dock or ship removed.");return;}
         var go=ZNetScene.instance.FindInstance(ShipId);var ship=go ? go.GetComponent<Ship>() : null;
@@ -148,7 +152,6 @@ public sealed class SummonRequest : MonoBehaviour
         if(Loading)KeepAreaLoaded();
         if(voyage){Status=voyage.Status;return;}
         Status=Loading ? "Gull finding the ship" : "Gull flying to the ship";
-        if(Time.time-started>1800){Cancel("The gull could not reach that ship in time.");return;}
         if(!ReadyArea || !ship || Vector3.Distance(gull!.transform.position,Center)>8)return;
         if(ship.HasPlayerOnboard() || ship.m_shipControlls.HaveValidUser()){Cancel("Summon stopped: ship is occupied.");return;}
         var view=ship.GetComponent<ZNetView>();view.ClaimOwnership();
@@ -207,7 +210,7 @@ internal static class SummonSceneObjects
     {
         var request=Plugin.Instance.Summon;if(!request || !request.Loading || !Plugin.Solo)return;
         remote.Clear();
-        ZDOMan.instance.FindSectorObjects(ZoneSystem.GetZone(request.Center),new SimulationDistance(2,0,true),remote);
+        ZDOMan.instance.FindSectorObjects(ZoneSystem.GetZone(request.SimulationCenter),new SimulationDistance(2,0,true),remote);
         var seen=new HashSet<ZDO>(currentNearObjects);
         foreach(var zdo in remote)
             if(ZoneSystem.instance.IsZoneLoaded(zdo.GetPosition()) && seen.Add(zdo))currentNearObjects.Add(zdo);
@@ -219,7 +222,7 @@ internal static class SummonActiveArea
     internal static void Postfix(Vector3 point,ref bool __result)
     {
         var request=Plugin.Instance.Summon;
-        if(request && request.Loading && Plugin.Solo && Mathf.Abs(point.x-request.Center.x)<128 && Mathf.Abs(point.z-request.Center.z)<128)__result=true;
+        if(request && request.Loading && Plugin.Solo && Mathf.Abs(point.x-request.SimulationCenter.x)<128 && Mathf.Abs(point.z-request.SimulationCenter.z)<128)__result=true;
     }
 }
 [HarmonyPatch(typeof(Ship),nameof(Ship.CustomFixedUpdate))]

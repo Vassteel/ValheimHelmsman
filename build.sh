@@ -14,6 +14,9 @@ export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 "$helmsman_dotnet" run --project tests/Helmsman.Tests/Helmsman.Tests.csproj -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Interaction.Tests/Interaction.Tests.csproj -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Whistle.Tests/Whistle.Tests.csproj -c Release --no-launch-profile
+"$helmsman_dotnet" run --project tests/Summon.Tests/Summon.Tests.csproj -c Release --no-launch-profile
+helmsman_game="$("$helmsman_dotnet" msbuild src/Helmsman/Helmsman.csproj -getProperty:ValheimDir "$@")"
+"$helmsman_dotnet" run --project tests/Whistle.ApiCheck -c Release "$@" -- "$PWD" "$helmsman_game"
 mkdir -p dist/ValheimHelmsman
 cp src/Helmsman/bin/Release/netstandard2.1/ValheimHelmsman.dll dist/ValheimHelmsman/
 cp src/Helmsman.Core/bin/Release/netstandard2.1/Helmsman.Core.dll dist/ValheimHelmsman/

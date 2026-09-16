@@ -4,11 +4,11 @@ namespace Helmsman.Core;
 
 public static class ShipRules
 {
-    public static bool CanSail(string prefabName, bool hasSail, float sailForce)
+    public static bool CanSail(string prefabName, bool hasSail, float sailForce, bool hasClothSail=false)
     {
         // Some rowing boats retain dummy mast/sail objects from a vanilla template.
         var name=prefabName.Replace("_", "").Replace("-", "").Replace(" ", "").ToLowerInvariant();
-        return hasSail && sailForce>0.0001f && !name.Contains("rowboat") &&
+        return (hasSail || hasClothSail) && sailForce>0.0001f && !name.Contains("rowboat") &&
             !name.Contains("rowing") && !name.Contains("canoe");
     }
     public static bool IsMast(string animation)=>string.Equals(animation,"attach_mast",StringComparison.OrdinalIgnoreCase);

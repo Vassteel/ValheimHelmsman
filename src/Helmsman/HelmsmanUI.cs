@@ -419,7 +419,7 @@ public sealed class HelmsmanUI : MonoBehaviour
         whistleRequestSnapshot=request;
         if(request)
         {
-            theme!.Text(body!,"The gull is checking the shore or fetching your ship.\nStay near the calling spot. You can close this menu and use the whistle again to check progress.",0,0,672,100,22,MenuTheme.Muted);
+            theme!.Text(body!,"The gull sails your ship to the original calling spot. Arrival takes time; you can move on. Use the whistle again to check progress.",0,0,672,100,22,MenuTheme.Muted);
             Button(body!,"Cancel summon",0,-145,672,()=>{request.Cancel("Summon cancelled.");rebuild=true;});return;
         }
         if(Plugin.Instance.Voyage || Plugin.Instance.CalledGull)
@@ -437,7 +437,7 @@ public sealed class HelmsmanUI : MonoBehaviour
             });
         }
         if(count==0)theme.Text(body!,"No named ships found. Name a ship at its mast or helm, then refresh.",0,-65,672,140,21,MenuTheme.Muted);
-        theme.Text(body!,"Stay within 64 m of where you call. I'll stop offshore where she fits.",0,-340,672,55,18,MenuTheme.Muted);
+        theme.Text(body!,"I'll sail her to safe water beside this calling spot. You can move on.",0,-340,672,55,18,MenuTheme.Muted);
         var previous=Button(body!,"Previous",0,-282,160,()=>{page--;rebuild=true;});previous.interactable=page>0;
         var next=Button(body!,"Next",180,-282,160,()=>{page++;rebuild=true;});next.interactable=page+1<(count+3)/4;
         Button(body!,"Refresh list",360,-282,312,()=>rebuild=true);
@@ -500,10 +500,13 @@ public sealed class HelmsmanUI : MonoBehaviour
         if((!voyage && !call && !adjustingView) || !Player.m_localPlayer){Remove(ref hud);hudStatus=null;return;}
         if(!hud)
         {
-            var font=MenuTheme.FindFont();if(!font || !GUIManager.CustomGUIFront)return;
+            var font=MenuTheme.FindFont();
+            var hotbar=Hud.instance ? Hud.instance.GetComponentInChildren<HotkeyBar>(true) : null;
+            if(!font || !hotbar)return;
             var t=new MenuTheme(font);
-            var rect=MenuTheme.Rect("Helmsman_VoyageStatus",GUIManager.CustomGUIFront.transform,24,-90,460,84);
+            var rect=MenuTheme.Rect("Helmsman_VoyageStatus",hotbar.transform,0,-100,460,84);
             hud=rect.gameObject;MenuTheme.Panel(rect,MenuTheme.Background,true);
+            hud.AddComponent<VoyageHudAnchor>().Bar=hotbar;
             hud.AddComponent<CanvasGroup>().blocksRaycasts=false;
             hudStatus=t.Text(rect,"",16,-8,428,68,18,MenuTheme.Gold);
             hudStatus.enableAutoSizing=true;hudStatus.fontSizeMin=14;hudStatus.fontSizeMax=18;

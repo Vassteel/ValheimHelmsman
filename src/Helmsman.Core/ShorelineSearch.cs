@@ -12,7 +12,7 @@ public readonly struct ShoreCandidate
 
 public static class ShorelineSearch
 {
-    public const double MaximumRadius=48,MaximumSwimGap=12,CallerLeash=64;
+    public const double MaximumRadius=48,MaximumSwimGap=12;
     // Closest rings first. An individual ship's actual clearance is checked by the game adapter.
     public static IEnumerable<ShoreCandidate> Candidates(Point caller,double length)
     {
@@ -42,6 +42,5 @@ public static class ShorelineSearch
         }
         return enteredWater && distance-lastLand<=MaximumSwimGap;
     }
-    public static bool CallerInRange(Point origin,Point current)=>Finite(current.X)&&Finite(current.Y)&&origin.Distance(current)<=CallerLeash;
     private static bool Finite(double value)=>!double.IsNaN(value)&&!double.IsInfinity(value);
 }

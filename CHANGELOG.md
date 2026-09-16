@@ -1,3 +1,14 @@
+# Changelog
+
+## 0.2.15
+
+- Recognize the current game's cloth sails on Karves and rafts, which no longer require the legacy sail-object reference.
+- Whistle summons sail to the original calling spot. Moving or teleporting away no longer cancels them; shoreline checks stay loaded during the search and run again before arrival.
+- Place voyage status below the native hotbar, aligned with its first slot and UI scale.
+- Pause and explain coroutine planning failures; remove partial Harmony patches when startup hooks fail.
+- Version the plugin and Core DLL together. Keep the established plugin GUID and saved-world keys.
+- Refresh player documentation, separate developer notes, and distinguish local play from remaining checks and disabled multiplayer.
+
 ## 0.2.14
 
 - Replace Unity JSON model loading with a validated binary mesh decoder after the live whistle registration failed with an empty-array access.
@@ -45,7 +56,6 @@
 
 - Added a faceted iron helmet with bronze trim and curved horns to the gull, matching the package artwork. The accessory follows perched head/body gestures and the flying body rig.
 
-# Changelog
 
 ## 0.2.6
 

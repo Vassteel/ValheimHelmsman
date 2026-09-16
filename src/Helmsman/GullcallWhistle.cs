@@ -13,7 +13,7 @@ internal static class GullcallWhistle
     {
         var item=new CustomItem(PrefabName,"BoneFragments",new ItemConfig {
             Name="Gullcall Whistle",
-            Description="A bone gull with wooden wings and feather ties. Use from your inventory or hotbar near shore to ask the gull to bring a named ship to safe water nearby. No Dock Ward required. Reusable.",
+            Description="A bone gull with wooden wings and feather ties. Use near shore to ask the gull to sail a named ship to this calling spot. Arrival takes time; you can move on. No Dock Ward required. Reusable.",
             Amount=1,StackSize=1,Weight=.2f,Icon=GullcallAssets.Icon(),
             CraftingStation="",MinStationLevel=0,
             Requirements=new[] {
