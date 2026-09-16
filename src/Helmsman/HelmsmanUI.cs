@@ -15,7 +15,14 @@ public sealed class HelmsmanUI : MonoBehaviour
     private bool adjustingView, inputBlocked;
     private bool editing, onboard, rebuild, naming;
     private Ship? namingShip;
+    private ItemDrop.ItemData? whistle;
+    private SummonRequest? whistleRequestSnapshot;
     private GullCall? calledGull;
+    private GullGuide? cargoSpeaker;
+    private bool hadCargoTab;
+    private Ship? CargoShip=>calledGull ? calledGull.Ship : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Ship : null;
+    private bool CargoAvailable=>onboard && cargoSpeaker && CargoShip && cargoSpeaker.ReadyOn(CargoShip) &&
+        QuartermasterBridge.Available && QuartermasterBridge.InRange(CargoShip);
     private string shipName="";
     private int tab, page;
     private DockMarker? dock;
@@ -44,19 +51,24 @@ public sealed class HelmsmanUI : MonoBehaviour
         Close();dock=marker;draft=marker.Settings.Copy();tab=2;RefreshShips();Open();
         notice=marker.Settings.configured ? "Choose a ship and destination." : "Configure this ward's berth first.";
     }
-    internal void OpenVoyage()
+    internal void OpenVoyage(GullGuide? speaker=null)
     {
         if(!Plugin.Instance.Voyage || !Plugin.Instance.Voyage.GullReady)return;
-        Close();onboard=true;tab=2;Plugin.Instance.Voyage.CallGull();Open();
+        Close();onboard=true;cargoSpeaker=speaker;tab=2;Plugin.Instance.Voyage.CallGull();Open();
     }
-    internal void OpenCalledGull(GullCall call)
+    internal void OpenCalledGull(GullCall call,GullGuide? speaker=null)
     {
         if(!call.Ready || !Player.m_localPlayer || !call.Ship.IsPlayerInBoat(Player.m_localPlayer))return;
-        Close();calledGull=call;onboard=true;tab=2;Open();
+        Close();calledGull=call;onboard=true;cargoSpeaker=speaker;tab=2;Open();
     }
     internal void OpenShipName(Ship ship)
     {
         Close();naming=true;namingShip=ship;shipName=ShipDirectory.Display(ship);Open();
+    }
+    internal void OpenWhistle(ItemDrop.ItemData item)
+    {
+        if(!GullcallWhistle.Carried(Player.m_localPlayer,item))return;
+        Close();whistle=item;Open();
     }
     private bool Open()
     {
@@ -90,6 +102,8 @@ public sealed class HelmsmanUI : MonoBehaviour
     {
         BlockInput(false);adjustingView=false;
         IsOpen=false;calledGull=null;naming=false;namingShip=null;editing=false;onboard=false;rebuild=false;dock=null;draft=null;selectedShip=null;notice="";page=0;
+        cargoSpeaker=null;hadCargoTab=false;
+        whistle=null;whistleRequestSnapshot=null;
         controls.Clear();refreshLabels.Clear();
         if(EventSystem.current && modal && EventSystem.current.currentSelectedGameObject &&
             EventSystem.current.currentSelectedGameObject.transform.IsChildOf(modal.transform))
@@ -115,7 +129,8 @@ public sealed class HelmsmanUI : MonoBehaviour
         UpdateHud();
         if(!IsOpen)return;
         if(!Player.m_localPlayer || Player.m_localPlayer.IsDead() || !GUIManager.CustomGUIFront ||
-            (!onboard && !dock && !naming) || (naming && !namingShip) ||
+            (!onboard && !dock && !naming && whistle==null) || (naming && !namingShip) ||
+            (whistle!=null && (!Plugin.Solo || !GullcallWhistle.Carried(Player.m_localPlayer,whistle))) ||
             (onboard && !Plugin.Instance.Voyage && !calledGull) ||
             (calledGull && (!calledGull.Ready || !calledGull.Ship.IsPlayerInBoat(Player.m_localPlayer)))){Close();return;}
         if(adjustingView)
@@ -128,6 +143,8 @@ public sealed class HelmsmanUI : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Escape) || ZInput.GetButtonDown("JoyButtonB"))
         {ZInput.ResetButtonStatus("JoyButtonB");Close();return;}
         // Rebuild after the input callback has completed, preserving live input controls while typing.
+        if(whistle!=null && !ReferenceEquals(whistleRequestSnapshot,Plugin.Instance.Summon))rebuild=true;
+        if(CargoAvailable!=hadCargoTab) { if(!CargoAvailable && tab==4)tab=2;rebuild=true; }
         if(rebuild){BuildMenu();rebuild=false;}
         FitModal();
         if(editing && draft!=null)
@@ -143,7 +160,7 @@ public sealed class HelmsmanUI : MonoBehaviour
         {
             nextLabels=Time.unscaledTime+.2f;
             foreach(var update in refreshLabels)update();
-            if(status)status.text=notice.Length>0 ? notice : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
+            if(status)status.text=notice.Length>0 ? notice : whistle!=null ? (Plugin.Instance.Summon ? Plugin.Instance.Summon.Status : "Stand near shore. The gull finds safe water nearby; no Dock Ward needed.") : tab==4 ? "Cargo moves only after your request." : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
                 naming ? "Ship names are saved with the world." : tab==3 ? "Choose an empty named ship to summon." :
                 editing && tab<2 ? (valid ? "Clearance: " : "Advisory: ")+validation : "Select a named dock to set sail.";
         }
@@ -161,8 +178,30 @@ public sealed class HelmsmanUI : MonoBehaviour
         var rect=MenuTheme.Rect("Helmsman_Menu",parent,0,0,720,620);modal=rect.gameObject;
         rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(.5f,.5f);rect.anchoredPosition=Vector2.zero;
         MenuTheme.Panel(rect,MenuTheme.Background,true);
-        theme.Text(rect,naming ? "SHIP NAME" : onboard ? "SHIP ORDERS" : "DOCK CONFIG",24,-16,570,38,28,MenuTheme.Gold);
+        theme.Text(rect,whistle!=null ? "GULLCALL WHISTLE" : naming ? "SHIP NAME" : onboard ? "SHIP ORDERS" : "DOCK CONFIG",24,-16,360,38,28,MenuTheme.Gold);
         Button(rect,"Close",602,-18,94,Close);
+        if(!naming)
+        {
+            var routeToggle=Button(rect,"",400,-18,186,()=>
+            {
+                Plugin.Instance.DebugRoute.Value=!Plugin.Instance.DebugRoute.Value;
+                Plugin.Instance.Config.Save();
+            });
+            var label=routeToggle.GetComponentInChildren<TMP_Text>();
+            Action updateRouteLabel=()=>label.text=Plugin.Instance.DebugRoute.Value ? "Hide route wisps" : "Show route wisps";
+            updateRouteLabel();refreshLabels.Add(updateRouteLabel);
+        }
+        if(whistle!=null)
+        {
+            theme.Text(rect,"Give me a ship's name, Viking. I'll bring her in.",24,-68,672,45,21,MenuTheme.Muted);
+            body=MenuTheme.Rect("Whistle orders",rect,24,-130,672,390);
+            BuildWhistle();
+            status=theme.Text(rect,"",24,-535,672,50,18,MenuTheme.Gold);
+            theme.Text(rect,"D-pad ↑↓: select   A: activate   B / Esc: close",24,-596,672,18,15,MenuTheme.Muted);
+            nextLabels=0;FitModal();
+            if(ZInput.IsGamepadActive() && controls.Count>0)controls[0].Select();
+            return;
+        }
         if(naming)
         {
             theme.Text(rect,"Give this ship a name so the dock gull can find it.",24,-76,672,50,21,MenuTheme.Muted);
@@ -174,17 +213,19 @@ public sealed class HelmsmanUI : MonoBehaviour
             });
             status=theme.Text(rect,"",24,-280,672,70,19,MenuTheme.Gold);FitModal();return;
         }
-        theme.Text(rect,calledGull ? "Where shall we sail? Choose a named dock below." : onboard ? "Speak to the gull to change course or end the voyage." : tab>=2 ? "Sail to a dock or summon a named ship" : "Ghost setup · No ship required",24,-60,onboard ? 672 : 482,28,18,MenuTheme.Muted);
+        theme.Text(rect,tab==4 ? "Let me carry that cargo ashore, Viking." : calledGull ? "Where shall we sail? Choose a named dock below." : onboard ? "Speak to the gull to change course or end the voyage." : tab>=2 ? "Sail to a dock or summon a named ship" : "Ghost setup · No ship required",24,-60,onboard ? 672 : 482,28,18,MenuTheme.Muted);
         if(!onboard && tab<2)Button(rect,"Adjust view",522,-58,174,AdjustView);
-        var tabs=onboard ? new[]{"Destination"} : new[]{"Berth","Departure","Destinations","Summon ship"};
+        hadCargoTab=CargoAvailable;
+        var tabs=onboard ? hadCargoTab ? new[]{"Destination","Unload cargo"} : new[]{"Destination"} : new[]{"Berth","Departure","Destinations","Summon ship"};
         for(int i=0;i<tabs.Length;i++)
         {
             int index=i;
-            var button=Button(rect,tabs[i],24+i*170,-101,onboard ? 672 : 162,()=>SwitchTab(index));
-            if(onboard || tab==i)button.GetComponent<Image>().color=MenuTheme.SelectedTab;
+            float spacing=onboard ? (hadCargoTab ? 344 : 680) : 170;
+            var button=Button(rect,tabs[i],24+i*spacing,-101,onboard ? (hadCargoTab ? 328 : 672) : 162,()=>SwitchTab(index));
+            if((onboard ? (tab==4 ? 1 : 0) : tab)==i)button.GetComponent<Image>().color=MenuTheme.SelectedTab;
         }
         body=MenuTheme.Rect("Contents",rect,24,-155,672,382);
-        if(tab==3 && !onboard)BuildSummon();else if(onboard || tab==2)BuildDestinations();else if(tab==0)BuildBerth();else BuildDeparture();
+        if(tab==4 && onboard)BuildCargo();else if(tab==3 && !onboard)BuildSummon();else if(onboard || tab==2)BuildDestinations();else if(tab==0)BuildBerth();else BuildDeparture();
         status=theme.Text(rect,"",24,-546,672,46,17,MenuTheme.Gold);
         status.enableAutoSizing=true;status.fontSizeMin=14;status.fontSizeMax=17;
         theme.Text(rect,"D-pad ↑↓: select   ←→: adjust   A: activate   B / Esc: close",24,-596,672,18,15,MenuTheme.Muted);
@@ -200,7 +241,7 @@ public sealed class HelmsmanUI : MonoBehaviour
     }
     private void SwitchTab(int index)
     {
-        if(onboard)return;
+        if(onboard) { tab=index==1 && CargoAvailable ? 4 : 2;page=0;notice="";rebuild=true;return; }
         tab=index;page=0;notice="";
         if(tab<2 && !editing){editing=true;if(draft==null && dock)draft=dock.Settings.Copy();CreatePreview();}
         if(preview)preview.SetActive(tab<2);
@@ -301,7 +342,8 @@ public sealed class HelmsmanUI : MonoBehaviour
         }
         else if(onboard)
         {
-            Button(body!,"Stop voyage / release autopilot",0,0,672,()=>{var voyage=Plugin.Instance.Voyage;if(voyage)voyage.Cancel("Voyage cancelled.");Close();});
+            Button(body!,"Stop voyage",0,0,328,()=>{var voyage=Plugin.Instance.Voyage;if(voyage)voyage.Cancel("Voyage cancelled.");Close();});
+            Button(body!,"What's happening?",344,0,328,()=>{if(Plugin.Instance.Voyage)Plugin.Instance.Voyage.ExplainStatus();});
         }
         else
         {
@@ -321,6 +363,31 @@ public sealed class HelmsmanUI : MonoBehaviour
         var next=Button(body!,"Next",282,-313,160,()=>{page++;rebuild=true;});next.interactable=page<pages-1;
         Button(body!,"Refresh docks",460,-313,212,()=>{notice="";rebuild=true;});
     }
+    private void BuildCargo()
+    {
+        var ship=CargoShip;
+        if(!CargoAvailable || !ship || !cargoSpeaker) return;
+        if(Plugin.Instance.Cargo)
+        {
+            var job=Plugin.Instance.Cargo;
+            var text=theme!.Text(body!,job.Status,0,0,672,90,21,MenuTheme.Gold);
+            refreshLabels.Add(()=> { if(job)text.text=job.Status;else {notice="Cargo request finished.";rebuild=true;} });
+            Button(body!,"Stop unloading",0,-130,672,()=>{if(job)job.Stop("Cargo unloading stopped.");rebuild=true;});return;
+        }
+        string reason=QuartermasterBridge.Check(ship);
+        if(reason.Length>0)
+        {
+            theme!.Text(body!,reason,0,0,672,90,21,MenuTheme.Gold);
+            Button(body!,"Check again",0,-130,672,()=>rebuild=true);return;
+        }
+        theme!.Text(body!,"Unload this boat into matching Quartermaster storage nearby.\n\nI'll sort one cargo slot at a time. Anything without matching space stays aboard.",0,0,672,150,21,MenuTheme.Muted);
+        Button(body!,"Unload cargo to base",0,-180,672,()=>
+        {
+            CargoOrder.Start(ship,cargoSpeaker,out var message);
+            notice=message;rebuild=true;
+        });
+    }
+
     private void BuildSummon()
     {
         if(!dock)return;
@@ -345,6 +412,35 @@ public sealed class HelmsmanUI : MonoBehaviour
         var previous=Button(body!,"Previous",0,-313,160,()=>{page--;rebuild=true;});previous.interactable=page>0;
         var next=Button(body!,"Next",180,-313,160,()=>{page++;rebuild=true;});next.interactable=page<pages-1;
         Button(body!,"Refresh list",360,-313,312,()=>rebuild=true);
+    }
+    private void BuildWhistle()
+    {
+        var request=Plugin.Instance.Summon;
+        whistleRequestSnapshot=request;
+        if(request)
+        {
+            theme!.Text(body!,"The gull is checking the shore or fetching your ship.\nStay near the calling spot. You can close this menu and use the whistle again to check progress.",0,0,672,100,22,MenuTheme.Muted);
+            Button(body!,"Cancel summon",0,-145,672,()=>{request.Cancel("Summon cancelled.");rebuild=true;});return;
+        }
+        if(Plugin.Instance.Voyage || Plugin.Instance.CalledGull)
+        {theme!.Text(body!,"Finish or cancel your current voyage or gull visit before requesting another ship.",0,0,672,120,22,MenuTheme.Muted);return;}
+        theme!.Text(body!,"Choose a ship to bring to your shoreline",0,0,672,46,23,MenuTheme.Gold);
+        var ships=Plugin.Instance.Ships.Records.OrderBy(s=>s.Name).ToList();int count=ships.Count;
+        page=Mathf.Clamp(page,0,Math.Max(0,(count-1)/4));
+        for(int i=0;i<4 && page*4+i<count;i++)
+        {
+            var ship=ships[page*4+i];var distance=Vector3.Distance(ship.Position,Player.m_localPlayer.transform.position);
+            Button(body!,ship.Name+" ("+ship.Prefab+") · "+distance.ToString("0")+" m",0,-60-i*52,672,()=>
+            {
+                if(!GullcallWhistle.Carried(Player.m_localPlayer,whistle)){Close();return;}
+                if(SummonRequest.BeginShoreline(ship,out var reason)){notice="";rebuild=true;}else notice=reason;
+            });
+        }
+        if(count==0)theme.Text(body!,"No named ships found. Name a ship at its mast or helm, then refresh.",0,-65,672,140,21,MenuTheme.Muted);
+        theme.Text(body!,"Stay within 64 m of where you call. I'll stop offshore where she fits.",0,-340,672,55,18,MenuTheme.Muted);
+        var previous=Button(body!,"Previous",0,-282,160,()=>{page--;rebuild=true;});previous.interactable=page>0;
+        var next=Button(body!,"Next",180,-282,160,()=>{page++;rebuild=true;});next.interactable=page+1<(count+3)/4;
+        Button(body!,"Refresh list",360,-282,312,()=>rebuild=true);
     }
     private void SelectDestination(DockRecord destination)
     {

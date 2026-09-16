@@ -26,7 +26,7 @@ public sealed class Voyage : MonoBehaviour
     private Berth? departure;
     private static bool Relaxed => Plugin.Instance.RelaxedDockChecks.Value;
     private bool DockManeuver => phase==VoyagePhase.Departing || phase==VoyagePhase.Reversing ||
-        phase==VoyagePhase.Approaching || phase==VoyagePhase.Docking;
+        (!destination.Temporary && (phase==VoyagePhase.Approaching || phase==VoyagePhase.Docking));
     private ZDOID sourceId;
     private BoardingGate? gate;
     private VoyagePhase phase;
@@ -39,9 +39,11 @@ public sealed class Voyage : MonoBehaviour
     private Ship.Speed command=Ship.Speed.Stop;
     private float rudder;
     private GullGuide? gull;
-    private LineRenderer? routeLine;
+    private RouteWisps? routeEffect;
     private Coroutine? planning;
     private int automaticReplans;
+    private float waitingForWorldSince=-1;
+    private bool worldWaitAnnounced;
     private const float Deceleration=.25f; // Conservative starting estimate, awaiting measured calibration.
 
     internal static bool Begin(Ship ship,DockRecord from,DockRecord to,out string reason,GullGuide? aboardGuide=null)
@@ -73,7 +75,7 @@ public sealed class Voyage : MonoBehaviour
             voyage.gull=sourceMarker ? sourceMarker.BoardGuide(voyage) : GullGuide.Create(from.MarkerPosition+Vector3.up*2,null,voyage);
             voyage.gull.ReserveDock(from.Id);
         }
-        voyage.routeLine=Visuals.Line(voyage.transform,new Color(.3f,.8f,1,.8f));
+        voyage.routeEffect=RouteWisps.Create(voyage.transform);
         Plugin.Instance.Record("Voyage selected: "+from.Berth.name+" -> "+to.Berth.name+"; reverse departure="+from.Berth.reverseDeparture);
         reason="Boarding countdown started.";return true;
     }
@@ -99,7 +101,7 @@ public sealed class Voyage : MonoBehaviour
         // Already at sea: plan from the actual ship pose; no artificial source ward or dock exit.
         var trip=ship.gameObject.AddComponent<Voyage>();trip.Ship=ship;trip.passenger=Player.m_localPlayer;
         trip.destination=fresh;trip.chart=new WaterChart(ship);trip.phase=VoyagePhase.Planning;trip.rerouting=true;
-        trip.gull=guide;guide.Board(trip);trip.routeLine=Visuals.Line(trip.transform,new Color(.3f,.8f,1,.8f));
+        trip.gull=guide;guide.Board(trip);trip.routeEffect=RouteWisps.Create(trip.transform);
         Plugin.Instance.Voyage=trip;trip.planning=trip.StartCoroutine(trip.Plan(WaterChart.AtSea(ship.transform.position)));
         Plugin.Instance.Record("Onboard voyage selected: "+ShipDirectory.Display(ship)+" -> "+fresh.Berth.name);
         reason="The gull is plotting the course.";return true;
@@ -110,6 +112,7 @@ public sealed class Voyage : MonoBehaviour
         if(!Plugin.Solo || Plugin.Instance.Voyage || !UnattendedShipPhysics.Installed || !ShipProfile.Supports(ship) || !ship.IsOwner())
         {reason="This ship cannot start an unattended voyage.";return false;}
         if(ship.HasPlayerOnboard() || ship.m_shipControlls.HaveValidUser()){reason="The ship is occupied.";return false;}
+        if(to.Temporary && !ShorelineArrival.Validate(to.MarkerPosition,to.Berth,new WaterChart(ship),out reason))return false;
         var trip=ship.gameObject.AddComponent<Voyage>();trip.Ship=ship;trip.passenger=Player.m_localPlayer;
         trip.Unattended=true;trip.destination=to;trip.sourceId=to.Id;trip.chart=new WaterChart(ship);
         trip.departure=new Berth {name="Summoned ship",position=WaterChart.AtSea(ship.transform.position),heading=ship.transform.eulerAngles.y,configured=true};
@@ -118,7 +121,7 @@ public sealed class Voyage : MonoBehaviour
             if(Vector3.Distance(WaterChart.AtSea(dock.Berth.position),trip.departure.position)<20)
             {docked=true;trip.departure.reverseDeparture=dock.Berth.reverseDeparture;trip.departure.reverseDistance=dock.Berth.reverseDistance;break;}
         trip.phase=VoyagePhase.Planning;trip.gull=guide;guide.Board(trip);
-        trip.routeLine=Visuals.Line(trip.transform,new Color(.3f,.8f,1,.8f));
+        trip.routeEffect=RouteWisps.Create(trip.transform);
         var start=docked ? trip.departure.Exit : trip.departure.position;
         if(!docked){trip.departure=null;trip.rerouting=true;}
         Plugin.Instance.Voyage=trip;trip.planning=trip.StartCoroutine(trip.Plan(start));
@@ -133,13 +136,17 @@ public sealed class Voyage : MonoBehaviour
         // Yield once so the coroutine handle is assigned before it can complete or fail.
         yield return null;
         route.Clear();waypoint=0;
+        if(routeEffect)routeEffect.Clear();
         var approach=destination.Berth.Approach;
         var leadIn=approach-destination.Berth.Forward*20;
         if(!chart.RegionalSegment(WaterChart.Point(leadIn),WaterChart.Point(approach)))
         {Pause("No clear straight approach to that dock.");yield break;}
+        float planStarted=Time.time;bool planningAnnounced=false;
         var search=new RouteSearch(WaterChart.Point(start),WaterChart.Point(leadIn),chart.RegionalSegment);
         while(search.State==SearchState.Searching)
         {
+            if(!planningAnnounced && Time.time-planStarted>=5)
+            { planningAnnounced=true;if(gull)gull.Speak("Still finding us a safe course, Viking. Give me a moment."); }
             var watch=System.Diagnostics.Stopwatch.StartNew();
             do {search.Step(1);} while(search.State==SearchState.Searching && watch.ElapsedMilliseconds<3);
             if(phase!=VoyagePhase.Boarding) Status="Plotting course — "+search.Expanded+" water cells checked";
@@ -159,9 +166,10 @@ public sealed class Voyage : MonoBehaviour
         }
         planning=null;
         route.Add(approach);
-        if(routeLine) {routeLine.positionCount=route.Count;routeLine.SetPositions(route.ToArray());}
+        if(routeEffect)routeEffect.SetRoute(route);
         // The first point is the departure endpoint/current ship position, already handled separately.
         waypoint=Math.Min(1,route.Count-1);
+        if(planningAnnounced && gull)gull.Speak("Course found, Viking. On we go!",true);
         Plugin.Instance.Record("Route ready: "+route.Count+" waypoints; "+search.Expanded+" cells examined.");
         if(rerouting) {phase=VoyagePhase.Cruising;rerouting=false;ResetProgress();}
         else if(phase==VoyagePhase.Planning && departure!=null)
@@ -188,10 +196,6 @@ public sealed class Voyage : MonoBehaviour
     {
         if(!Ship || !passenger || passenger.IsDead() || !ZNet.instance)
         {Cancel("Voyage ended.");return;}
-        if(routeLine)
-        {
-            routeLine.enabled=Plugin.Instance.DebugRoute.Value;
-        }
     }
 
     internal void Tick(float dt)
@@ -202,7 +206,14 @@ public sealed class Voyage : MonoBehaviour
         if(!passenger || passenger.IsDead()) {Cancel("Voyage stopped.");return;}
         if(Unattended && Ship.HasPlayerOnboard()){Cancel("Summon stopped: player boarded the ship.");return;}
         if(Unattended && (!Plugin.Instance.Summon || !Plugin.Instance.Summon.ReadyArea))
-        {command=Ship.Speed.Stop;SpeedField(Ship)=command;RudderField(Ship)=0;Status="Waiting for water and terrain to load";return;}
+        {
+            command=Ship.Speed.Stop;SpeedField(Ship)=command;RudderField(Ship)=0;Status="Waiting for water and terrain to load";
+            if(waitingForWorldSince<0)waitingForWorldSince=Time.time;
+            if(!worldWaitAnnounced && Time.time-waitingForWorldSince>=5)
+            {worldWaitAnnounced=true;if(gull)gull.Speak("Holding here until I can check the waters ahead, Viking.");}
+            return;
+        }
+        waitingForWorldSince=-1;worldWaitAnnounced=false;
         bool aboard=Ship.IsPlayerInBoat(passenger);
         if(phase==VoyagePhase.Boarding)
         {
@@ -252,7 +263,7 @@ public sealed class Voyage : MonoBehaviour
         float groundSpeed=new Vector2(body.linearVelocity.x,body.linearVelocity.z).magnitude;
         if(phase==VoyagePhase.Paused || phase==VoyagePhase.Planning)
         {Brake(speed);return;}
-        if(Time.time>nextDestinationCheck)
+        if(!destination.Temporary && Time.time>nextDestinationCheck)
         {
             nextDestinationCheck=Time.time+2;
             var current=DockDirectory.Resolve(destination.Id);
@@ -303,7 +314,7 @@ public sealed class Voyage : MonoBehaviour
             if(distance<6 && waypoint<route.Count-1) {waypoint++;target=route[waypoint];distance=Vector3.Distance(position,target);}
             if(waypoint==route.Count-1 && distance<5)
             {
-                if(!chart.ValidateArrival(destination.Berth,out var reason,Relaxed)) {Pause("Destination unavailable: "+reason);return;}
+                if(!chart.ValidateArrival(destination.Berth,out var reason,Relaxed && !destination.Temporary)) {Pause("Destination unavailable: "+reason);return;}
                 phase=VoyagePhase.Approaching;ResetProgress();return;
             }
             var delta=target-position;
@@ -370,6 +381,7 @@ public sealed class Voyage : MonoBehaviour
         automaticReplans++;
         phase=VoyagePhase.Planning;command=Ship.Speed.Stop;rudder=0;
         Status=reason+" Slowing to replot course ("+automaticReplans+"/3).";
+        if(gull)gull.Speak(VoyageWords.Obstruction(reason)+" Slowing down to find another way.");
         if(planning!=null)StopCoroutine(planning);
         planning=StartCoroutine(ReplanAfterSlowing());
     }
@@ -405,18 +417,37 @@ public sealed class Voyage : MonoBehaviour
             command=speed>0 ? Ship.Speed.Back : Ship.Speed.Slow;
     }
     private void ResetProgress(){progressPosition=WaterChart.AtSea(Ship.transform.position);progressTime=Time.time;}
-    private void Pause(string reason){phase=VoyagePhase.Paused;command=Ship.Speed.Stop;rudder=0;Status="Paused: "+reason;Plugin.Message(Status);Plugin.Instance.Record("Paused: "+reason);}
-    private void Arrive(){Status="Arrived at "+DestinationName;Finish(Status);}
+    private void Pause(string reason)
+    {
+        phase=VoyagePhase.Paused;command=Ship.Speed.Stop;rudder=0;Status="Paused: "+reason;
+        if(gull)gull.Speak(VoyageWords.Obstruction(reason)+" Take the helm or choose the destination again when it's clear.",true);
+        Plugin.Message(Status);Plugin.Instance.Record("Paused: "+reason);
+    }
+    internal void ExplainStatus()
+    {
+        if(!gull)return;
+        string text=phase==VoyagePhase.Planning ? "I'm finding a safe course, Viking. "+Status :
+            phase==VoyagePhase.Paused ? VoyageWords.Obstruction(Status)+" Take the helm or choose the destination again when it's clear." :
+            "Here's the situation, Viking: "+Status+".";
+        gull.Speak(text,requested:true);
+    }
+    private void Arrive()
+    {
+        Status="Arrived at "+DestinationName;
+        if(gull)gull.Speak(destination.Temporary ? "Your ship's here, Viking. Mind the step aboard!" :
+            "We've reached "+DestinationName+", Viking. I'll keep this perch warm.",true);
+        Finish(Status,true);
+    }
     internal void Cancel(string reason)=>Finish(reason);
-    private void Finish(string reason)
+    private void Finish(string reason,bool arrived=false)
     {
         if(phase==VoyagePhase.Finished)return;
         phase=VoyagePhase.Finished;
         Plugin.Instance.Record("Voyage ended: "+reason);
         if(Ship && Ship.IsOwner()) {SpeedField(Ship)=Ship.Speed.Stop;RudderField(Ship)=0;}
         command=Ship.Speed.Stop;rudder=0;
-        if(gull) {gull.FlyAway();gull=null;}
-        if(routeLine) {Destroy(routeLine.sharedMaterial);Destroy(routeLine.gameObject);}
+        if(gull) {if(arrived && Ship)GullCall.AfterArrival(Ship!,gull);else gull.FlyAway();gull=null;}
+        if(routeEffect) {routeEffect.gameObject.SetActive(false);Destroy(routeEffect.gameObject);}
         if(Plugin.Instance.Voyage==this)Plugin.Instance.Voyage=null;
         if(Unattended && Plugin.Instance.Summon)Plugin.Instance.Summon.Complete(reason);
         Plugin.Message(reason);Destroy(this);

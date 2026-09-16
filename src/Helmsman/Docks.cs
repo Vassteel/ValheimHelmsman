@@ -28,6 +28,8 @@ public sealed class Berth
 
 public sealed class DockRecord
 {
+    // Request-local arrival only; never written into the world dock directory.
+    internal bool Temporary;
     public ZDOID Id;
     public Berth Berth = null!;
     public Vector3 MarkerPosition;

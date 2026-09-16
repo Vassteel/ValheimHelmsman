@@ -2,21 +2,34 @@
 
 <img src="https://raw.githubusercontent.com/Vassteel/ValheimHelmsman/master/assets/helmsman-icon-v1.png" alt="Viking gull sailing through rough seas" width="320">
 
-**SKRAAA! One careful captain. Several inattentive rocks.**
+**SKRAAA! A captain for your longship. Scratches included.**
 
-Helmet on. Lovely longship. Kindly stop looking at the hole. I'm your gull helmsman: set up named docks and I'll guide the voyage, reverse out, change course or fetch an empty named ship.
+## What I do
 
-Supports Karve, Longship and compatible OdinShip boats. Rowboats need two seats.
+- **Sail between named docks:** configure a Dock Ward, board and choose a destination. Reverse departures, course changes and clearance checks included.
+- **Fetch named ships:** summon an empty ship to a dock, or use a **Gullcall Whistle** for a checked landing near your shoreline. Ships sail there.
+- **Explain the hold-up:** a squawk and chat message for blocked routes, shallow water and longer planning delays. Ask **What's happening?** for the current status.
+- **Announce arrival:** a squawk, a message and a gull settling on his perch.
+- **Show the route:** flowing blue wisps, raised 4 metres. Show/hide from the gull, dock or whistle menu; your choice is saved.
+- **Unload with Quartermaster:** request cargo unloading near a Deposit Chest. One slot per step, three thrown trinkets per slot. Nothing unloads without your order.
 
-**Install:** requires **BepInEx** and **Jötunn**. Import the local package with r2modman.
+Helmeted gull, weather reactions and sorting animations included. Supports **Karve, Longship and compatible modded ships**, including eligible OdinShip boats. Rowboats need two seats.
 
-1. Build and configure a **Dock Ward** at each destination.
-2. At the mast, **tap Use to hold fast; hold Use to call the gull**.
-3. Once I land at the stern, speak to me and choose a dock. Slow down and release the helm first.
+## Get sailing
 
-**F8** also calls me. **Shift + Use** names the ship.
+1. Install **BepInEx** and **Jötunn**, then Helmsman.
+2. Build a **Dock Ward** and configure its berth and departure.
+3. At the mast, **tap Use to hold fast; hold Use to call the gull**. Speak to him after he lands.
 
-**Multiplayer untested.** Take the helm to cancel autopilot. Boat sold pre-scratched.
+| Control | Action |
+|---|---|
+| **F8** | Call or speak to the gull |
+| **Shift + Use** at the mast | Name the ship |
+| Take the helm | Cancel autopilot |
+
+**Gullcall Whistle:** handcraft with **4 bone fragments, 2 wood, 2 leather scraps and 2 feathers**. Use near shore, choose an empty named ship and stay within **64 m** of the calling spot. No dock required.
+
+**Multiplayer untested.** Slow down and release the helm before giving orders. Boat sold pre-scratched.
 
 [GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/abN7R2tWyK) · [Guide](https://github.com/Vassteel/ValheimHelmsman/blob/master/GUIDE.md) · [Compatibility](https://github.com/Vassteel/ValheimHelmsman/blob/master/COMPATIBILITY.md)
 

@@ -7,6 +7,20 @@ namespace Helmsman;
 
 public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
 {
+    private string lastSpeech="";
+    private float nextSpeech;
+    internal void Speak(string text,bool important=false,bool requested=false)
+    {
+        if(!important && (Time.time<nextSpeech || (!requested && text==lastSpeech)))return;
+        if(!Player.m_localPlayer)return;
+        lastSpeech=text;nextSpeech=Time.time+4;
+        CallDown();GullSpeech.Say(transform,text);
+    }
+    internal void StayAfterArrival(Ship ship)
+    {
+        voyage=null;visitingShip=ship;dock=null;fetching=false;leaving=false;
+        ResolvePerch();
+    }
     private static readonly Dictionary<ZDOID,GullGuide> travellers=new Dictionary<ZDOID,GullGuide>();
     private ZDOID? homeDock;
     private DockMarker? dock;
@@ -24,6 +38,17 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     private Vector3 flightTarget, perchLocal;
     private Transform? perchParent;
     private GullMeshRig? sittingRig;
+    private ItemDrop.ItemData? cargoItem;
+    private int cargoThrows;
+    private float cargoStarted, nextCargoThrow;
+    internal bool SortingCargo=>cargoThrows>0;
+    internal void SortCargo(ItemDrop.ItemData item)
+    { cargoItem=item.Clone();cargoThrows=3;cargoStarted=Time.time;nextCargoThrow=Time.time+.34f; }
+    internal void EndCargoSort(bool clearProps=true)
+    {
+        cargoThrows=0;cargoItem=null;
+        if(clearProps && QuartermasterBridge.Available)QuartermasterBridge.ClearThrows(transform);
+    }
     private GullMood animatedMood;
     private GullPose blendedPose;
     private float moodStarted, flightStarted;
@@ -230,7 +255,16 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         float roll=PerchShip ? Mathf.DeltaAngle(0,PerchShip!.transform.eulerAngles.z) : 0;
         float pitch=PerchShip ? Mathf.DeltaAngle(0,PerchShip!.transform.eulerAngles.x) : 0;
         var gesture=GullPerformance.Sample(mood.Current,Time.time-moodStarted,threatYaw,windYaw,roll,pitch);
-        if(Time.time<greetUntil && Player.m_localPlayer && mood.Current!=GullMood.Combat)
+        bool toss=false, sorting=SortingCargo;
+        if(sorting)
+        {
+            float t=Time.time-cargoStarted, cycle=t%.65f;
+            float scoop=Mathf.Sin(Mathf.Clamp01(cycle/.34f)*Mathf.PI);
+            gesture=new GullPose { HeadPitch=60*scoop-22*Mathf.Sin(Mathf.Clamp01((cycle-.34f)/.31f)*Mathf.PI),
+                BodyPitch=25*scoop,Crouch=.07*scoop,HeadYaw=22*Mathf.Sin(t*5),TailYaw=15*Mathf.Sin(t*12) };
+            if(Time.time>=nextCargoThrow) { toss=true;cargoThrows--;nextCargoThrow=Time.time+.65f; }
+        }
+        if(!sorting && Time.time<greetUntil && Player.m_localPlayer && mood.Current!=GullMood.Combat)
             gesture.HeadYaw=Mathf.Clamp(LocalYaw(Player.m_localPlayer.transform.position-transform.position),-65,65);
         blendedPose=GullPerformance.Blend(blendedPose,gesture,1-Mathf.Exp(-Time.deltaTime*12));
         gesture=blendedPose;
@@ -240,6 +274,8 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         pose.localRotation=Quaternion.Slerp(pose.localRotation,targetRotation,1-Mathf.Exp(-Time.deltaTime*8));
         pose.localScale=Vector3.one;pose.localPosition=Vector3.up*(float)gesture.Hop;
         sittingRig?.Apply(gesture);
+        if(toss && cargoItem!=null && QuartermasterBridge.Available)
+            QuartermasterBridge.Throw(transform,cargoItem,sittingRig!=null ? sittingRig.BeakWorld : transform.position+transform.up*.7f);
         bool hop=gesture.Hop>.035;
         if(displayFlight!=hop)SetModels(hop);
         if(hop && flying)
@@ -294,6 +330,7 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     }
     private void OnDestroy()
     {
+        EndCargoSort();
         if(homeDock.HasValue && travellers.TryGetValue(homeDock.Value,out var guide) && guide==this)
             travellers.Remove(homeDock.Value);
         sittingRig?.Destroy();
@@ -306,9 +343,9 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         if(hold || leaving || user!=Player.m_localPlayer)return false;
         if(!perched){Plugin.Message("Wait for the gull to land.");return false;}
         CallDown();
-        if(voyage)Plugin.Instance.UI.OpenVoyage();
+        if(voyage)Plugin.Instance.UI.OpenVoyage(this);
         else if(visitingShip && Plugin.Instance.CalledGull && Plugin.Instance.CalledGull.Ship==visitingShip)
-            Plugin.Instance.UI.OpenCalledGull(Plugin.Instance.CalledGull);
+            Plugin.Instance.UI.OpenCalledGull(Plugin.Instance.CalledGull,this);
         else if(dock)Plugin.Instance.UI.OpenDestinations(dock);
         return true;
     }

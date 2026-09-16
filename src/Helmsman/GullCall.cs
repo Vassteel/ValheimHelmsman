@@ -10,6 +10,15 @@ public sealed class GullCall : MonoBehaviour
     private Player requester=null!;
     private GullGuide? guide;
     private bool finished, announced;
+    private bool arrivalVisit;
+    private float arrivalUntil;
+    internal static void AfterArrival(Ship ship,GullGuide gull)
+    {
+        var call=ship.gameObject.AddComponent<GullCall>();
+        call.Ship=ship;call.requester=Player.m_localPlayer;call.guide=gull;
+        call.arrivalVisit=true;call.arrivalUntil=Time.unscaledTime+120;call.announced=true;
+        gull.StayAfterArrival(ship);Plugin.Instance.CalledGull=call;
+    }
     internal bool Ready=>!finished && guide && guide.ReadyOn(Ship);
     internal string Status=>Ready ? "The gull has landed. Speak to him to choose a dock." : "The gull is flying aboard.";
 
@@ -61,8 +70,11 @@ public sealed class GullCall : MonoBehaviour
     private void Update()
     {
         if(finished)return;
-        if(!Plugin.Solo || !Ship || !Ship.IsOwner() || !requester || requester.IsDead() ||
-            !Ship.IsPlayerInBoat(requester) || !guide)
+        if(arrivalVisit && Ship && requester && Ship.IsPlayerInBoat(requester))arrivalVisit=false;
+        bool canWait=arrivalVisit && Time.unscaledTime<arrivalUntil && Ship && requester &&
+            Vector3.Distance(requester.transform.position,Ship.transform.position)<64;
+        if(!Plugin.Solo || !Ship || !Ship.IsOwner() || !requester || requester!=Player.m_localPlayer || requester.IsDead() ||
+            (!Ship.IsPlayerInBoat(requester) && !canWait) || !guide)
         {Dismiss("Gull visit ended.");return;}
         if(Ready && !announced){announced=true;Plugin.Message(Status);}
     }

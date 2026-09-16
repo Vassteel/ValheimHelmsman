@@ -1,3 +1,35 @@
+## 0.2.12
+
+- Native gull squawks and local chat explanations for blocked/shallow routes, longer planning delays and arrival; ask “What's happening?” during a voyage.
+- Reuse the voyage gull as a perched visitor after arrival. A summoned ship's gull waits up to two minutes for boarding.
+- Speak the result of requested Quartermaster unloading, including where unmatched cargo belongs.
+- Rewrite GitHub and Thunderstore READMEs as compact feature and control guides.
+
+## 0.2.11
+
+- Replace the solid blue navigation line with layered, animated blue wisps and soft mist, raised 4 metres above the route.
+- Add a saved show/hide control to gull, dock and whistle menus.
+- Clear the old visual during route recalculation and clean up its materials on voyage completion.
+
+## 0.2.10
+
+- Whistle summons now bring a named ship to checked water beside the caller's shoreline; no Dock Ward or dock picker required.
+- Search nearby loaded water for a hull-sized landing with depth, hull/mast, approach and turning clearance. Reject unsafe shores and cancel when the caller leaves the area.
+- Keep the arrival point request-local; no permanent ward or saved berth is created. Existing dock summon controls remain available.
+- Remove the large leather loop from the whistle model and regenerate its matching inventory icon; keep small wraps and feather ties.
+
+## 0.2.9
+
+- Add the reusable Gullcall Whistle, crafted without a station from bone fragments, wood, leather scraps and feathers.
+- Inventory/hotbar use opens arrival-dock and named-ship selection, with progress and cancellation. Existing ships sail to configured docks through the existing summon system.
+- Include an original faceted gull-shaped model and matching transparent inventory icon, embedded in the DLL.
+
+## 0.2.8
+
+- With Quartermaster 0.1.11+, talk to the landed ship gull near a Deposit Chest for **Unload cargo**.
+- Explicit requests sort boat cargo into matching base storage one slot at a time, with three scoop-and-throw effects per slot.
+- Stop from the dialogue or by taking the helm/leaving; unmatched cargo stays aboard. Cargo controls are absent without Quartermaster or outside base range.
+
 ## 0.2.7
 
 - Added a faceted iron helmet with bronze trim and curved horns to the gull, matching the package artwork. The accessory follows perched head/body gestures and the flying body rig.

@@ -63,4 +63,15 @@ Reset();ship=new Ship();GullCall.Call(ship);call=Plugin.Instance.CalledGull;Gull
 Reset();Plugin.Solo=false;GullCall.Call(new Ship());Check(!Plugin.Instance.CalledGull,"Multiplayer must retain existing support boundary");
 Reset();GullCall.Call(new Ship{Owned=false});Check(!Plugin.Instance.CalledGull,"Must not attach a guide to an unowned ship");
 Reset();GullCall.Call(new Ship{Aboard=false});Check(!Plugin.Instance.CalledGull,"Calling requires player aboard");
+Reset();ship=new Ship();gull=new GullGuide{Ship=ship,Landed=true};GullCall.AfterArrival(ship,gull);call=Plugin.Instance.CalledGull;
+Check(call.Ready && Guide(call)==gull && gull.FlyAwayCount==0,"Arrival keeps the same gull perched and ready for orders");
+Tick(call);Check(call.Ready,"Arrived gull remains aboard with the player");
+ship.Aboard=false;Tick(call);Check(!Plugin.Instance.CalledGull&&gull.FlyAwayCount==1,"Leaving after arrival dismisses the perched gull");
+Reset();ship=new Ship{Aboard=false};gull=new GullGuide{Ship=ship,Landed=true};GullCall.AfterArrival(ship,gull);call=Plugin.Instance.CalledGull;
+Tick(call);Check(call.Ready,"Summoned ship gull waits on its perch for the nearby caller");
+UnityEngine.Time.unscaledTime+=121;Tick(call);Check(!Plugin.Instance.CalledGull&&gull.FlyAwayCount==1,"Unboarded arrival visit expires without leaking the actor");
+Reset();ship=new Ship{Aboard=false};gull=new GullGuide{Ship=ship,Landed=true};GullCall.AfterArrival(ship,gull);call=Plugin.Instance.CalledGull;
+Player.m_localPlayer.transform.position=new UnityEngine.Vector3(100,0,0);Tick(call);
+Check(!Plugin.Instance.CalledGull,"Walking away releases the arrival gull");
+CargoTests.Run(Check);
 Console.WriteLine($"PASS: {checks} mast interaction and gull visit checks using production code with game test doubles.");

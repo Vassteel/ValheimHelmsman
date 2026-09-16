@@ -38,11 +38,14 @@ public class DockRecord {}
 public class SummonRequest:UnityEngine.MonoBehaviour {}
 public class DockMarker:UnityEngine.MonoBehaviour {public bool Ready=true;public int Id=1;public GullGuide Guide;internal GullGuide CallGuide(Ship ship){Guide.ReserveDock(Id);Guide.Visit(ship);return Guide;}}
 public class GullGuide:UnityEngine.MonoBehaviour {
+ public bool SortingCargo; public int Sorts,Clears; internal void SortCargo(ItemDrop.ItemData item){SortingCargo=true;Sorts++;} internal void EndCargoSort(bool clearProps=true){SortingCargo=false;if(clearProps)Clears++;}
  public Ship Ship;public bool Landed;public int FlyAwayCount;public static int Created;public static Dictionary<int,GullGuide> Homes=new();
  internal static GullGuide Traveller(int id)=>Homes.TryGetValue(id,out var g)&&g?g:null;
  internal void ReserveDock(int id)=>Homes[id]=this;
  internal static GullGuide Create(UnityEngine.Vector3 start,DockMarker dock,Voyage voyage){Created++;return new GullGuide();}
  internal void Visit(Ship ship){Ship=ship;Landed=false;}
+ internal void StayAfterArrival(Ship ship){Ship=ship;}
+ internal void Speak(string text,bool important=false,bool requested=false){}
  internal bool ReadyOn(Ship ship)=>Ship==ship&&Landed;
  internal void FlyAway(){FlyAwayCount++;}
 }
@@ -51,5 +54,5 @@ public class Voyage:UnityEngine.MonoBehaviour {
  internal static bool BeginAboard(Ship ship,DockRecord to,GullGuide guide,out string reason){reason=Allow?"Sailing":"Blocked";if(!Allow)return false;Transferred=guide;Plugin.Instance.Voyage=new Voyage{Ship=ship};return true;}
 }
 public class HelmsmanUI {public int MastOpens,OrdersOpens,VisitOpens;internal void OpenMast(Chair chair,Ship ship)=>MastOpens++;internal void OpenVoyage()=>OrdersOpens++;internal void OpenCalledGull(GullCall call)=>VisitOpens++;}
-public class Plugin {public static Plugin Instance=new();public static bool Solo=true;public HelmsmanUI UI=new();public Voyage Voyage;public SummonRequest Summon;public GullCall CalledGull;public static string LastMessage;internal static void Message(string text)=>LastMessage=text;internal void Error(Exception error){} }
+public class Plugin:UnityEngine.Object {public CargoOrder Cargo;public static Plugin Instance=new();public static bool Solo=true;public HelmsmanUI UI=new();public Voyage Voyage;public SummonRequest Summon;public GullCall CalledGull;public static string LastMessage;internal static void Message(string text)=>LastMessage=text;internal void Error(Exception error){} }
 }

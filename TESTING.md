@@ -1,3 +1,37 @@
+## Gull feedback — 0.2.12
+
+- 105 core, 64 interaction/cargo and 28 whistle checks pass. New arrival checks cover actor reuse, further orders, disembarkation, waiting for a shore caller, expiry and leaving the area.
+- 458 game/Unity/Jötunn member references resolve; chat visibility field and whistle hook signatures verified.
+- In-game acceptance pending: hear the native gull call at the game sound-effects volume, read chat on a blocked/shallow route and arrival, ask for status, verify the perch after arrival, and unload unmatched/full/busy cargo. Check repeated navigation ticks do not repeatedly squawk.
+
+## Route wisps — 0.2.11
+
+- Release build: zero warnings/errors. Existing 105 core, 58 interaction/cargo and 28 whistle checks pass.
+- API check: 438 game/Unity/Jötunn members resolve; whistle hook and embedded assets match.
+- Visual trail only: existing route coordinates, navigation and berth preview lines remain unchanged. Raised visual center is +4 m, with gentle sway; at most eight ribbons × 768 samples, animated at 30 Hz. Hidden trails skip animation updates.
+- In-game acceptance pending: inspect blue strands/mist in daylight and darkness, verify terrain occludes them, hide/show from gull/dock/whistle menus, restart to confirm the preference persists, change destination to check stale trail clearing, and cancel/arrive to check removal. Check frame rate on a long route.
+
+## Shoreline summons and whistle model — 0.2.10
+
+- Release build: zero warnings/errors. 105 core checks, including 20 new bounded-candidate/shore-access checks; 58 interaction/cargo checks; 28 whistle registration/use checks. 422 game/Unity/Jötunn member references and the UseItem hook resolve; embedded asset bytes match source.
+- New core checks cover nearest-first rings, full angular coverage, hull-size offsets, invalid/oversized inputs, shoreline swim distance, intervening land, unloaded terrain, cliffs, pier origins and the 64 m caller boundary. These use production search geometry with synthetic terrain, not Unity collision simulation.
+- Live acceptance pending: call from open shore without any Dock Ward and compare small/large ships; reject shallow, rocky, crowded and narrow approaches; verify selected ship sails to the original call spot and stops offshore. Check actual hull/mast clearance and stopping under wind/waves. Test blocked arrival after a building/boat enters the approach; cancellation during search, while fetching and en route; walking/teleporting >64 m away; death/world changes; already-nearby and occupied ships; normal ward summons. No save/reload resume should occur.
+- Whistle loop removed from mesh and icon. Six parts, 906 triangles, roughly 22 cm long. Collider derives from mesh bounds. Inspect the dropped item, pickup, inventory icon and persistence after relaunch.
+- No live navigation or graphical acceptance has been claimed. Multiplayer untested.
+
+## Gullcall Whistle checks for 0.2.9
+
+- Release build: zero warnings/errors; 85 core and 58 existing interaction/cargo checks pass. Added 28 production whistle registration/use assertions: no workbench, exact early-biome recipe, model/icon attachment, reusable behavior, inventory/hotbar opening, unrelated-item passthrough, and rejection for remote/dead players, items in other containers, removed items, combat actions and multiplayer.
+- Binary check resolves 421 game/Unity/Jötunn references, verifies the Humanoid.UseItem injection signature, and compares embedded model/icon bytes against the source assets. Original mesh: six parts, 1,206 triangles, about 23 cm long. Inspected a 512px geometry render; shipped icon is 128px RGBA.
+- Live acceptance pending: unlock and craft with no station; use from inventory and hotbar/controller; check single-item quantity before/after use; drop/pick up, save/reload and verify model/icon. Choose loaded and unloaded destination wards; fetch an existing named unoccupied ship; test occupied/missing ships, missing docks, repeated use, cancellation and leaving/reloading the world. Check the existing dock summon flow too. Verify menu dismissal if the whistle is removed and normal use of unrelated items.
+- GPU appearance, crafting discovery, persistence and complete ship arrival still require in-game verification. Multiplayer untested.
+
+## Optional cargo checks for 0.2.8
+
+- Release build resolves against installed game assemblies. Added 20 production CargoOrder checks using a fake Quartermaster bridge: no arrival job, missing dependency, landed-gull requirement, rejected/duplicate requests, waiting for animation between slots, cancellation, completion, no resume and stopping during animation on access/player/gull/mod changes.
+- Core sailing and mast/gull-visit checks remain included. Quartermaster's separate tests cover the unloading loop and real inventory transfer implementation.
+- Live acceptance pending: verify **Unload cargo** appears only after directly interacting with the landed ship gull while both mods are enabled and a Deposit Chest is in range. F8 alone should show destination orders. Request unloading, watch one slot and three throw props, verify base/boat counts, blocked leftovers and cancellation. Check the gull's scoop pose and props against the moving deck. Verify ordinary Helmsman behavior without Quartermaster. Multiplayer untested.
+
 ## Helmet checks for 0.2.7
 
 Release build passes with zero warnings/errors; all 123 existing core/interaction checks pass. Helmet mesh/material ownership is local to each gull; seated deformation follows the same head and body rotations as the mesh. Flight placement measures the posed head and attaches to the body bone.

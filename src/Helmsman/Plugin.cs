@@ -10,8 +10,9 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.7")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.12")]
 [BepInDependency(Jotunn.Main.ModGuid)]
+[BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
 public sealed class Plugin : BaseUnityPlugin
 {
@@ -24,6 +25,7 @@ public sealed class Plugin : BaseUnityPlugin
     internal ShipDirectory Ships=null!;
     internal SummonRequest? Summon;
     internal GullCall? CalledGull;
+    internal CargoOrder? Cargo;
     internal ConfigEntry<float> BoardingSeconds = null!;
     internal ConfigEntry<KeyCode> CallKey = null!;
     internal ConfigEntry<bool> DebugRoute = null!;
@@ -41,7 +43,7 @@ public sealed class Plugin : BaseUnityPlugin
         BoardingSeconds = Config.Bind("Voyages", "BoardingGraceSeconds", 10f,
             new ConfigDescription("Minimum boarding grace period.", new AcceptableValueRange<float>(3,60)));
         CallKey = Config.Bind("Controls", "CallGullKey", KeyCode.F8, "Call the gull aboard, or speak to him after he lands.");
-        DebugRoute = Config.Bind("Diagnostics", "ShowRoute", true, "Draw the prototype route while a voyage is active.");
+        DebugRoute = Config.Bind("Diagnostics", "ShowRoute", true, "Show blue route wisps four metres above the navigation path. Also toggled from the gull, dock or whistle menu.");
         MinimumWaterDepth = Config.Bind("Navigation", "MinimumWaterDepth", 1f,
             new ConfigDescription("Minimum water depth in metres for navigation checks. Berth settings can be saved even when clearance checks fail.",
                 new AcceptableValueRange<float>(.25f,5f)));
@@ -55,11 +57,12 @@ public sealed class Plugin : BaseUnityPlugin
         harmony = new Harmony(Guid);
         harmony.PatchAll();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.7 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.12 loaded. Experimental solo ship voyages and summoning; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
     {
+        GullcallWhistle.Register();
         var prefab = PrefabManager.Instance.CreateClonedPrefab(DockPrefab, "guard_stone");
         var area = prefab.GetComponent<PrivateArea>();
         if (area)
@@ -117,12 +120,14 @@ public sealed class Plugin : BaseUnityPlugin
     private void OnDestroy()
     {
         MastInteraction.Cancel();
+        if(Cargo)Cargo.Stop("Helmsman unloaded.");
         if(CalledGull)CalledGull.Dismiss("Helmsman unloaded.");
         if(Summon)Summon.Cancel("Helmsman unloaded.");
         if (Voyage) Voyage.Cancel("Helmsman unloaded.");
         if (UI) UI.Close();
         PrefabManager.OnVanillaPrefabsAvailable -= RegisterDock;
         harmony?.UnpatchSelf();
+        GullcallAssets.Release();
     }
 }
 

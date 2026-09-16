@@ -129,4 +129,5 @@ Check(!ShipRules.IsSeat("attach_mast") && !ShipRules.IsSeat("attach_dragon"),"Ho
 Check(!ShipRules.IsSeat("attach_bed") && !ShipRules.IsSeat(""),"Beds and standing helms do not count as seats");
 Check(ShipRules.IsSeat("attach_sitship") && ShipRules.IsSeat("attach_chair"),"Passenger and seated helm animations count");
 Check(ShipRules.IsSeat("attach_lox"),"Odin single-canoe seated helm is recognized");
+ShorelineTests.Run(Check);
 Console.WriteLine($"{passed} checks passed.");

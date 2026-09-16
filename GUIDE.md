@@ -1,8 +1,33 @@
-# Helmsman guide
+## Gull announcements — 0.2.12
 
-A gull-guided ship autopilot between named Dock Wards, with ship naming and empty-ship summoning.
+The gull uses Valheim's seagull sound and writes local chat lines for route obstructions, shallow water, planning lasting over five seconds, and arrival. **What's happening?** in the voyage menu repeats the current explanation on request. Automatic lines accompany events, not every navigation tick. Requested cargo unloading also announces its result, including Quartermaster's reason for leftovers.
 
-**Status:** builds against the locally installed Valheim 1.0.12 / Unity 6 assemblies, BepInEx 5.4.2350, and Jötunn 2.30.0. Automated core checks pass. The user has reported successful Karve departure and land avoidance. Arrival and the new naming, summoning, and larger-ship features still require in-game validation. This is a prototype for a disposable test world, not a proven unattended navigator.
+On arrival, the same gull stays on the stern for further orders. After an unattended summon it waits up to two minutes for a nearby caller to board; walking away or leaving after boarding dismisses it. Chat lines are local NPC feedback, not messages broadcast as the player.
+
+## Blue route wisps — 0.2.11
+
+The navigation guide is now a flowing blue mist trail, raised 4 metres above the route. Choose **Hide route wisps** or **Show route wisps** at the top of the gull, dock or whistle menu. The setting takes effect immediately and is saved for future sessions. Existing `Diagnostics.ShowRoute` preferences are retained.
+
+## Gullcall Whistle — 0.2.10
+
+Craft by hand in the inventory crafting list: **4 Bone Fragments, 2 Wood, 2 Leather Scraps, 2 Feathers**. No crafting station, metal or later-biome ingredient is required. Discover the ingredients to unlock the recipe. The whistle weighs 0.2, does not stack, has no durability and is not consumed.
+
+Stand near the shoreline or on a low pier, use the whistle from inventory or a hotbar slot, and choose a named ship. **No Dock Ward is required.** The gull checks nearby landing positions and sails the existing ship to a clear offshore stop near where you called. The whistle never teleports or creates a ship. Name ships with Shift + Use at their mast or helm.
+
+The landing search accounts for the selected hull's length, width, draft and mast height. It checks loaded terrain, depth, the full approach, turning space, buildings, rocks and other boats. The bow must be accessible from the calling shore with at most roughly 12 m of water between shore and bow. Narrow/shallow or obstructed shores may be rejected, particularly for larger ships. A rejected search leaves the ship in place. Searches are spread over frames and bounded to 48 m around the caller. Arrival clearance is checked again using the loaded ship before departure and before the final approach.
+
+**Stay within 64 m of the calling spot.** Walking/teleporting farther away, dying or changing worlds cancels the request. The landing point stays fixed rather than following you. Use the whistle again to see progress or cancel. Removing it closes its menu but does not cancel an accepted request. Existing occupied-ship, supported-hull and single-active-request restrictions remain. Summoning retains the existing solo-only runtime guard; multiplayer untested.
+
+The whistle has an original faceted bone-and-wood gull model, small leather wraps and two feather ties. The large loop has been removed from the model and its matching inventory icon. Both assets are embedded in the DLL. Existing Dock Ward summon controls still work separately.
+
+## Optional ship unloading
+
+Requires **Helmsman 0.2.8 or newer** and **Quartermaster 0.1.11 or newer**, both enabled. Stop the boat within a Deposit Chest's configured **BaseRange**, close the cargo hold and release the helm. Call the Helmsman gull, wait for it to land, then interact with the gull itself and choose **Unload cargo → Unload cargo to base**. Calling it or docking alone never transfers items.
+
+The gull unloads one occupied cargo slot per step into accessible storage in the nearest Deposit Chest's base group and radius. Quartermaster's learned types, preferred/overflow destinations, accepting-storage settings, access checks and ordinary stack limits apply. Each successful slot queues three temporary thrown props; the next slot waits for those throws. Props bounce and fade; they are decorative and cannot be collected. Unmatched cargo or excess that cannot fit remains aboard.
+
+You can close the dialogue while it works. **Stop unloading**, taking the helm, starting a voyage, opening the hold, leaving the boat/base, losing access or disabling either mod ends the request. A stopped/completed request never restarts automatically; talk to the gull to request another. Boats need one supported cargo hold. Existing multiplayer restrictions remain; multiplayer is untested.
+
 
 ## Call the gull from your ship
 

@@ -18,4 +18,4 @@ Inspected installed **OdinShip 0.7.9** assembly and prefab metadata:
 
 The canoes retain dummy sail objects but have zero sail force. Helmsman keeps eligible rowboats in rowing mode. OdinShip’s ordinary canoe speed boost depends on a player being aboard; unattended summoning uses standard slow rowing and does not fake player occupancy.
 
-Other OdinShip versions and compatible ship mods are discovered through the same rules without a hard dependency. The table documents local metadata checks, not verified sailing performance for every vessel. Hull dimensions, draft and braking remain estimates and require individual playtests. Restart Valheim after updating and look for `Helmsman 0.2.7 loaded` followed by `Detected ships:` in the BepInEx log.
+Other OdinShip versions and compatible ship mods are discovered through the same rules without a hard dependency. The table documents local metadata checks, not verified sailing performance for every vessel. Hull dimensions, draft and braking remain estimates and require individual playtests. Restart Valheim after updating and look for `Helmsman 0.2.8 loaded` followed by `Detected ships:` in the BepInEx log.

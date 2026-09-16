@@ -1,9 +1,9 @@
 {
   "name": "ValheimHelmsman",
   "author": "Local",
-  "version_number": "0.2.7",
+  "version_number": "0.2.12",
   "website_url": "https://github.com/Vassteel/ValheimHelmsman",
-  "description": "Gull-guided ship autopilot between named docks, ship naming and summoning. Experimental solo-world build.",
+  "description": "Gull-guided voyages, named-ship summons, a craftable shoreline whistle, blue route wisps and requested cargo unloading with Quartermaster.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2350",
     "ValheimModding-Jotunn-2.30.0"

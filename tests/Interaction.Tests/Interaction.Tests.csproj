@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><Nullable>annotations</Nullable></PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../src/Helmsman/CargoOrder.cs" Link="CargoOrder.cs" />
     <Compile Include="../../src/Helmsman/GullCall.cs" Link="GullCall.cs" />
     <Compile Include="../../src/Helmsman/MastInteraction.cs" Link="MastInteraction.cs" />
     <Compile Include="../../src/Helmsman.Core/ShipRules.cs" Link="ShipRules.cs" />

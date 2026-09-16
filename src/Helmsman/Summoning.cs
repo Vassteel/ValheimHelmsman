@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -20,28 +21,92 @@ public sealed class SummonRequest : MonoBehaviour
     private Voyage? voyage;
     private Player requester=null!;
     private float nextUpdate,started;
-    private bool finishing,areaReady;
+    private bool finishing,areaReady,shoreline,searchingShore;
+    private Vector3 shoreOrigin;
+    private DockRecord? shoreDestination;
+    private long world;
     private readonly List<ZDO> checkedObjects=new List<ZDO>();
     internal static bool Begin(DockMarker ward,ShipRecord record,out string reason)
     {
+        var home=ward && ward.Ready ? DockDirectory.Resolve(ward.Id) : null;
+        if(home==null){reason="Configure this dock's arrival berth first.";return false;}
+        return Begin(home,record,ward,out reason);
+    }
+    internal static bool BeginShoreline(ShipRecord record,out string reason)
+    {
+        if(!CanRequest(record,out var zdo,out var ship,out reason))return false;
+        if(!ShorelineArrival.CallerReady(Player.m_localPlayer,out reason))return false;
+        var request=Plugin.Instance.gameObject.AddComponent<SummonRequest>();
+        request.shoreline=true;request.searchingShore=true;request.shoreOrigin=Player.m_localPlayer.transform.position;
+        request.ShipId=record.Id;request.requester=Player.m_localPlayer;request.Center=zdo.GetPosition();request.started=Time.time;
+        request.world=ZNet.instance.GetWorldUID();request.Status="Finding safe water near your shoreline";
+        Plugin.Instance.Summon=request;
+        request.StartCoroutine(request.FindShoreline(record,ship));
+        reason="The gull is checking for a safe landing nearby. Stay near this shoreline.";return true;
+    }
+    private IEnumerator FindShoreline(ShipRecord record,Ship ship)
+    {
+        var profile=ShipProfile.For(ship);var chart=new WaterChart(record.Loaded,profile);
+        int checkedSpots=0;
+        foreach(var berth in ShorelineArrival.Candidates(shoreOrigin,profile,record.Prefab))
+        {
+            if(finishing)yield break;
+            bool clear;
+            try {clear=ShorelineArrival.Validate(shoreOrigin,berth,chart,out _);}
+            catch(Exception e){Plugin.Instance.Error(e);Cancel("Could not check the shoreline safely.");yield break;}
+            if(clear)
+            {
+                if(Vector3.Distance(WaterChart.AtSea(Center),WaterChart.AtSea(berth.position))<6)
+                {Cancel("That ship is already beside this shoreline.");yield break;}
+                shoreDestination=new DockRecord {Temporary=true,Berth=berth,MarkerPosition=shoreOrigin};
+                searchingShore=false;
+                try
+                {
+                    gull=GullGuide.Create(shoreOrigin+Vector3.up*3,null,null);
+                    if(!gull){Cancel("The gull could not answer.");yield break;}
+                    gull.Fetch(Center+Vector3.up*3);
+                    Status="The gull is fetching "+record.Name+" to your shoreline";
+                    Plugin.Message(Status);
+                }
+                catch(Exception e){Plugin.Instance.Error(e);Cancel("The gull could not answer.");}
+                yield break;
+            }
+            Status="Checking shoreline clearance — "+(++checkedSpots)+" spots";
+            yield return null;
+        }
+        Cancel("No safe landing nearby for that ship. Try a more open shoreline with deeper water.");
+    }
+    private static bool CanRequest(ShipRecord record,out ZDO zdo,out Ship ship,out string reason)
+    {
+        zdo=null!;ship=null!;
         if(!Plugin.Solo){reason="Ship summoning currently supports solo worlds.";return false;}
         if(!UnattendedShipPhysics.Installed){reason="Empty-ship control is incompatible with this game/mod setup.";return false;}
         if(Plugin.Instance.Voyage || Plugin.Instance.Summon || Plugin.Instance.CalledGull){reason="Finish or cancel the current voyage or gull visit first.";return false;}
-        if(!ward.Settings.configured || DockDirectory.Resolve(ward.Id)==null){reason="Configure this dock's arrival berth first.";return false;}
-        if(GullGuide.Traveller(ward.Id)){reason="The gull is finishing its last trip.";return false;}
-        var zdo=ZDOMan.instance.GetZDO(record.Id);
+        zdo=ZDOMan.instance.GetZDO(record.Id);
         if(zdo==null || zdo.GetString(ShipDirectory.NameKey,"").Length==0){reason="That named ship no longer exists.";return false;}
         var prefab=ZNetScene.instance.GetPrefab(zdo.GetPrefab());
         if(!prefab || !ShipProfile.Supports(prefab.GetComponent<Ship>())){reason="This ship needs a custom movement adapter.";return false;}
         var loaded=record.Loaded;
         if(loaded && (loaded.HasPlayerOnboard() || loaded.m_shipControlls.HaveValidUser())){reason="The ship is occupied. Only empty ships can be summoned.";return false;}
-        if(Vector3.Distance(WaterChart.AtSea(zdo.GetPosition()),WaterChart.AtSea(ward.Settings.position))<6){reason="That ship is already at this dock.";return false;}
+        ship=loaded ? loaded : prefab.GetComponent<Ship>();reason="";return true;
+    }
+    private static bool Begin(DockRecord home,ShipRecord record,DockMarker? ward,out string reason)
+    {
+        if(!CanRequest(record,out var zdo,out _,out reason))return false;
+        if(GullGuide.Traveller(home.Id)){reason="The gull is finishing its last trip.";return false;}
+        if(Vector3.Distance(WaterChart.AtSea(zdo.GetPosition()),WaterChart.AtSea(home.Berth.position))<6){reason="That ship is already at this dock.";return false;}
         var request=Plugin.Instance.gameObject.AddComponent<SummonRequest>();
-        request.Home=ward.Id;request.ShipId=record.Id;request.requester=Player.m_localPlayer;request.Center=zdo.GetPosition();request.started=Time.time;
+        request.Home=home.Id;request.ShipId=record.Id;request.requester=Player.m_localPlayer;request.Center=zdo.GetPosition();request.started=Time.time;request.world=ZNet.instance.GetWorldUID();
         Plugin.Instance.Summon=request;
-        request.gull=ward.FetchGuide(request.Center+Vector3.up*3);
-        request.gull.ReserveDock(ward.Id);
-        if(!ward.GetComponent<SummonBeacon>())ward.gameObject.AddComponent<SummonBeacon>();
+        if(ward)request.gull=ward.FetchGuide(request.Center+Vector3.up*3);
+        else
+        {
+            request.gull=GullGuide.Create(Player.m_localPlayer.transform.position+Vector3.up*3,null,null);
+            if(!request.gull){request.Cancel("The gull could not answer.");reason="The gull could not answer.";return false;}
+            request.gull.Fetch(request.Center+Vector3.up*3);
+        }
+        request.gull.ReserveDock(home.Id);
+        if(ward && !ward.GetComponent<SummonBeacon>())ward.gameObject.AddComponent<SummonBeacon>();
         reason="The gull is fetching "+record.Name+".";return true;
     }
     internal bool ReadyArea=>Loading && areaReady;
@@ -69,8 +134,11 @@ public sealed class SummonRequest : MonoBehaviour
     }
     private void Advance()
     {
-        if(!Plugin.Solo || !requester || requester.IsDead()){Cancel("Summon stopped: player unavailable.");return;}
-        var home=DockDirectory.Resolve(Home);var zdo=ZDOMan.instance.GetZDO(ShipId);
+        if(!Plugin.Solo || !requester || requester!=Player.m_localPlayer || requester.IsDead() || ZNet.instance.GetWorldUID()!=world){Cancel("Summon stopped: player unavailable.");return;}
+        if(shoreline && !ShorelineSearch.CallerInRange(WaterChart.Point(shoreOrigin),WaterChart.Point(requester.transform.position)))
+        {Cancel("Shoreline summon cancelled: you left the calling area. Use the whistle again near the shore.");return;}
+        if(searchingShore)return;
+        var home=shoreline ? shoreDestination : DockDirectory.Resolve(Home);var zdo=ZDOMan.instance.GetZDO(ShipId);
         if(home==null || zdo==null){Cancel("Summon stopped: dock or ship removed.");return;}
         var go=ZNetScene.instance.FindInstance(ShipId);var ship=go ? go.GetComponent<Ship>() : null;
         Center=ship ? ship.transform.position : zdo.GetPosition();
@@ -85,7 +153,7 @@ public sealed class SummonRequest : MonoBehaviour
         if(ship.HasPlayerOnboard() || ship.m_shipControlls.HaveValidUser()){Cancel("Summon stopped: ship is occupied.");return;}
         var view=ship.GetComponent<ZNetView>();view.ClaimOwnership();
         if(!view.IsOwner())return;
-        if(Voyage.BeginSummoned(ship,home,gull,out var reason)){voyage=Plugin.Instance.Voyage;Status="Bringing the ship to the dock";}
+        if(Voyage.BeginSummoned(ship,home,gull,out var reason)){voyage=Plugin.Instance.Voyage;Status=shoreline ? "Bringing the ship to your shoreline" : "Bringing the ship to the dock";}
         else Cancel(reason);
     }
     internal void Complete(string reason)
