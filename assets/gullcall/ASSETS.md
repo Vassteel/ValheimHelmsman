@@ -8,3 +8,5 @@ Original faceted geometry authored by tools/gullcall_model.py. The model represe
 - gullcall.obj / gullcall.mtl: editable interchange export.
 
 Regenerate with Python plus NumPy and Pillow: `python tools/gullcall_model.py`. The script validates nondegenerate triangle geometry while rendering. Meshes use flat normals recalculated by Unity and native world-lit materials with emission disabled. No asset bundle or external Unity project is required.
+
+Runtime model data is packed from model.json into model.bin by tools/pack_gullcall_model.py during build. The versioned binary decoder validates all six parts before touching the Unity prefab.

@@ -1,3 +1,8 @@
+## 0.2.14
+
+- Replace Unity JSON model loading with a validated binary mesh decoder after the live whistle registration failed with an empty-array access.
+- Validate all model parts before modifying the item prefab; add real-asset and damaged-asset regression checks.
+
 ## 0.2.13
 
 - Fix the missing Gullcall Whistle by cloning the native BoneFragments material instead of looking up bundled shaders by name.

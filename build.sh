@@ -6,6 +6,7 @@ if ! command -v "$helmsman_dotnet" >/dev/null 2>&1; then
   if [ -x /tmp/wildglow-dotnet/dotnet ]; then helmsman_dotnet=/tmp/wildglow-dotnet/dotnet;
   else printf '%s\n' 'Install .NET SDK 8 or set DOTNET to its executable.' >&2; exit 1; fi
 fi
+python3 tools/pack_gullcall_model.py
 export DOTNET_CLI_HOME="$PWD/.build/dotnet-home"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1

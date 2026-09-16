@@ -1,3 +1,15 @@
+# Local installation — Helmsman 0.2.14
+
+Installed the binary whistle model loader with Valheim closed. Both DLLs match the release package byte-for-byte.
+
+- Backup: `/home/deck/Documents/ChatGPT/Valheim stýrimaður (Valheim Helmsman)/.build/installed-backup-0.2.14-20260915-202142`
+- Package: `dist/Local-ValheimHelmsman-0.2.14.zip`
+- Zero build warnings/errors; 113 core, 64 interaction/cargo and 28 whistle checks pass; 470 API references resolve.
+
+Whistle registration and crafting-menu appearance await an in-game restart check.
+
+## Previous installation
+
 # Local installation — Helmsman 0.2.13
 
 Installed the native-material repair with Valheim closed. Both DLLs match the release archive byte-for-byte.

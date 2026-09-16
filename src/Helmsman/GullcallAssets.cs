@@ -9,14 +9,6 @@ namespace Helmsman;
 // Original mesh and matching orthographic icon, embedded so an installed DLL is self-contained.
 internal static class GullcallAssets
 {
-    [Serializable] private sealed class Model { public Part[] parts=Array.Empty<Part>(); }
-    [Serializable] private sealed class Part
-    {
-        public string name="";
-        public Color color=Color.white;
-        public Vector3[] vertices=Array.Empty<Vector3>();
-        public int[] triangles=Array.Empty<int>();
-    }
     private static readonly List<UnityEngine.Object> assets=new List<UnityEngine.Object>();
     internal static byte[] Read(string name)
     {
@@ -35,6 +27,9 @@ internal static class GullcallAssets
     }
     internal static void Attach(GameObject prefab)
     {
+        // Decode and validate every mesh before modifying the cloned item.
+        using var modelStream=new MemoryStream(Read("model.bin"));
+        var model=Helmsman.Core.GullcallModel.Read(modelStream);
         // Capture the cloned BoneFragments material before replacing its renderers.
         // Its actual shader reference works even when Shader.Find cannot find bundled shaders.
         Material? native=null;
@@ -48,15 +43,17 @@ internal static class GullcallAssets
         foreach(var filter in prefab.GetComponentsInChildren<MeshFilter>(true)) UnityEngine.Object.DestroyImmediate(filter);
         foreach(var light in prefab.GetComponentsInChildren<Light>(true)) UnityEngine.Object.DestroyImmediate(light);
         foreach(var collider in prefab.GetComponentsInChildren<Collider>(true)) UnityEngine.Object.DestroyImmediate(collider);
-        var model=JsonUtility.FromJson<Model>(System.Text.Encoding.UTF8.GetString(Read("model.json")));
-        var bounds=new Bounds(model.parts[0].vertices[0],Vector3.zero);
+        var first=model[0].Vertices;
+        var bounds=new Bounds(new Vector3(first[0],first[1],first[2]),Vector3.zero);
         var root=new GameObject("Gullcall carved model");root.transform.SetParent(prefab.transform,false);
-        foreach(var part in model.parts)
+        foreach(var part in model)
         {
-            foreach(var vertex in part.vertices)bounds.Encapsulate(vertex);
-            var mesh=new Mesh {name="Gullcall "+part.name,vertices=part.vertices,triangles=part.triangles};
+            var vertices=new Vector3[part.Vertices.Length/3];
+            for(int i=0;i<vertices.Length;i++)
+            {vertices[i]=new Vector3(part.Vertices[i*3],part.Vertices[i*3+1],part.Vertices[i*3+2]);bounds.Encapsulate(vertices[i]);}
+            var mesh=new Mesh {name="Gullcall "+part.Name,vertices=vertices,triangles=part.Triangles};
             mesh.RecalculateNormals();mesh.RecalculateBounds();assets.Add(mesh);
-            var material=new Material(native!) {name="Gullcall "+part.name,color=part.color};
+            var material=new Material(native!) {name="Gullcall "+part.Name,color=new Color(part.Color[0],part.Color[1],part.Color[2],part.Color[3])};
             if(material.HasProperty("_MainTex"))material.SetTexture("_MainTex",Texture2D.whiteTexture);
             foreach(var property in new[]{"_EmissionColor","_NoiseGlowColor"})
                 if(material.HasProperty(property))material.SetColor(property,Color.black);
@@ -65,7 +62,7 @@ internal static class GullcallAssets
             if(material.HasProperty("_MoveableObject"))material.SetFloat("_MoveableObject",1);
             material.DisableKeyword("_EMISSION");material.DisableKeyword("NOISEGLOW");
             material.globalIlluminationFlags=MaterialGlobalIlluminationFlags.EmissiveIsBlack;assets.Add(material);
-            var go=new GameObject(part.name);go.transform.SetParent(root.transform,false);
+            var go=new GameObject(part.Name);go.transform.SetParent(root.transform,false);
             go.AddComponent<MeshFilter>().sharedMesh=mesh;
             var renderer=go.AddComponent<MeshRenderer>();renderer.sharedMaterial=material;
             renderer.receiveShadows=true;renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.On;

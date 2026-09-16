@@ -1,3 +1,9 @@
+## Whistle model decoder — 0.2.14
+
+The 0.2.13 live log showed an IndexOutOfRangeException in GullcallAssets.Attach after the earlier material failure was removed. The new binary reader avoids native JSON model deserialization and validates part counts, coordinates and triangle indices before creating Unity objects.
+
+113 core checks (including eight real-model/invalid-data checks), 64 interaction/cargo checks and 28 whistle checks pass. 470 API members resolve and all embedded assets match source. Zero build warnings/errors. Live crafting registration still needs confirmation on restart.
+
 ## Missing whistle / dock setup fix — 0.2.13
 
 The live 0.2.12 log showed `No supported lit shader for Gullcall Whistle` escaping RegisterDock. The whistle now clones the native BoneFragments material, and whistle errors cannot prevent Dock Ward registration. The gull helmet also uses native material references rather than shader-name lookups.

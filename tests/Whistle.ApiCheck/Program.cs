@@ -15,7 +15,7 @@ int members=0;foreach(var r in mod.GetMemberReferences())
  if(r is FieldReference f && f.Resolve()==null)throw new Exception("Unresolved "+r);
  members++;
 }
-foreach(var name in new[]{"icon.png","model.json"})
+foreach(var name in new[]{"icon.png","model.json","model.bin"})
 {
  var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Gullcall."+name);
  if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,"assets/gullcall",name))))throw new Exception("Stale embedded "+name);
