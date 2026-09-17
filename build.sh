@@ -10,10 +10,16 @@ python3 tools/pack_gullcall_model.py
 export DOTNET_CLI_HOME="$PWD/.build/dotnet-home"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+DOTNET="$helmsman_dotnet" python3 tests/MaritimeMaterials/run.py
 "$helmsman_dotnet" build src/Helmsman/Helmsman.csproj -c Release --nologo "$@"
 "$helmsman_dotnet" run --project tests/Helmsman.Tests/Helmsman.Tests.csproj -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Interaction.Tests/Interaction.Tests.csproj -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Whistle.Tests/Whistle.Tests.csproj -c Release --no-launch-profile
+"$helmsman_dotnet" run --project tests/Carpenter.Tests -c Release --no-launch-profile
+"$helmsman_dotnet" run --project tests/Category.Tests -c Release --no-launch-profile
+"$helmsman_dotnet" run --project tests/Placement.Tests -c Release --no-launch-profile
+"$helmsman_dotnet" run --project tests/Launch.Tests -c Release --no-launch-profile
+"$helmsman_dotnet" run --project tests/Sail.Tests -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Workshop.Tests -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Network.Tests -c Release --no-launch-profile
 "$helmsman_dotnet" run --project tests/Summon.Tests/Summon.Tests.csproj -c Release --no-launch-profile

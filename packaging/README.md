@@ -1,42 +1,45 @@
-# Valheim Helmsman
+# ⚓ Helmsman — Sailing & Harbour Life
 
 <img src="https://raw.githubusercontent.com/Vassteel/ValheimHelmsman/master/assets/helmsman-icon-v1.png" alt="Viking gull sailing through rough seas" width="320">
 
-**SKRAAA! A captain for your longship. Scratches included.**
+A gull captain sails your ships, a puffin builds and refits them, and a pelican brings in the catch.
 
-**For solo play. Multiplayer and dedicated-server operation are disabled.**
+## ⛵ Sailing & Navigation
 
-## What I do
+- **Gull captain:** Handles sailing, explains delays and announces arrival.
+- **Dock setup:** Name destinations and preview berths using a ghost ship.
+- **Voyage controls:** Check status, change destination or stop. Taking the helm cancels autopilot.
+- **Ship recall:** Call an empty named ship to a dock or shoreline. The gull sails it there—arrival takes time.
+- **Route display:** Blue wisps mark the course. Toggle them in the menu.
+- **Hugin tutorials:** First-time introductions explain the Dock Ward, Carpenter’s Table and whistle.
 
-- **Sail between named docks:** configure a Dock Ward, board and choose a destination. Reverse departures, course changes and clearance checks included.
-- **Fetch named ships:** call an empty ship to a dock or use a **Gullcall Whistle** near shore. **The gull sails it to your calling spot—arrival takes time.** You can leave; the destination stays fixed.
-- **Explain delays:** squawks and chat messages for obstructions, shallow water and longer planning. Ask **What’s happening?** for the current status.
-- **Announce arrival:** a squawk, a message and a gull settling on his perch.
-- **Show the route:** blue wisps float 4 metres above the course. Show or hide them from the gull, dock or whistle menu.
-- **Unload with Quartermaster:** request unloading near a Deposit Chest. One cargo slot per step, three thrown trinkets per slot. Nothing unloads without your order.
+## 🔨 Ships & Harbour
 
-Helmet and weather reactions included. Supports standard ship physics, including eligible modded boats. Rowboats need two seats; see [Compatibility](https://github.com/Vassteel/ValheimHelmsman/blob/master/COMPATIBILITY.md).
+- **Puffin shipwright:** Commission ships at the Carpenter’s Table. Construction takes time, and orders survive restarts.
+- **Longship refits:** Lantern, canopy, expanded cargo, protective treatment and a decorative trophy mount.
+- **Ship styles:** Supported hull, shield, figurehead and sail options, including custom sail and canopy textures.
+- **Fishing:** Pelican fishing, the Hercule’s deployable net and fish-oil processing.
+- **Harbour pieces:** Decorations, dock extensions and craftable shipbuilding materials.
+- **Quartermaster integration:** Request cargo unloading into nearby base storage.
 
-## Get sailing
+## 🚀 Quick Start
 
-1. Install **BepInEx**, **Jötunn** and Helmsman.
-2. Build a **Dock Ward** and configure its berth and departure.
-3. At the mast, **tap Use to hold fast; hold Use to call the gull**. Speak after he lands.
+1. Install **BepInEx, Jötunn and Helmsman**.
+2. Build a **Dock Ward** beside water and configure its berth.
+3. Board your ship, slow down and release the helm.
+4. Call the gull and speak to him after he lands.
+5. Build a **Carpenter’s Table** near a configured dock for shipbuilding and refits.
 
-| Control | Action |
-|---|---|
-| **F8**, rebindable | Call or speak to the gull |
-| **Shift + Use** at the mast | Name the ship |
-| Take the helm | Cancel autopilot |
+## 🎮 Controls
 
-The shortcut setting is **Controls → CallGullKey**.
+- **F8:** Call or speak to the gull; configurable.
+- **Tap Use at the mast:** Hold fast.
+- **Hold Use at the mast:** Call the gull.
+- **Shift + Use at the mast or helm:** Name your ship.
+- **Take the helm:** Cancel autopilot.
 
-**Gullcall Whistle:** handcraft with **4 bone fragments, 2 wood, 2 leather scraps and 2 feathers**. Use near shore and choose an empty named ship. The gull sails it to safe water beside that spot. No dock required.
+**Testing:** Functional in local play. Recent additions and multiplayer/server behaviour still need testing. Use matching versions on server and clients.
 
-Solo play has been used locally. Recent fixes and remaining checks are listed in [Testing](https://github.com/Vassteel/ValheimHelmsman/blob/master/TESTING.md).
-
-Slow down and release the helm before giving orders. Boat sold pre-scratched.
-
-[GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/abN7R2tWyK) · [Guide](https://github.com/Vassteel/ValheimHelmsman/blob/master/GUIDE.md)
+[Guide](https://github.com/Vassteel/ValheimHelmsman/blob/master/GUIDE.md) · [GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/abN7R2tWyK)
 
 Code, artwork and documentation developed with generative AI.

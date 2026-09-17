@@ -70,7 +70,12 @@ public sealed partial class Shipwright : MonoBehaviour
         return stations.Any(s=>s && s.GetLevel()>=upgrade.Level && PrivateArea.CheckAccess(s.transform.position,0,false,true)) ? "" :
             "Needs "+Localization.instance.Localize(upgrade.Station)+" level "+upgrade.Level+" within 100 m.";
     }
-    internal static string Pay(Player player,ShipUpgrade upgrade,Vector3 position,Action commit)
+    internal static string Pay(Player player,ShipUpgrade upgrade,Vector3 position,Action commit,bool noCost=false)
+    {
+        return CommissionCosts.Commit(noCost,()=>PayMaterials(player,upgrade,position,commit),commit,
+            error=>Plugin.Instance.Error(error));
+    }
+    private static string PayMaterials(Player player,ShipUpgrade upgrade,Vector3 position,Action commit)
     {
         string station=StationCheck(upgrade,position);if(station.Length>0)return station;
         var inventory=player.GetInventory();var costs=ShipwrightRules.Costs(upgrade.Recipe);

@@ -17,3 +17,7 @@ Retextures: original generated albedo edits under `../shipwright/hulls`, bound t
 Visual variants: 38 original serialized sail, shield and hull materials are retained as choices. Default hulls use repainted atlases; optional variants preserve their pattern textures on native, matte shaders. Non-sailing single-seat and double canoes use native rowing gear.
 
 Birds: original procedural low-poly geometry and generated surface texture; no external bird model was imported. The approved concept drawings are design references, not screenshots of game models.
+
+## Boatyard geometry redesign
+
+`redesign/` contains Helmsman-authored shore structures, supplies and ship fittings plus derived ship-stem mesh changes. Imported ship bases, animated rigs, alternate styles and catch animals retain their source attribution. See `redesign/DESIGN.md` for exact coverage and validation limits.

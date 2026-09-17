@@ -21,4 +21,4 @@ Prompt set: `PROMPTS.md`.
 
 ## OdinShip
 
-No OdinShip or OdinShipPlus models have been imported or bundled. User has explicitly confirmed Marlthon’s permission for model reuse, retexturing and redistribution inside Helmsman. Keep author attribution with imported assets. Existing installed assets must not be mistaken for Helmsman-owned models or proof of redistribution permission.
+The selected OdinShip/OdinShipPlus models are bundled under `../ships`. The user explicitly confirmed Marlthon’s permission for model reuse, retexturing and redistribution inside Helmsman. Keep author attribution with imported assets. Existing installed assets must not be mistaken for Helmsman-owned models or proof of redistribution permission.

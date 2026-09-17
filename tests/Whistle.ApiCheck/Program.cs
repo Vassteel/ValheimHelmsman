@@ -31,8 +31,12 @@ foreach(var type in mod.Types)
 foreach(var patch in type.CustomAttributes.Where(a=>a.AttributeType.Name=="HarmonyPatch" && a.ConstructorArguments.Count>=2))
 {
  var targetType=((TypeReference)patch.ConstructorArguments[0].Value).Resolve();
- var methodName=(string)patch.ConstructorArguments[1].Value;
- var methods=targetType.Methods.Where(m=>m.Name==methodName).ToArray();
+ var kind=patch.ConstructorArguments[1];
+ var methodName=kind.Type.FullName=="HarmonyLib.MethodType" && Equals(kind.Value,kind.Type.Resolve().Fields.Single(f=>f.Name=="Constructor").Constant)?".ctor":(string)kind.Value;
+ var candidates=targetType.Methods.Where(m=>m.Name==methodName);
+ if(patch.ConstructorArguments.Count>=3 && patch.ConstructorArguments[2].Value is CustomAttributeArgument[] signatures)
+ {var names=signatures.Select(a=>((TypeReference)a.Value).FullName);candidates=candidates.Where(m=>m.Parameters.Select(p=>p.ParameterType.FullName).SequenceEqual(names));}
+ var methods=candidates.ToArray();
  if(methods.Length!=1)throw new Exception("Ambiguous or missing Harmony target: "+targetType.Name+"."+methodName);
  var method=methods[0];
  foreach(var handler in type.Methods.Where(m=>m.Name is "Prefix" or "Postfix" or "Finalizer"))
@@ -42,7 +46,7 @@ foreach(var patch in type.CustomAttributes.Where(a=>a.AttributeType.Name=="Harmo
   if(parameter.Name=="__instance") {if(actual!=targetType.FullName)throw new Exception("Wrong __instance: "+type.Name);}
   else if(parameter.Name=="__result") {if(actual!=method.ReturnType.FullName)throw new Exception("Wrong __result: "+type.Name);}
   else if(parameter.Name.StartsWith("___")) {if(!targetType.Fields.Any(f=>f.Name==parameter.Name.Substring(3) && f.FieldType.FullName==actual))throw new Exception("Missing injected field: "+type.Name+"."+parameter.Name);}
-  else if(!parameter.Name.StartsWith("__") && !method.Parameters.Any(p=>p.Name==parameter.Name && p.ParameterType.FullName==actual))throw new Exception("Wrong injection: "+type.Name+"."+parameter.Name);
+  else if(!parameter.Name.StartsWith("__") && !method.Parameters.Any(p=>p.Name==parameter.Name && (p.ParameterType is ByReferenceType targetRef ? targetRef.ElementType.FullName : p.ParameterType.FullName)==actual))throw new Exception("Wrong injection: "+type.Name+"."+parameter.Name);
  }
  hooks++;
 }

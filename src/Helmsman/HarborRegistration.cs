@@ -19,6 +19,7 @@ internal static partial class ImportedHulls
         {
             var prefab=Clone(entry.Prefab,entry.Prefab);
             ImportedShipMaterials.Apply(prefab,entry.Prefab);
+            BoatyardModels.Apply(prefab,entry.Prefab);
             string description=entry.Prefab switch {
                 "ResinWood"=>"Resin-treated timber for shipbuilding.",
                 "CaulkedWood"=>"Sealed timber for larger vessels.",
@@ -32,6 +33,7 @@ internal static partial class ImportedHulls
             var config=new ItemConfig {Name=entry.Name,Description=description,Amount=entry.Amount};
             if(entry.Recipe.Length>0)
             {config.CraftingStation=TablePrefab;config.MinStationLevel=1;config.Requirements=Costs(entry.Recipe);}
+            BoatyardModels.RefreshIcon(prefab);
             var item=new CustomItem(prefab,true,config);
             foreach(var effect in new[]{item.ItemDrop.m_itemData.m_shared.m_equipStatusEffect,item.ItemDrop.m_itemData.m_shared.m_consumeStatusEffect})
                 if(effect && effects.Add(effect.name))
@@ -45,6 +47,8 @@ internal static partial class ImportedHulls
         {
             var prefab=Clone(entry.Prefab,entry.Prefab);
             ImportedShipMaterials.Apply(prefab,entry.Prefab);
+            BoatyardModels.Apply(prefab,entry.Prefab);
+            ShoreBuildBounds.ConfigureDock(prefab,entry.Prefab);
             if(entry.Prefab=="FishingDock")
             {
                 var worker=prefab.transform.Find("FisherMan");
@@ -52,7 +56,6 @@ internal static partial class ImportedHulls
                 var fishing=prefab.AddComponent<FishingDock>();fishing.WorkerAnchor=worker?worker:prefab.transform;
                 fishing.Chest=prefab.transform.Find("Container").GetComponent<Container>();
                 fishing.Chest.m_rootObjectOverride=prefab.GetComponent<ZNetView>();
-                prefab.GetComponent<Piece>().m_waterPiece=true;
             }
             if(entry.Prefab=="OilPress")
             {
@@ -61,6 +64,9 @@ internal static partial class ImportedHulls
                 press.Working=prefab.transform.Find("_fermenting").gameObject;
                 prefab.AddComponent<WorkstationLease>();
             }
+            BoatyardModels.RefreshIcon(prefab);
+            prefab.GetComponent<Piece>().m_usage=Piece.UsageTagFlags.Decor|
+                (entry.Prefab=="FishingDock"||entry.Prefab=="OilPress"?Piece.UsageTagFlags.Crafting:0);
             PieceManager.Instance.AddPiece(new CustomPiece(prefab,true,new PieceConfig {
                 Name=entry.Name,Description=entry.Prefab=="FishingDock"?"Daylight fishing with the pelican. Catches enter the dock chest.":entry.Prefab=="OilPress"?"Ten fish become one bottle of fish oil after ten minutes.":"Harbor decoration.",PieceTable="Hammer",Category="Helmsman",CraftingStation="piece_workbench",Requirements=Costs(entry.Recipe)
             }));

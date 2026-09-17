@@ -137,5 +137,7 @@ ShorelineTests.Run(Check);
 GullcallModelTests.Run(Check);
 GuardedStepsTests.Run(Check);
 ShipConstructionTests.Run(Check);
+CommissionCostTests.Run(Check);
+PuffinPerformanceTests.Run(Check);
         ShipwrightRulesTests.Run(Check);
 Console.WriteLine($"{passed} checks passed.");

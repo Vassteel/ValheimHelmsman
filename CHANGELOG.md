@@ -1,5 +1,58 @@
 # Changelog
 
+## 0.2.26
+
+- Refresh the README with current features, setup and controls.
+
+## 0.2.25
+
+- Hugin explains Dock Wards, the Carpenter’s Table and Gullcall Whistle on first construction, discovery or use. Read lessons are remembered per character.
+
+## 0.2.24
+
+- Restore masked glow to merchant lantern glass and warm deck illumination.
+- Stabilize the merchant ship lantern: steady illumination without moving point-light shadows on the hull.
+
+
+## 0.2.23
+
+- Fix imported ship sail animation errors interrupting player movement and leaving characters floating.
+
+## 0.2.22
+
+- Center ship previews and display the selected ship name beneath them.
+- Add livelier pelican and puffin idle poses, plus occasional puffin bench strolls.
+- Add building hops with anticipation, landings and distinct tool-work sequences; show a translucent ship at its berth during construction.
+- Check ship launches against actual collision shapes instead of the padded navigation box, allowing tighter berths.
+
+## 0.2.21
+
+- Relax fishing dock and dock extension placement against existing piers and shoreline terrain.
+- Browse ship commissions with an image carousel using the actual ship models.
+- Honor debug zero-cost building for ship commissions; free orders do not refund unpaid materials.
+- Restrict the Carpenter’s Table to Helmsman recipes, including in no-cost mode.
+- Include the current build-menu Helmsman category correction.
+
+## 0.2.20
+
+- Add the Helmsman category to the current usage-based build menu, alongside other mods’ categories. Keep legacy tabs and existing category entries intact.
+
+## 0.2.19
+
+- Group all Helmsman build pieces in the Helmsman tab.
+- Fix rebuilt harbor previews jumping away from the cursor; keep preview collision separate from finished structures.
+- Use normal surface placement for the fishing dock.
+
+## 0.2.17
+
+- Apply a boatyard visual pass to all 42 imported assets: rebuilt shore structures and supplies, individual ship-stem profiles, working shelters and nautical fittings. Refresh menu icons from the revised models.
+- Keep original prefab identities and functional ship rigs; rebuilt shore structures use matching collision meshes. This visual pass still requires in-game validation.
+
+- Fix maritime registration failing when the current longship lacks a legacy sail renderer or Custom/Piece hull material. Use native building materials and discover cloth renderers directly.
+- Set current build-menu usage tags; put the Carpenter’s Table in Crafting and harbor decorations in Decor. Ships remain timed puffin commissions.
+- Replace raised clothing blobs with fitted panels, remove clothing surface noise, and rebuild the pelican hat as a continuous mesh.
+- Add regression checks for the material-resolution failure reported in the live log.
+
 ## 0.2.16
 
 - Integrate the civilian OdinShip/OdinShipPlus fleet, harbor decorations, original prefab names and recipes; exclude autonomous enemies and naval combat. Original plugin DLLs are not included.

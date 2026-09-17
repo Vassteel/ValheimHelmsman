@@ -14,6 +14,8 @@ internal sealed class ConstructionOrder
     public string blueprint="", recipe="", name="";
     public long started,creator;
     public float duration;
+    // Missing on older saved orders, which were always paid.
+    public bool freeBuild;
     public Vector3 position;
     public float heading;
     internal bool Valid=>ShipConstruction.Find(blueprint)!=null && ShipConstruction.ValidDuration(duration) && started>=0 &&
@@ -29,6 +31,11 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     private ZNetView view=null!;
     private WearNTear wear=null!;
     private VikingBirds.PerchedBird? bird;
+    private PuffinBenchWalk? stroll;
+    private float idleOffset,workBlend;
+    private PuffinWorkPose workPose;
+    private readonly ShipBuildGhost buildGhost=new();
+    private bool ghostFailed;
     private float nextTick;
     private string status="";
     internal bool Ready=>view&&view.IsValid();
@@ -87,6 +94,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
             if(!collider.isTrigger && collider.Raycast(ray,out var hit,10) && hit.distance<closest)
             {closest=hit.distance;perch=transform.InverseTransformPoint(hit.point);}
         bird.Root.transform.localPosition=perch;
+        stroll=new PuffinBenchWalk(bird.Root.transform);idleOffset=UnityEngine.Random.Range(0f,23f);
         bird.Probes(transform);
         var trigger=bird.Root.AddComponent<SphereCollider>();trigger.center=new Vector3(0,.6f,0);trigger.radius=.35f;
         var interaction=bird.Root.AddComponent<BirdInteraction>();interaction.Label=GetHoverName;interaction.Hint=GetHoverText;
@@ -94,20 +102,27 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     }
     private void Update()
     {
-        if(!Ready)return;
+        if(!Ready){buildGhost.Dispose();return;}
         var order=Order;
+        if(order==null)ghostFailed=false;
+        if(Player.m_localPlayer && !ghostFailed)
+            try{buildGhost.Update(order,order==null?0:(float)(Elapsed(order)/order.duration));}
+            catch(Exception error){ghostFailed=true;Plugin.Instance.Error(error);}
+
         if(bird!=null)
         {
-            var task=order==null?ShipwrightTask.Idle:ShipConstruction.Task(ShipConstruction.Find(order.blueprint)!.HasSail,Elapsed(order),order.duration);
-            int tool=task==ShipwrightTask.Hammer?1:task==ShipwrightTask.Chisel?2:task==ShipwrightTask.Stitch?3:0;
-            bird.SetTool(tool);
-            float cycle=tool==1?Mathf.Sin(Time.time*8):tool==2?Mathf.Sin(Time.time*4):Mathf.Sin(Time.time*5);
-            float stroke=Mathf.Max(0,cycle);
-            bird.Pose(tool==1?20+10*stroke:tool==2?35+8*cycle:tool==3?30+8*cycle:0,
-                tool==3?cycle*16:0,0,tool==1?10+55*stroke:tool==2?35+12*stroke:tool==3?15:0,
-                tool==1?.09f*stroke:tool>0?.025f*(cycle+1):0,tool>0?15:0);
             bool nearby=Player.m_localPlayer&&(Player.m_localPlayer.transform.position-bird.Root.transform.position).sqrMagnitude<9;
-            bird.Rest(order==null&&EnvMan.instance&&!EnvMan.IsDaylight()&&!nearby,Time.time,Time.deltaTime);
+            bool sleeping=order==null&&EnvMan.instance&&!EnvMan.IsDaylight()&&!nearby;
+            bool working=order!=null && Elapsed(order)<order.duration && (stroll==null||stroll.AtHome);
+            if(working)workPose=PuffinPerformance.Sample(ShipConstruction.Find(order!.blueprint)!.HasSail,Elapsed(order));
+            workBlend=Mathf.MoveTowards(workBlend,working?1:0,Time.deltaTime*4);
+            var pose=workPose;float blend=workBlend;
+            bird.SetTool(blend>.5f?pose.Tool:0);
+            bird.Pose(pose.Pitch*blend,pose.HeadYaw*blend,pose.Roll*blend,pose.BodyPitch*blend,pose.Crouch*blend,pose.Wing*blend);
+            if(blend<.01f&&!sleeping)bird.Idle(Time.time+idleOffset);
+            stroll?.Tick(bird,order==null&&!Busy&&!sleeping&&blend<.01f,Time.deltaTime);
+            if(blend>0)bird.Stage(new Vector3(pose.X,pose.Hop,pose.Z)*blend,pose.Yaw*blend,pose.Hop*.3f*blend);
+            bird.Rest(sleeping&&(stroll==null||stroll.AtHome),Time.time+idleOffset,Time.deltaTime);
         }
         if(order==null || !view.IsOwner() || Time.time<nextTick || Elapsed(order)<order.duration)return;
         nextTick=Time.time+2;
@@ -128,15 +143,17 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
         var prefab=ZNetScene.instance.GetPrefab(blueprint.Prefab);
         if(!prefab || !ShipProfile.Supports(prefab.GetComponent<Ship>()))return "That ship model is not ready.";
         var berth=current.Berth;
-        if(!new WaterChart(null,ShipProfile.For(prefab.GetComponent<Ship>())).HullSegment(berth.position,berth.position,Quaternion.Euler(0,berth.heading,0),true,out var reason))return reason;
+        if(!ShipLaunchClearance.Clear(prefab.GetComponent<Ship>(),berth.position,Quaternion.Euler(0,berth.heading,0),out var reason))return reason;
         var order=new ConstructionOrder {blueprint=blueprint.Id,recipe=blueprint.Recipe,name=blueprint.Name,creator=player.GetPlayerID(),
-            started=ZNet.instance.GetTime().Ticks,duration=durations[blueprint.Id].Value,position=berth.position,heading=berth.heading};
+            started=ZNet.instance.GetTime().Ticks,duration=durations[blueprint.Id].Value,position=berth.position,heading=berth.heading,
+            freeBuild=player.NoCostCheat()};
         return Shipwright.Pay(player,new ShipUpgrade(blueprint.Id,blueprint.Name,blueprint.Recipe,"$piece_workbench",1),transform.position,()=>
         {
             if(!view.IsOwner() || Busy)throw new InvalidOperationException("The workshop changed before payment completed.");
             view.GetZDO().Set(LaunchKey,ZDOID.None);
             view.GetZDO().Set(OrderKey,JsonUtility.ToJson(order));
-        }) is string error && error.Length>0 ? error : "Materials paid. I'll build "+blueprint.Name+" here; come back when she's ready.";
+        },order.freeBuild) is string error && error.Length>0 ? error :
+            (order.freeBuild?"No-cost build started. ":"Materials paid. ")+"I'll build "+blueprint.Name+" here; come back when she's ready.";
     }
     private void Launch(ConstructionOrder order)
     {
@@ -152,8 +169,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
         }
         var blueprint=ShipConstruction.Find(order.blueprint)!;
         var prefab=ZNetScene.instance.GetPrefab(blueprint.Prefab);if(!prefab){status="Waiting for the ship model.";return;}
-        var chart=new WaterChart(null,ShipProfile.For(prefab.GetComponent<Ship>()));
-        if(!chart.HullSegment(order.position,order.position,Quaternion.Euler(0,order.heading,0),true,out status))return;
+        if(!ShipLaunchClearance.Clear(prefab.GetComponent<Ship>(),order.position,Quaternion.Euler(0,order.heading,0),out status))return;
         // No Unity object is spawned until construction is finished and water is clear.
         // Native ZNetScene creates this persistent ZDO through its normal world-loading path.
         var ship=ZDOMan.instance.CreateNewZDO(WaterChart.AtSea(order.position),blueprint.Prefab.GetStableHashCode());
@@ -171,7 +187,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     {
         if(!Ready||!view.IsOwner()||view.GetZDO().GetZDOID(LaunchKey)!=ZDOID.None)return;
         var order=Order;if(order==null)return;
-        foreach(var cost in ShipwrightRules.Costs(order.recipe))
+        foreach(var cost in CommissionCosts.Refund(order.recipe,order.freeBuild))
         {
             var prefab=ObjectDB.instance.GetItemPrefab(cost.Key);if(!prefab)continue;
             int left=cost.Value;
@@ -185,5 +201,5 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     public bool Interact(Humanoid user,bool hold,bool alt)
     {if(hold||!(user is Player p)||p!=Player.m_localPlayer||!Near(p))return false;Plugin.Instance.UI.OpenShipyard(this);return true;}
     public bool UseItem(Humanoid user,ItemDrop.ItemData item)=>false;
-    private void OnDestroy(){if(wear)wear.m_onDestroyed-=ReturnMaterials;bird?.Dispose();}
+    private void OnDestroy(){if(wear)wear.m_onDestroyed-=ReturnMaterials;bird?.Dispose();buildGhost.Dispose();}
 }

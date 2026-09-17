@@ -15,14 +15,27 @@ internal static class ImportedShipMaterials
     private static Material? wood,cloth;
     internal static void Prepare()
     {
-        var ship=PrefabManager.Instance.GetPrefab("VikingShip");
-        if(!ship)throw new InvalidOperationException("Native longship materials are not ready.");
-        var materials=ship.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).Where(m=>m&&m.shader).ToArray();
-        wood=materials.FirstOrDefault(m=>m.shader.name=="Custom/Piece");
-        cloth=ship.GetComponent<Ship>().m_sailObject.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).FirstOrDefault(m=>m&&m.shader);
-        if(!wood||!cloth)throw new InvalidOperationException("Native wood or sail material is missing.");
-        foreach(var material in materials)native[material.shader.name]=material.shader;
+        Material[] From(string name)
+        {
+            var prefab=PrefabManager.Instance.GetPrefab(name);
+            return prefab?prefab.GetComponentsInChildren<Renderer>(true)
+                .Where(r=>r is MeshRenderer||r is SkinnedMeshRenderer)
+                .SelectMany(r=>r.sharedMaterials).Where(m=>m&&m.shader).ToArray():Array.Empty<Material>();
+        }
+        var materials=From("VikingShip");
+        var building=From("piece_workbench").Concat(From("piece_chest_wood")).ToArray();
+        // Current ships can use cloth sails outside the legacy m_sailObject and
+        // hull shaders other than Custom/Piece. Resolve actual renderer materials.
+        wood=building.Concat(materials).FirstOrDefault(m=>m.shader.name=="Custom/Piece")
+            ??materials.Concat(building).FirstOrDefault(m=>WorldSurface(m.shader.name));
+        cloth=materials.FirstOrDefault(m=>WorldSurface(m.shader.name)&&m.name.IndexOf("sail",StringComparison.OrdinalIgnoreCase)>=0)??wood;
+        if(!wood||!cloth)throw new InvalidOperationException("No native world-surface material is available for maritime content.");
+        foreach(var material in materials.Concat(building))native[material.shader.name]=material.shader;
+        Plugin.Instance.Record("Maritime materials: wood="+wood.name+" ("+wood.shader.name+"); cloth="+cloth.name+" ("+cloth.shader.name+").");
     }
+    internal static bool WorldSurface(string shader)=>shader.StartsWith("Custom/",StringComparison.Ordinal)&&
+        shader.IndexOf("Water",StringComparison.OrdinalIgnoreCase)<0&&shader.IndexOf("Shadow",StringComparison.OrdinalIgnoreCase)<0&&
+        shader.IndexOf("Particle",StringComparison.OrdinalIgnoreCase)<0&&shader.IndexOf("Unlit",StringComparison.OrdinalIgnoreCase)<0;
     internal static void Apply(GameObject prefab,string source)
     {
         foreach(var renderer in prefab.GetComponentsInChildren<Renderer>(true))
@@ -61,12 +74,47 @@ internal static class ImportedShipMaterials
                         material.globalIlluminationFlags=MaterialGlobalIlluminationFlags.EmissiveIsBlack;
                         if(material.HasProperty("_MoveableObject"))material.SetFloat("_MoveableObject",source=="CarpentersTable"?0:1);
                     }
+                    // Lantern glass has a dedicated emission mask. Preserve that mask
+                    // without making the metal frame, hull or crew emissive.
+                    if(source=="MercantShip"&&original.name=="fi_village_lighting")
+                    {
+                        var emission=original.HasProperty("_EmissionMap")?original.GetTexture("_EmissionMap"):null;
+                        if(emission)
+                        {
+                            if(!material.HasProperty("_EmissionMap"))
+                            {
+                                var standard=Shader.Find("Standard");
+                                if(standard&&standard.isSupported)
+                                {UnityEngine.Object.Destroy(material);material=new Material(original){shader=standard};}
+                            }
+                            if(material.HasProperty("_EmissionMap")&&material.HasProperty("_EmissionColor"))
+                            {
+                                material.SetTexture("_EmissionMap",emission);
+                                material.SetColor("_EmissionColor",new Color(1.5f,1.15f,.65f));
+                                material.EnableKeyword("_EMISSION");
+                                material.globalIlluminationFlags=MaterialGlobalIlluminationFlags.None;
+                                if(material.HasProperty("_Glossiness"))material.SetFloat("_Glossiness",.15f);
+                            }
+                            else Plugin.Instance.Record("Merchant lantern: native shader lacks masked emission.");
+                        }
+                    }
                     material.name=original.name+" [Helmsman vanilla finish]";owned.Add(key,material);
                 }
                 materials[i]=material;
             }
             renderer.sharedMaterials=materials;
         }
+    }
+    internal static Material BoatyardMaterial(Color color,bool timber)
+    {
+        if(!wood)throw new InvalidOperationException("Boatyard materials requested before native materials.");
+        var material=new Material(wood){name="Helmsman boatyard matte",color=color};
+        material.mainTexture=timber?ShipwrightAssets.Texture("hulls/planks-horizontal"):Texture2D.whiteTexture;
+        material.mainTextureScale=Vector2.one;material.mainTextureOffset=Vector2.zero;
+        foreach(var p in new[]{"_EmissionColor","_EmissiveColor","_NoiseGlowColor"})if(material.HasProperty(p))material.SetColor(p,Color.black);
+        foreach(var p in new[]{"_Glossiness","_Metallic","_MetalGloss","_NoiseGlowEnabled"})if(material.HasProperty(p))material.SetFloat(p,0);
+        material.DisableKeyword("_EMISSION");material.DisableKeyword("NOISEGLOW");
+        material.globalIlluminationFlags=MaterialGlobalIlluminationFlags.EmissiveIsBlack;return material;
     }
     private static bool IsFabric(string name)=>name.StartsWith("Sail",StringComparison.OrdinalIgnoreCase)||name.StartsWith("Vela",StringComparison.OrdinalIgnoreCase)||name=="Cloth"||name=="HerculeSail"||name=="Roman Sail";
     private static Texture2D? Replacement(string source,string name,bool fabric)

@@ -1,0 +1,296 @@
+[
+  {
+    "name": "RowingCanoe",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 60
+  },
+  {
+    "name": "DoubleRowingCanoe",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 5,
+    "hidden_renderers": 0,
+    "new_triangles": 60
+  },
+  {
+    "name": "LittleBoat",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 6,
+    "hidden_renderers": 0,
+    "new_triangles": 60
+  },
+  {
+    "name": "HerculeShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 5,
+    "hidden_renderers": 0,
+    "new_triangles": 76
+  },
+  {
+    "name": "MercantShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter; replacement bird figurehead",
+    "replaced_meshes": 4,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "CargoShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 3,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "FastShipSkuldelev",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 8,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "BigCargoShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 14,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "WarShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 110,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "Skuldelev",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 26,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "CargoCaravel",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 4,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "GoblinShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 7,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "TaurusWarShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter; replacement bird figurehead",
+    "replaced_meshes": 5,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "CargoAnimalShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 13,
+    "hidden_renderers": 0,
+    "new_triangles": 76
+  },
+  {
+    "name": "HugeCargoShip",
+    "design": "Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter",
+    "replaced_meshes": 13,
+    "hidden_renderers": 0,
+    "new_triangles": 152
+  },
+  {
+    "name": "ShipConstruction",
+    "design": "New keel/rib/planking geometry on braced slipway",
+    "replaced_meshes": 0,
+    "hidden_renderers": 7,
+    "new_triangles": 3300
+  },
+  {
+    "name": "ShipConstruction1",
+    "design": "New keel/rib/planking geometry on braced slipway",
+    "replaced_meshes": 0,
+    "hidden_renderers": 1,
+    "new_triangles": 2160
+  },
+  {
+    "name": "ShipConstruction2",
+    "design": "New keel/rib/planking geometry on braced slipway",
+    "replaced_meshes": 0,
+    "hidden_renderers": 5,
+    "new_triangles": 1032
+  },
+  {
+    "name": "PierCrane1",
+    "design": "New winch-jib geometry, replacing treadwheel silhouette",
+    "replaced_meshes": 0,
+    "hidden_renderers": 552,
+    "new_triangles": 304
+  },
+  {
+    "name": "PierCrane2",
+    "design": "New winch-jib geometry, replacing treadwheel silhouette",
+    "replaced_meshes": 0,
+    "hidden_renderers": 5,
+    "new_triangles": 248
+  },
+  {
+    "name": "PulleyCobia",
+    "design": "Twin-post catch hoist, diagonal braces; original catch species retained",
+    "replaced_meshes": 0,
+    "hidden_renderers": 21,
+    "new_triangles": 112
+  },
+  {
+    "name": "PulleyElephantSeal",
+    "design": "Twin-post catch hoist, diagonal braces; original catch species retained",
+    "replaced_meshes": 0,
+    "hidden_renderers": 21,
+    "new_triangles": 112
+  },
+  {
+    "name": "PulleyMarlin",
+    "design": "Twin-post catch hoist, diagonal braces; original catch species retained",
+    "replaced_meshes": 0,
+    "hidden_renderers": 21,
+    "new_triangles": 112
+  },
+  {
+    "name": "Enguias",
+    "design": "New pegged frame and individually modelled catch/net",
+    "replaced_meshes": 0,
+    "hidden_renderers": 5,
+    "new_triangles": 432
+  },
+  {
+    "name": "Peixes",
+    "design": "New pegged frame and individually modelled catch/net",
+    "replaced_meshes": 0,
+    "hidden_renderers": 4,
+    "new_triangles": 177
+  },
+  {
+    "name": "RedePesca",
+    "design": "New pegged frame and individually modelled catch/net",
+    "replaced_meshes": 0,
+    "hidden_renderers": 4,
+    "new_triangles": 276
+  },
+  {
+    "name": "Totem1",
+    "design": "New carved nautical post with rope binding",
+    "replaced_meshes": 0,
+    "hidden_renderers": 1,
+    "new_triangles": 692
+  },
+  {
+    "name": "Totem2",
+    "design": "New carved nautical post with rope binding",
+    "replaced_meshes": 0,
+    "hidden_renderers": 1,
+    "new_triangles": 692
+  },
+  {
+    "name": "Totem3",
+    "design": "New carved nautical post with rope binding",
+    "replaced_meshes": 0,
+    "hidden_renderers": 1,
+    "new_triangles": 940
+  },
+  {
+    "name": "Totem4",
+    "design": "New carved nautical post with rope binding",
+    "replaced_meshes": 0,
+    "hidden_renderers": 1,
+    "new_triangles": 680
+  },
+  {
+    "name": "OilPress",
+    "design": "New braced frame, screw press, staves and collection spout",
+    "replaced_meshes": 0,
+    "hidden_renderers": 5,
+    "new_triangles": 2884
+  },
+  {
+    "name": "FishingDock",
+    "design": "Braced plank dock; dedicated fish sorting shelf and net roller",
+    "replaced_meshes": 0,
+    "hidden_renderers": 8,
+    "new_triangles": 2014
+  },
+  {
+    "name": "FishingDock_Extension",
+    "design": "Braced plank dock; dedicated fish sorting shelf and net roller",
+    "replaced_meshes": 0,
+    "hidden_renderers": 1,
+    "new_triangles": 516
+  },
+  {
+    "name": "ResinWood",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "CaulkedWood",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "ClothShip",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "ShipRope",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "WindBelt",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "FishExtract",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "FishExtract2",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 0,
+    "new_triangles": 0
+  },
+  {
+    "name": "DriedFishBasket",
+    "design": "Original modelled boatyard supply item with readable role-specific silhouette",
+    "replaced_meshes": 1,
+    "hidden_renderers": 6,
+    "new_triangles": 0
+  },
+  {
+    "name": "CarpentersTable",
+    "design": "Asymmetric pegged bench, vise, tool tray, rib jig and shelf",
+    "replaced_meshes": 0,
+    "hidden_renderers": 7,
+    "new_triangles": 440
+  }
+]

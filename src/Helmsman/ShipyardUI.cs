@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Helmsman.Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Helmsman;
 
@@ -41,18 +42,36 @@ public sealed partial class HelmsmanUI
         var choices=ShipConstruction.Blueprints;
         blueprintIndex=Mathf.Clamp(blueprintIndex,0,choices.Count-1);
         var blueprint=choices[blueprintIndex];
-        Button(body!,"‹",0,0,48,()=>{blueprintIndex=(blueprintIndex+choices.Count-1)%choices.Count;rebuild=true;});
-        theme!.Text(body!,blueprint.Name,66,0,536,40,25,MenuTheme.Gold);
-        Button(body!,"›",624,0,48,()=>{blueprintIndex=(blueprintIndex+1)%choices.Count;rebuild=true;});
-        theme.Text(body!,Shipwright.Requirements(new ShipUpgrade(blueprint.Id,blueprint.Name,blueprint.Recipe,"$piece_workbench",1)),0,-62,672,80,20,MenuTheme.Muted);
+        Button(body!,"‹",0,-50,48,()=>{blueprintIndex=(blueprintIndex+choices.Count-1)%choices.Count;rebuild=true;});
+        var pictureRect=MenuTheme.Rect("Ship picture: "+blueprint.Prefab,body!,66,0,540,124);
+        // Image.preserveAspect aligns spare space using the RectTransform pivot.
+        pictureRect.pivot=new Vector2(.5f,.5f);pictureRect.anchoredPosition=new Vector2(336,-62);
+        var picture=pictureRect.gameObject.AddComponent<Image>();
+        picture.sprite=ShipMenuPreviews.Get(blueprint.Prefab);picture.preserveAspect=true;picture.raycastTarget=false;
+        if(!picture.sprite)
+        {
+            picture.enabled=false;
+            theme!.Text(body!,"Ship preview unavailable",66,-42,540,38,20,MenuTheme.Muted).alignment=TMPro.TextAlignmentOptions.Center;
+        }
+        theme!.Text(body!,blueprint.Name,66,-125,540,25,21,MenuTheme.Gold).alignment=TMPro.TextAlignmentOptions.Center;
+        theme.Text(body!,(blueprintIndex+1)+" / "+choices.Count,66,-152,540,18,15,MenuTheme.Muted).alignment=TMPro.TextAlignmentOptions.Center;
+        Button(body!,"›",624,-50,48,()=>{blueprintIndex=(blueprintIndex+1)%choices.Count;rebuild=true;});
+        var costLabel=theme.Text(body!,"",0,-173,672,38,18,MenuTheme.Muted);
         var docks=yard.Docks;
         yardDockIndex=docks.Count>0?yardDockIndex%docks.Count:0;
         var dock=docks.Count>0?docks[yardDockIndex]:null;
-        Button(body!,dock==null?"No configured Dock Ward nearby":"Launch at: "+dock.Berth.name+"  ›",0,-158,672,()=>{yardDockIndex++;rebuild=true;});
-        theme.Text(body!,"Build time: "+Shipyard.FormatDuration(Shipyard.Duration(blueprint))+". Pay materials to start; she launches when the berth is clear.",0,-212,672,66,19,MenuTheme.Muted);
-        var button=Button(body!,yard.Busy?"Construction in progress":"Pay materials and begin building",0,-295,672,()=>
+        Button(body!,dock==null?"No configured Dock Ward nearby":"Launch at: "+dock.Berth.name+"  ›",0,-214,672,()=>{yardDockIndex++;rebuild=true;});
+        theme.Text(body!,"Build time: "+Shipyard.FormatDuration(Shipyard.Duration(blueprint))+". She launches when construction is finished and the berth is clear.",0,-260,672,44,18,MenuTheme.Muted);
+        var button=Button(body!,yard.Busy?"Construction in progress":"Pay materials and begin building",0,-315,672,()=>
         {if(yard&&dock!=null){YardNotice(yard.Commission(blueprint,dock));rebuild=true;}});
         button.interactable=!yard.Busy&&dock!=null;
+        var buttonLabel=button.GetComponentInChildren<TMPro.TMP_Text>();
+        refreshLabels.Add(()=> {
+            bool free=Player.m_localPlayer && Player.m_localPlayer.NoCostCheat();
+            costLabel.text=free?"No material cost · zero-cost building enabled":
+                Shipwright.Requirements(new ShipUpgrade(blueprint.Id,blueprint.Name,blueprint.Recipe,"$piece_workbench",1));
+            buttonLabel.text=yard&&yard.Busy?"Construction in progress":free?"Begin building — no cost":"Pay materials and begin building";
+        });
     }
     private void BuildRefits()
     {

@@ -31,13 +31,28 @@ internal static partial class ImportedHulls
         {
             var prefab=Clone(blueprint.Source,blueprint.Prefab);
             ImportedShipMaterials.Apply(prefab,blueprint.Source);
+            BoatyardModels.Apply(prefab,blueprint.Source);
+            // The merchant lamp's animated point light sweeps full-strength shadows
+            // across nearby hull surfaces. Keep its warm light steady on a moving ship.
+            if(blueprint.Source=="MercantShip")
+            {
+                var lamp=prefab.transform.Find("ship/visual/Customize/TraderLamp");
+                if(lamp)
+                {
+                    foreach(var flicker in lamp.GetComponentsInChildren<LightFlicker>(true))
+                    {flicker.m_flickerIntensity=0;flicker.m_flickerSpeed=0;flicker.m_movement=0;}
+                    foreach(var light in lamp.GetComponentsInChildren<Light>(true))
+                    {light.shadows=LightShadows.None;light.color=new Color(1f,.78f,.52f);light.intensity=1.5f;light.range=7f;}
+                }
+            }
             var ship=prefab.GetComponent<Ship>();
             if(!ship || !ship.m_floatCollider || !ship.m_shipControlls || !prefab.GetComponent<ZNetView>())
                 throw new InvalidOperationException(blueprint.Name+" is missing native ship components.");
             prefab.AddComponent<ShipOarAnimation>();
+            prefab.AddComponent<ImportedSailAnimation>();
             ship.m_hasSail=blueprint.HasSail;
             if(!blueprint.HasSail)ship.m_sailForceFactor=0;
-            var piece=prefab.GetComponent<Piece>();piece.m_name=blueprint.Name;
+            var piece=prefab.GetComponent<Piece>();piece.m_name=blueprint.Name;piece.m_usage=Piece.UsageTagFlags.Transport;
             piece.m_description="Built by the puffin shipwright. Name her to call her with a Gullcall Whistle.";
             piece.m_resources=Costs(blueprint.Recipe).Select(c=>c.GetRequirement()).ToArray();
             var holds=prefab.GetComponentsInChildren<Container>(true);
@@ -78,16 +93,20 @@ internal static partial class ImportedHulls
                 var trigger=handleObject.AddComponent<SphereCollider>();trigger.radius=.45f;
                 handleObject.AddComponent<NetInteraction>().Net=net;
             }
+            BoatyardModels.RefreshIcon(prefab);
             PrefabManager.Instance.AddPrefab(new CustomPrefab(prefab,true));
         }
         var table=Clone("CarpentersTable",TablePrefab);
         ImportedShipMaterials.Apply(table,"CarpentersTable");
+        BoatyardModels.Apply(table,"CarpentersTable");
         var station=table.GetComponent<CraftingStation>();
-        if(station)station.m_name="Carpenter's Table";
+        if(station)CarpenterRecipes.Configure(station);
         foreach(var guide in table.GetComponentsInChildren<GuidePoint>(true))Object.DestroyImmediate(guide);
         foreach(var particles in table.GetComponentsInChildren<ParticleSystem>(true))Object.DestroyImmediate(particles.gameObject);
+        table.GetComponent<Piece>().m_usage=Piece.UsageTagFlags.Crafting;
         table.AddComponent<Shipyard>();
         table.AddComponent<WorkstationLease>();
+        BoatyardModels.RefreshIcon(table);
         PieceManager.Instance.AddPiece(new CustomPiece(table,true,new PieceConfig {
             Name="Carpenter's Table",Description="Pay the puffin to build ships and refit nearby longships. Place beside a configured Dock Ward.",
             PieceTable="Hammer",Category="Helmsman",CraftingStation="piece_workbench",

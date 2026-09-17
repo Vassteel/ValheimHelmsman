@@ -19,6 +19,7 @@ public sealed class FishingDock : MonoBehaviour
     private double previous;
     private float next;
     private Vector3 perch;
+    private float idleOffset;
     internal static void Configure(ConfigFile config)
     {
         seconds=config.Bind("Fishing Dock","SecondsPerCatch",20f,new ConfigDescription("Daylight work seconds per fish.",new AcceptableValueRange<float>(5,3600), new ConfigurationManagerAttributes { IsAdminOnly=true }));
@@ -31,6 +32,7 @@ public sealed class FishingDock : MonoBehaviour
         var material=GetComponentsInChildren<MeshRenderer>(true).SelectMany(r=>r.sharedMaterials).FirstOrDefault(m=>m&&m.shader&&m.shader.name=="Custom/Piece");
         if(!material)yield break;
         bird=new VikingBirds.PerchedBird(null!,material,false,true);bird.Root.transform.localScale=Vector3.one*.8f;bird.Probes(transform);
+        idleOffset=UnityEngine.Random.Range(0f,23f);
         perch=WorkerAnchor?transform.InverseTransformPoint(WorkerAnchor.position):Vector3.zero;
         var ray=new Ray(transform.TransformPoint(perch)+transform.up*4,-transform.up);float closest=float.PositiveInfinity;
         foreach(var collider in GetComponentsInChildren<Collider>(true))
@@ -60,7 +62,9 @@ public sealed class FishingDock : MonoBehaviour
             float bob=Mathf.Sin(Time.time*.75f);
             bird.Pose(working?12+6*bob:0,working?10*bob:0,0,working?4:0,0,working?8+4*bob:0);
             bool nearby=Player.m_localPlayer&&(Player.m_localPlayer.transform.position-bird.Root.transform.position).sqrMagnitude<9;
-            bird.Rest(!working&&EnvMan.instance&&!EnvMan.IsDaylight()&&!nearby,Time.time,Time.deltaTime);
+            bool sleeping=!working&&EnvMan.instance&&!EnvMan.IsDaylight()&&!nearby;
+            if(!sleeping)bird.Idle(Time.time+idleOffset,working);
+            bird.Rest(sleeping,Time.time+idleOffset,Time.deltaTime);
         }
         if(Time.time<next)return;next=Time.time+1;
         double now=ZNet.instance.GetTimeSeconds();double elapsed=previous>0?Math.Max(0,Math.Min(2,now-previous)):0;previous=now;
