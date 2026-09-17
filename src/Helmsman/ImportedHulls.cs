@@ -26,6 +26,8 @@ internal static partial class ImportedHulls
         if(!bundle)throw new InvalidOperationException("Cannot read ship models.");
         ImportedShipMaterials.Prepare();
         RegisterItems();
+        // Stations must remain buildable even if a ship model fails to load.
+        RegisterStations();
         var visualBindings=ShipCosmetics.ReadBindings();
         foreach(var blueprint in ShipConstruction.Blueprints.Where(b=>b.Id!="longship"))
         {
@@ -54,7 +56,8 @@ internal static partial class ImportedHulls
             ship.m_hasSail=blueprint.HasSail;
             if(!blueprint.HasSail)ship.m_sailForceFactor=0;
             var piece=prefab.GetComponent<Piece>();piece.m_name=blueprint.Name;piece.m_usage=Piece.UsageTagFlags.Transport;
-            piece.m_description="Built by the puffin shipwright. Name her to call her with a Gullcall Whistle.";
+            piece.m_description="Build with the hammer. Visit the puffin for paint and decoration. Name her to call her with a Gullcall Whistle.";
+            piece.m_waterPiece=true;
             piece.m_resources=Costs(blueprint.Recipe).Select(c=>c.GetRequirement()).ToArray();
             var holds=prefab.GetComponentsInChildren<Container>(true);
             for(int i=0;i<holds.Length;i++)
@@ -96,13 +99,20 @@ internal static partial class ImportedHulls
                 handleObject.AddComponent<NetInteraction>().Net=net;
             }
             BoatyardModels.RefreshIcon(prefab);
-            PrefabManager.Instance.AddPrefab(new CustomPrefab(prefab,true));
+            PieceManager.Instance.AddPiece(new CustomPiece(prefab,true,new PieceConfig {
+                Name=blueprint.Name,Description=piece.m_description,PieceTable="Hammer",Category="Helmsman",
+                CraftingStation="piece_workbench",Requirements=Costs(blueprint.Recipe)
+            }));
         }
+        Plugin.Instance.Record("Registered the player fleet and the Carpenter's Table.");
+    }
+    private static void RegisterStations()
+    {
         var table=Clone("CarpentersTable",TablePrefab);
         ImportedShipMaterials.Apply(table,"CarpentersTable");
         BoatyardModels.Apply(table,"CarpentersTable");
         var station=table.GetComponent<CraftingStation>();
-        if(station)CarpenterRecipes.Configure(station);
+        if(station)Object.DestroyImmediate(station); // Supplies are crafted at the ordinary workbench.
         foreach(var guide in table.GetComponentsInChildren<GuidePoint>(true))Object.DestroyImmediate(guide);
         foreach(var particles in table.GetComponentsInChildren<ParticleSystem>(true))Object.DestroyImmediate(particles.gameObject);
         table.GetComponent<Piece>().m_usage=Piece.UsageTagFlags.Crafting;
@@ -110,12 +120,12 @@ internal static partial class ImportedHulls
         table.AddComponent<WorkstationLease>();
         BoatyardModels.RefreshIcon(table);
         PieceManager.Instance.AddPiece(new CustomPiece(table,true,new PieceConfig {
-            Name="Carpenter's Table",Description="Pay the puffin to build ships and refit nearby longships. Place beside a configured Dock Ward.",
+            Name="Carpenter's Table",Description="Visit the puffin to paint and decorate ships within 35 m. Ships and harbor pieces are built with the hammer.",
             PieceTable="Hammer",Category="Helmsman",CraftingStation="piece_workbench",
             Requirements=Costs(HarborCatalog.TableRecipe)
         }));
         RegisterHarbor();
-        Plugin.Instance.Record("Registered the player fleet and the Carpenter's Table.");
+        Plugin.Instance.Record("Registered Carpenter's Table and harbor workstations.");
     }
     private static GameObject Clone(string source,string name)
     {

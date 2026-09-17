@@ -62,7 +62,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     {
         get
         {
-            var o=Order;if(o==null)return Busy?"Saved order needs inspection; its materials are retained.":"Ready for a commission.";
+            var o=Order;if(o==null)return Busy?"Saved order needs inspection; its materials are retained.":"Choose a nearby ship to paint or decorate.";
             double left=Math.Max(0,o.duration-Elapsed(o));
             return left>0?o.name+" — "+FormatDuration(left)+" remaining":status.Length>0?status:"Construction finished; checking launch area.";
         }
@@ -130,31 +130,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     }
     internal bool Near(Player player)=>Ready&&player&&!player.IsDead()&&Vector3.Distance(player.transform.position,transform.position)<6&&PrivateArea.CheckAccess(transform.position,0,false,true);
     internal List<DockRecord> Docks=>Plugin.Instance.Directory.Records.Where(d=>Vector3.Distance(d.MarkerPosition,transform.position)<45).ToList();
-    internal string Commission(ShipBlueprint blueprint,DockRecord dock)
-        =>GetComponent<WorkstationLease>().Run(()=>CommissionOwned(blueprint,dock));
-    private string CommissionOwned(ShipBlueprint blueprint,DockRecord dock)
-    {
-        var player=Player.m_localPlayer;
-        if(!Near(player))return "Stand beside an accessible Carpenter's Table.";
-        if(Busy)return "Let me finish this ship first.";
-        if(!GetComponent<WorkstationLease>().Held)return "Workshop access changed. Please try again.";
-        var current=DockDirectory.Resolve(dock.Id);
-        if(current==null || Vector3.Distance(current.MarkerPosition,transform.position)>=45)return "Choose a configured Dock Ward within 45 m.";
-        var prefab=ZNetScene.instance.GetPrefab(blueprint.Prefab);
-        if(!prefab || !ShipProfile.Supports(prefab.GetComponent<Ship>()))return "That ship model is not ready.";
-        var berth=current.Berth;
-        if(!ShipLaunchClearance.Clear(prefab.GetComponent<Ship>(),berth.position,Quaternion.Euler(0,berth.heading,0),out var reason))return reason;
-        var order=new ConstructionOrder {blueprint=blueprint.Id,recipe=blueprint.Recipe,name=blueprint.Name,creator=player.GetPlayerID(),
-            started=ZNet.instance.GetTime().Ticks,duration=durations[blueprint.Id].Value,position=berth.position,heading=berth.heading,
-            freeBuild=player.NoCostCheat()};
-        return Shipwright.Pay(player,new ShipUpgrade(blueprint.Id,blueprint.Name,blueprint.Recipe,"$piece_workbench",1),transform.position,()=>
-        {
-            if(!view.IsOwner() || Busy)throw new InvalidOperationException("The workshop changed before payment completed.");
-            view.GetZDO().Set(LaunchKey,ZDOID.None);
-            view.GetZDO().Set(OrderKey,JsonUtility.ToJson(order));
-        },order.freeBuild) is string error && error.Length>0 ? error :
-            (order.freeBuild?"No-cost build started. ":"Materials paid. ")+"I'll build "+blueprint.Name+" here; come back when she's ready.";
-    }
+    // Existing paid orders still finish and refund normally; no new timed orders.
     private void Launch(ConstructionOrder order)
     {
         var zdo=view.GetZDO();var id=zdo.GetZDOID(LaunchKey);
@@ -197,7 +173,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     }
     public string GetHoverName()=>"Puffin shipwright";
     public float GetHoverOffset()=>0;
-    public string GetHoverText()=>Localization.instance.Localize("Puffin shipwright\n[<color=yellow><b>$KEY_Use</b></color>] Ships and refits\n")+Status;
+    public string GetHoverText()=>Localization.instance.Localize("Puffin shipwright\n[<color=yellow><b>$KEY_Use</b></color>] Paint and decoration\n")+Status;
     public bool Interact(Humanoid user,bool hold,bool alt)
     {if(hold||!(user is Player p)||p!=Player.m_localPlayer||!Near(p))return false;Plugin.Instance.UI.OpenShipyard(this);return true;}
     public bool UseItem(Humanoid user,ItemDrop.ItemData item)=>false;

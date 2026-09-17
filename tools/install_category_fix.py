@@ -14,7 +14,7 @@ def atomic(path,data):
  finally:
   if os.path.exists(temp):os.unlink(temp)
 closed()
-manifest=root/'packaging/manifest.json';version=json.loads(manifest.read_text())['version_number'];assert version=='0.2.30'
+manifest=root/'packaging/manifest.json';version=json.loads(manifest.read_text())['version_number'];assert version=='0.2.31'
 sources=[root/'dist/ValheimHelmsman/ValheimHelmsman.dll',root/'dist/ValheimHelmsman/Helmsman.Core.dll',manifest]
 places=[Path('/home/deck/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins/ValheimHelmsman'),Path('/home/deck/.var/app/io.github.ebkr.r2modman/config/r2modmanPlus-local/Valheim/profiles/Mods/BepInEx/plugins/local-ValheimHelmsman')]
 for folder in places:

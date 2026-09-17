@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.31
+
+- Build ships and harbor pieces from Hammer → Helmsman; the puffin now handles paint and decoration.
+- Craft maritime supplies at an ordinary Workbench. Existing paid ship orders still finish.
+
+- Fix ship model loading that prevented the Carpenter’s Table and harbor stations from appearing.
+- Register workstations before ships so a ship loading error cannot hide them.
+
 ## 0.2.30
 
 - Add the redesigned Ottar, heavy freighter, Snekkja, Falkuša, Ceol and six-slot Currach to puffin shipbuilding.

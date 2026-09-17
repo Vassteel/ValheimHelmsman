@@ -11,20 +11,8 @@ using Object=UnityEngine.Object;
 namespace Helmsman;
 
 // Authored Blender geometry; native Ship, ZNetView and cargo serialization remain intact.
-internal static class FinalFleetModels
+internal static partial class FinalFleetModels
 {
-    [Serializable] internal sealed class Point {public string kind="";public float[] position=Array.Empty<float>(),exit=Array.Empty<float>(),facing=Array.Empty<float>();}
-    [Serializable] internal sealed class Solid {public float[] position=Array.Empty<float>(),size=Array.Empty<float>();}
-    [Serializable] internal sealed class HullSolid {public float[] vertices=Array.Empty<float>();public int[] triangles=Array.Empty<int>();}
-    [Serializable] internal sealed class Sheet {public float[] head=Array.Empty<float>(),foot=Array.Empty<float>();}
-    [Serializable] internal sealed class Spec
-    {
-        public string prefab="",name="";
-        public float length=0,beam=0,walkHeight=0,waterline=0,airHeight=0,cargoHeight=0;
-        public float[] sailPivot=Array.Empty<float>(),rudderPivot=Array.Empty<float>();
-        public HullSolid[] hullSolids=Array.Empty<HullSolid>(),cargoSolids=Array.Empty<HullSolid>();
-        public Point[] points=Array.Empty<Point>();public Solid[] colliders=Array.Empty<Solid>();public Sheet[] sheets=Array.Empty<Sheet>();
-    }
     private sealed class Part {internal string Group="";internal Mesh Mesh=null!;internal Material Material=null!;}
     private sealed class Model {internal Spec Spec=null!;internal readonly List<Part> Parts=new();}
     private static readonly Dictionary<string,Model> cache=new();
@@ -46,8 +34,7 @@ internal static class FinalFleetModels
         using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("Helmsman.Ships.final."+name+".bin.gz")??throw new InvalidDataException("Missing final ship "+name);
         using var zip=new GZipStream(stream,CompressionMode.Decompress);using var r=new BinaryReader(zip);
         if(Encoding.ASCII.GetString(r.ReadBytes(4))!="HMF1")throw new InvalidDataException("Unknown final fleet format");
-        var model=new Model{Spec=JsonUtility.FromJson<Spec>(Text(r,1000000))};var s=model.Spec;
-        if(s.prefab!=name||s.length<4||s.length>30||s.beam<1||s.beam>10||s.points.Count(p=>p.kind=="helm")!=1)throw new InvalidDataException("Invalid final ship specification");
+        var model=new Model{Spec=ReadSpecification(Text(r,1000000),name)};
         int nm=Count(r,128);var materials=new Material[nm];
         for(int i=0;i<nm;i++)
         {

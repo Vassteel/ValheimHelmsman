@@ -26,6 +26,7 @@
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/assembly_*.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/Splatform.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/UnityEngine*.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/Newtonsoft.Json.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/Unity.TextMeshPro.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/mscorlib.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/netstandard.dll" Private="false" />

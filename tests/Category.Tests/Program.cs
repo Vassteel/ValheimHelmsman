@@ -17,6 +17,7 @@ Call(typeof(AddHelmsmanUsageCategory),"Postfix",arrays);Check(((string[])arrays[
 var table=new PieceTable();var dock=new Piece{gameObject=Plugin.DockPrefab};var foreign=new Piece{gameObject="Skylands_other"};var repair=new Piece{gameObject="repair",m_repairPiece=true};
 table.m_availablePieces.UnionWith(new[]{dock,foreign,repair});
 foreach(var entry in HarborCatalog.Pieces)Check(BuildMenuCategory.Contains(new Piece{gameObject=entry.Prefab}),"Catalog piece included: "+entry.Prefab);
+foreach(var ship in ShipConstruction.Blueprints)Check(BuildMenuCategory.Contains(new Piece{gameObject=ship.Prefab}),"Hammer ship category includes: "+ship.Prefab);
 var result=new List<Piece>();Check(!(bool)Call(typeof(FilterHelmsmanUsageCategory),"Prefix",3,table,result,names),"Own category handles filtering");
 Check(result.Contains(dock)&&result.Contains(repair)&&!result.Contains(foreign),"Only Helmsman plus native repair entries");
 result.Clear();Check((bool)Call(typeof(FilterHelmsmanUsageCategory),"Prefix",2,table,result,names)&&result.Count==0,"Other-mod filters untouched");

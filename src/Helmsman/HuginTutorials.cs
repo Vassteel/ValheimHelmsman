@@ -37,7 +37,7 @@ public sealed class HuginTutorials : MonoBehaviour
         else if(key==Carpenter)
         {
             title="The puffin shipwright";
-            text="Use the puffin's Carpenter's Table with [$KEY_Use] to commission ships or refit a nearby vessel. Place it beside a configured Dock Ward.\n\nChoose a ship with the menu arrows, choose its launch berth and pay the listed materials. Construction takes time. Keep the launch area clear; the puffin will launch the ship when it is ready.";
+            text="Build ships and harbor structures with the hammer under Helmsman. Craft sail canvas, marine rope and prepared timber at an ordinary Workbench.\n\nUse the puffin's Carpenter's Table with [$KEY_Use] to paint and decorate a ship within 35 m. No Dock Ward is required for decoration.";
         }
         else
         {

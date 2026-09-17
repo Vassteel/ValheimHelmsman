@@ -32,7 +32,7 @@ internal static partial class ImportedHulls
             };
             var config=new ItemConfig {Name=entry.Name,Description=description,Amount=entry.Amount};
             if(entry.Recipe.Length>0)
-            {config.CraftingStation=TablePrefab;config.MinStationLevel=1;config.Requirements=Costs(entry.Recipe);}
+            {config.CraftingStation="piece_workbench";config.MinStationLevel=1;config.Requirements=Costs(entry.Recipe);}
             BoatyardModels.RefreshIcon(prefab);
             var item=new CustomItem(prefab,true,config);
             foreach(var effect in new[]{item.ItemDrop.m_itemData.m_shared.m_equipStatusEffect,item.ItemDrop.m_itemData.m_shared.m_consumeStatusEffect})

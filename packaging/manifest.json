@@ -1,7 +1,7 @@
 {
   "name": "ValheimHelmsman",
   "author": "Local",
-  "version_number": "0.2.30",
+  "version_number": "0.2.31",
   "website_url": "https://github.com/Vassteel/ValheimHelmsman",
   "description": "Gull-guided sailing and ship recall, puffin shipbuilding, longship refits, a civilian fleet, harbor props and pelican fishing. Optional Quartermaster cargo unloading.",
   "dependencies": [
