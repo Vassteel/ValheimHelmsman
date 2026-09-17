@@ -1,0 +1,10 @@
+{
+  "name": "ValheimHelmsman",
+  "dlls": [
+    "ValheimHelmsman.dll",
+    "Helmsman.Core.dll"
+  ],
+  "game": "valheim",
+  "page_id": 3815,
+  "file_id": null
+}
