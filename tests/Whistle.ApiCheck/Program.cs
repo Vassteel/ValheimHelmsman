@@ -21,6 +21,13 @@ foreach(var name in new[]{"icon.png","model.json","model.bin"})
  var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Gullcall."+name);
  if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,"assets/gullcall",name))))throw new Exception("Stale embedded "+name);
 }
+// Check the exact six runtime mesh payloads, including new sail and collision data.
+foreach(var file in Directory.GetFiles(Path.Combine(root,"assets/ships/final"),"*.bin.gz"))
+{
+ var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Ships.final."+Path.GetFileName(file));
+ if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(file)))throw new Exception("Stale final fleet asset "+file);
+}
+if(mod.Resources.Count(r=>r.Name.StartsWith("Helmsman.Ships.final."))!=6)throw new Exception("Missing final fleet resources");
 var hook=mod.Types.Single(t=>t.Name=="UseGullcallWhistle").Methods.Single(m=>m.Name=="Prefix");
 var target=resolver.Resolve(new AssemblyNameReference("assembly_valheim",new Version(0,0,0,0))).MainModule.Types.Single(t=>t.Name=="Humanoid").Methods.Single(m=>m.Name=="UseItem");
 if(target.ReturnType.FullName!="System.Void")throw new Exception("Unexpected UseItem return type");
@@ -53,6 +60,13 @@ foreach(var patch in type.CustomAttributes.Where(a=>a.AttributeType.Name=="Harmo
 var api=chat.Module;
 foreach(var field in new[]{("Ship","m_speed","Ship/Speed"),("Ship","m_rudderValue","System.Single"),("Inventory","m_width","System.Int32")})
  if(!api.Types.Single(t=>t.Name==field.Item1).Fields.Any(f=>f.Name==field.Item2 && f.FieldType.FullName==field.Item3))throw new Exception("Missing reflected field: "+field.Item2);
+// Runtime map/ward delegates must resolve before a report can be collected.
+foreach(var field in new[]{("Minimap","m_fogTexture","UnityEngine.Texture2D"),("Minimap","m_pins","System.Collections.Generic.List`1<Minimap/PinData>"),("PrivateArea","m_allAreas","System.Collections.Generic.List`1<PrivateArea>")})
+ if(!api.Types.Single(t=>t.Name==field.Item1).Fields.Any(f=>f.Name==field.Item2 && f.FieldType.FullName==field.Item3))throw new Exception("Missing scouting field: "+field.Item2);
+foreach(var entry in new[]{("Minimap","Explore",new[]{"System.Int32","System.Int32"}),("PrivateArea","IsEnabled",Array.Empty<string>()),("PrivateArea","IsInside",new[]{"UnityEngine.Vector3","System.Single"}),("PrivateArea","IsPermitted",new[]{"System.Int64"})})
+ if(!api.Types.Single(t=>t.Name==entry.Item1).Methods.Any(m=>m.Name==entry.Item2 && m.ReturnType.FullName=="System.Boolean" && m.Parameters.Select(p=>p.ParameterType.FullName).SequenceEqual(entry.Item3)))throw new Exception("Missing scouting method: "+entry.Item2);
+foreach(var entry in new[]{("MineRock","GetAreaIndex","System.Int32",new[]{"UnityEngine.Collider"}),("MineRock5","GetAreaIndex","System.Int32",new[]{"UnityEngine.Collider"}),("MineRock","RPC_Hit","System.Void",new[]{"System.Int64","HitData","System.Int32"}),("MineRock5","RPC_Damage","System.Void",new[]{"System.Int64","HitData","System.Int32"}),("Destructible","RPC_Damage","System.Void",new[]{"System.Int64","HitData"}),("Container","CheckAccess","System.Boolean",new[]{"System.Int64"})})
+ if(!api.Types.Single(t=>t.Name==entry.Item1).Methods.Any(m=>m.Name==entry.Item2 && m.ReturnType.FullName==entry.Item3 && m.Parameters.Select(p=>p.ParameterType.FullName).SequenceEqual(entry.Item4)))throw new Exception("Missing rock clearing method: "+entry.Item1+"."+entry.Item2);
 if(!api.Types.Single(t=>t.Name=="Player").Methods.Any(m=>m.Name=="TakeInput" && m.Parameters.Count==0 && m.ReturnType.FullName=="System.Boolean"))throw new Exception("Player.TakeInput changed");
 foreach(var name in new[]{"Awake","Load"})
  if(api.Types.Single(t=>t.Name=="Container").Methods.Count(m=>m.Name==name && m.Parameters.Count==0)!=1)throw new Exception("Cargo deserialization hook changed: "+name);

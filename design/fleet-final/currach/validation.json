@@ -1,0 +1,10 @@
+{
+  "mast_clear": true,
+  "stern_clear": true,
+  "materials": 24,
+  "batches": 27,
+  "vertices": 127910,
+  "triangles": 65402,
+  "walk_slabs": 87,
+  "cargo_cells": 0
+}

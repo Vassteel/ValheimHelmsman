@@ -24,6 +24,8 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     private static readonly Dictionary<ZDOID,GullGuide> travellers=new Dictionary<ZDOID,GullGuide>();
     private ZDOID? homeDock;
     private DockMarker? dock;
+    private Transform? reportTable;
+    internal bool ReportLanded=>reportTable&&perched;
     private Voyage? voyage;
     private Ship? visitingShip;
     private Ship? PerchShip=>voyage && voyage.Ship ? voyage.Ship : visitingShip;
@@ -55,7 +57,7 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     private bool displayFlight;
     private Vector3 flightOrigin, flightBase, threatPosition;
     private Quaternion flightRestRotation;
-    internal bool IsTravelling=>voyage || visitingShip || leaving || fetching;
+    internal bool IsTravelling=>voyage || visitingShip || leaving || fetching || reportTable;
     internal static GullGuide? Traveller(ZDOID id)=>travellers.TryGetValue(id,out var guide) && guide ? guide : null;
     internal void ReserveDock(ZDOID id){homeDock=id;travellers[id]=this;}
 
@@ -102,7 +104,8 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
             guide.perched=true;root.transform.SetParent(guide.perchParent,false);
             root.transform.localPosition=guide.perchLocal;root.transform.localRotation=Quaternion.identity;
         }
-        var collider=root.AddComponent<SphereCollider>();collider.radius=.55f;collider.center=Vector3.up*.3f;
+        // Hover queries include triggers; the gull must never add a solid shape to a ship.
+        var collider=root.AddComponent<SphereCollider>();collider.isTrigger=true;collider.radius=.55f;collider.center=Vector3.up*.3f;
         guide.SetModels(!guide.perched);
         return guide;
     }
@@ -146,6 +149,13 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
         return result+Vector3.up*.015f;
     }
 
+    internal void DeliverScoutReport(MapTable table)
+    {
+        dock=null;voyage=null;visitingShip=null;fetching=false;leaving=false;perched=false;
+        reportTable=table.transform;perchParent=reportTable;
+        perchLocal=SurfacePerch(reportTable,new Vector3(.45f,1.05f,0));
+        flightOrigin=transform.position;flightStarted=Time.time;SetModels(true);
+    }
     internal void FetchTarget(Vector3 target)=>fetchPosition=target;
     internal void Fetch(Vector3 target)
     {
@@ -170,15 +180,15 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     internal void CallDown() {greetUntil=Time.time+6;}
     internal void FlyAway()
     {
+        GetComponent<Collider>().enabled=false;
         leaving=true;perched=false;fetching=false;transform.SetParent(null,true);
         disappearAt=Time.time+4;flightTarget=transform.position+Vector3.up*18+transform.forward*25;
-        GetComponent<Collider>().enabled=false;
         SetModels(true);
     }
 
     private void LateUpdate()
     {
-        if(!leaving && !fetching && (!perchParent || (!dock && !PerchShip))) {Destroy(gameObject);return;}
+        if(!leaving && !fetching && (!perchParent || (!dock && !PerchShip && !reportTable))) {Destroy(gameObject);return;}
         if(leaving && Time.time>=disappearAt) {Destroy(gameObject);return;}
         var target=leaving ? flightTarget : fetching ? fetchPosition : perchParent!.TransformPoint(perchLocal);
         if(!perched)
@@ -340,12 +350,13 @@ public sealed class GullGuide : MonoBehaviour, Interactable, Hoverable
     }
     public string GetHoverName()=>"Helmsman gull";
     public float GetHoverOffset()=>.25f;
-    public string GetHoverText()=>Localization.instance.Localize(GetHoverName()+(leaving ? "\nFlying away" : !perched ? "\nLanding…" : "\n[<color=yellow><b>$KEY_Use</b></color>] Choose destination"));
+    public string GetHoverText()=>Localization.instance.Localize(GetHoverName()+(leaving ? "\nFlying away" : !perched ? "\nLanding…" : reportTable ? "\n[<color=yellow><b>$KEY_Use</b></color>] Receive island chart" : "\n[<color=yellow><b>$KEY_Use</b></color>] Choose destination"));
     public bool Interact(Humanoid user,bool hold,bool alt)
     {
         if(hold || leaving || user!=Player.m_localPlayer)return false;
         if(!perched){Plugin.Message("Wait for the gull to land.");return false;}
         CallDown();
+        if(reportTable){IslandScouting.Instance.Collect();return true;}
         if(voyage)Plugin.Instance.UI.OpenVoyage(this);
         else if(visitingShip && Plugin.Instance.CalledGull && Plugin.Instance.CalledGull.Ship==visitingShip)
             Plugin.Instance.UI.OpenCalledGull(Plugin.Instance.CalledGull,this);

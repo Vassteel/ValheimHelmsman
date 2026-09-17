@@ -76,21 +76,12 @@ for name in json.loads((ROOT/'assets/ships/content-roots.json').read_text()):
    for side in [-1,1]:k.beam((side*width,deck+.1,z),(side*width,deck+2.15,z),.11)
    k.beam((-width-.15,deck+2.15,z),(width+.15,deck+2.15,z),.14)
    for x in [-width*.5,width*.5]:k.tube([(x,deck+2.15,z),(x,deck+1.9,z+.15)],.03,ROPE,6)
-  else:
-   # Merchant/cargo shelters have different lengths and roof forms. Fast hulls get
-   # only a short navigation awning, keeping their low runner silhouette.
-   length=half*(.36 if name in ['MercantShip','BigCargoShip','HugeCargoShip','CargoCaravel'] else .19)
-   height=deck+2.15;roofwidth=width*1.7
-   for side in [-1,1]:
-    for zz in [z-length/2,z+length/2]:k.beam((side*roofwidth/2,deck+.1,zz),(side*roofwidth/2,height-.22,zz),.10)
-    k.beam((side*roofwidth/2,height-.22,z-length/2),(side*roofwidth/2,height-.22,z+length/2),.08)
-   k.cloth((0,height,z),roofwidth,length,.25,CLOTH if ni%2 else BLUE)
-   for zz in [z-length/2,z+length/2]:
-    k.beam((-roofwidth/2,height-.22,zz),(0,height+.015,zz),.055)
-    k.beam((0,height+.015,zz),(roofwidth/2,height-.22,zz),.055)
-  plan['extra']=mesh_from_kit(k);shown+=visual(k,'Boatyard end fittings')
+  # Cloth aft awnings and their support posts have been removed. Canoe racks
+  # and the fishing/animal lashing gantries are separate working fittings.
+  if k.v:
+   plan['extra']=mesh_from_kit(k);shown+=visual(k,'Boatyard end fittings')
   shown += [changed.get(id(p),p) for p in parts if changed.get(id(p),p) is not None]
-  note='Individual stem rake/height; deck preserved; original rig and cargo retained; class-specific rack, gantry or shelter'+('; replacement bird figurehead' if ornaments else '')
+  note='Individual stem rake/height; deck preserved; original rig and cargo retained; open aft deck; canoe racks and working gantries retained'+('; replacement bird figurehead' if ornaments else '')
  else:
   keep=[]
   if name=='CarpentersTable':k=bench();note='Asymmetric pegged bench, vise, tool tray, rib jig and shelf'

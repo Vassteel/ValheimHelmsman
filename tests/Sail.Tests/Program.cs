@@ -18,6 +18,10 @@ legacy.m_sailObject=null;legacy.m_mastObject=null;Check(!ImportedSailCompatibili
 var rowing=Make();rowing.m_hasSail=false;Check(!ImportedSailCompatibility.Prefix(rowing,.02f)&&rowing.m_sailObject.transform.localScale.y==1,"Rowing-only hulls bypass unused sail animation");
 var noEnvironment=Make();EnvMan.instance=null;Check(!ImportedSailCompatibility.Prefix(noEnvironment,.02f),"Scene startup without environment cannot interrupt shared physics");
 EnvMan.instance=new();EnvMan.instance.Wind=new Vector3();noEnvironment.Setting=Ship.Speed.Full;Check(!ImportedSailCompatibility.Prefix(noEnvironment,.02f),"Zero projected wind leaves a valid mast rotation");
+var fixedRig=Make();fixedRig.GetComponent<ImportedSailAnimation>().FixedMast=true;
+fixedRig.Setting=Ship.Speed.Stop;
+for(int i=0;i<100;i++)ImportedSailCompatibility.Prefix(fixedRig,.02f);
+Check(Math.Abs(fixedRig.m_sailObject.transform.localScale.y-.1f)<.001f,"Final fleet sails still furl on fixed standing rigging");
 int characterTicks=0;
 for(int i=0;i<50;i++) {if(ImportedSailCompatibility.Prefix(legacy,.02f))throw new NullReferenceException("Old ship has no current cloth rig");characterTicks++;}
 Check(characterTicks==50,"Compatibility path allows later character updates to execute every tick");

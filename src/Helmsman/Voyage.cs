@@ -32,17 +32,19 @@ public sealed class Voyage : MonoBehaviour
     private VoyagePhase phase;
     private WaterChart chart=null!;
     private readonly List<Vector3> route=new List<Vector3>();
-    private int waypoint;
+    private int waypoint,detourLastWaypoint=-1;
     private bool rerouting, slowingForTurn;
     private float nextDecision, modeSince, nextDestinationCheck, progressTime;
-    private Vector3 progressPosition;
+    private Vector3 progressPosition,lastReplanPosition;
     private Ship.Speed command=Ship.Speed.Stop;
     private float rudder;
     private GullGuide? gull;
     private RouteWisps? routeEffect;
     private Coroutine? planning;
     private int automaticReplans;
-    private float waitingForWorldSince=-1;
+    private float waitingForWorldSince=-1,nextRockClear,rockApproachUntil;
+    private Collider? lastClearedRock;
+    private int rockClearAttempts;
     private bool worldWaitAnnounced;
     private const float Deceleration=.25f; // Conservative starting estimate, awaiting measured calibration.
 
@@ -132,18 +134,50 @@ public sealed class Voyage : MonoBehaviour
     internal bool GullReady=>gull && gull.ReadyOn(Ship);
     internal void CallGull() {if(gull) gull.CallDown();}
 
-    private IEnumerator Plan(Vector3 start) => GuardedSteps.Run(BuildPlan(start), error =>
+    private IEnumerator Plan(Vector3 start,bool repair=false) => GuardedSteps.Run(BuildPlan(start,repair), error =>
     {
         planning=null;
         Plugin.Instance.Error(error);
         Pause("Course planning failed. Choose the destination again or take the helm.");
     });
 
-    private IEnumerator BuildPlan(Vector3 start)
+    private IEnumerator BuildPlan(Vector3 start,bool repair)
     {
         // Yield once so the coroutine handle is assigned before it can complete or fail.
         yield return null;
-        route.Clear();waypoint=0;
+        chart.PlanRockClearing=!Unattended&&Plugin.Instance.ClearNavigationRocks.Value;
+        // Reuse the offshore course when a newly loaded rock blocks its next leg.
+        // A six-metre local search can use passages the regional 24 m grid misses.
+        if(repair&&route.Count>waypoint)
+        {
+            var previous=route.Select(WaterChart.Point).ToArray();
+            bool LocalClear(Point a,Point b)
+            {
+                var from=WaterChart.Vector(a);var to=WaterChart.Vector(b);var delta=to-from;
+                return chart.HullSegment(from,to,Quaternion.LookRotation(delta.sqrMagnitude>.01f?delta:Ship.transform.forward),true,out _,allowClearableRocks:chart.PlanRockClearing);
+            }
+            var detour=LocalDetour.Create(WaterChart.Point(start),previous,waypoint,LocalClear);
+            if(detour!=null)
+            {
+                while(detour.Search.State==SearchState.Searching)
+                {
+                    var watch=System.Diagnostics.Stopwatch.StartNew();
+                    do {detour.Search.Step(1);}while(detour.Search.State==SearchState.Searching&&watch.ElapsedMilliseconds<3);
+                    Status="Finding a passage around the obstruction";
+                    yield return null;
+                }
+                if(detour.Search.State==SearchState.Found)
+                {
+                    route.Clear();route.AddRange(detour.Splice(previous).Select(WaterChart.Vector));
+                    waypoint=Math.Min(1,route.Count-1);detourLastWaypoint=detour.Search.Route.Count-1;planning=null;rerouting=false;
+                    phase=VoyagePhase.Cruising;ResetProgress();
+                    if(routeEffect)routeEffect.SetRoute(route);
+                    Plugin.Instance.Record("Local detour ready: "+detour.Search.Expanded+" nearby water cells checked.");
+                    yield break;
+                }
+            }
+        }
+        route.Clear();waypoint=0;detourLastWaypoint=-1;
         if(routeEffect)routeEffect.Clear();
         var approach=destination.Berth.Approach;
         var leadIn=approach-destination.Berth.Forward*20;
@@ -222,6 +256,7 @@ public sealed class Voyage : MonoBehaviour
             return;
         }
         waitingForWorldSince=-1;worldWaitAnnounced=false;
+        FishCollisionPass.UpdateFor(Ship,Plugin.Instance.FishPassThrough.Value&&CanControl);
         bool aboard=Ship.IsPlayerInBoat(passenger);
         if(phase==VoyagePhase.Boarding)
         {
@@ -285,7 +320,7 @@ public sealed class Voyage : MonoBehaviour
         var motion=groundSpeed>.3f ? new Vector3(body.linearVelocity.x,0,body.linearVelocity.z).normalized :
             (phase==VoyagePhase.Reversing ? -Ship.transform.forward : Ship.transform.forward);
         if(!chart.HullSegment(position,position+motion*stopping,Quaternion.Euler(0,Ship.transform.eulerAngles.y,0),true,out var obstruction,Relaxed && DockManeuver))
-        {ReplanOrPause(obstruction);Brake(speed);return;}
+        {if(!ClearBlockingRock(chart.BlockingCollider,groundSpeed))ReplanOrPause(obstruction);Brake(speed);return;}
 
         if(phase==VoyagePhase.Reversing || phase==VoyagePhase.Departing)
         {
@@ -319,7 +354,7 @@ public sealed class Voyage : MonoBehaviour
         {
             if(waypoint>=route.Count) {phase=VoyagePhase.Approaching;return;}
             var target=route[waypoint];float distance=Vector3.Distance(position,target);
-            if(distance<6 && waypoint<route.Count-1) {waypoint++;target=route[waypoint];distance=Vector3.Distance(position,target);}
+            if(distance<(waypoint<=detourLastWaypoint?2:6) && waypoint<route.Count-1) {waypoint++;target=route[waypoint];distance=Vector3.Distance(position,target);}
             if(waypoint==route.Count-1 && distance<5)
             {
                 string reason;
@@ -335,7 +370,7 @@ public sealed class Voyage : MonoBehaviour
             // Check the predicted turning sweep before applying rudder, not just a straight cast.
             var predicted=position+motion*Mathf.Min(stopping,8);
             if(!chart.HullSegment(position,predicted,Quaternion.Euler(0,Ship.transform.eulerAngles.y+Mathf.Clamp(error,-20,20),0),true,out var turnReason))
-            {ReplanOrPause("Turning clearance blocked: "+turnReason);return;}
+            {if(!ClearBlockingRock(chart.BlockingCollider,groundSpeed))ReplanOrPause("Turning clearance blocked: "+turnReason);Brake(speed);return;}
             slowingForTurn=HelmMath.NeedsSlowTurn(error,slowingForTurn);
             if(slowingForTurn)
             {
@@ -348,7 +383,7 @@ public sealed class Voyage : MonoBehaviour
             {
                 phase=VoyagePhase.Cruising;
                 float wind=Ship.GetWindAngleFactor();
-                bool sail=ShipProfile.CanSail(Ship) && wind>(command==Ship.Speed.Half || command==Ship.Speed.Full ? .15f : .35f);
+                bool sail=Time.time>=rockApproachUntil&&ShipProfile.CanSail(Ship) && wind>(command==Ship.Speed.Half || command==Ship.Speed.Full ? .15f : .35f);
                 SetMode(sail ? Ship.Speed.Half : Ship.Speed.Slow,!sail);
                 Status=sail ? "Sailing to "+DestinationName : "Paddling to "+DestinationName;
             }
@@ -386,11 +421,26 @@ public sealed class Voyage : MonoBehaviour
         }
     }
 
+    private bool ClearBlockingRock(Collider? obstacle,float speed)
+    {
+        if(!Plugin.Instance.ClearNavigationRocks.Value||Unattended||!CanControl||!obstacle)return false;
+        if(lastClearedRock==obstacle&&rockClearAttempts>=3){Pause("This rock could not be cleared. Take the helm or replot around it.");return true;}
+        var result=RockClearing.TryClear(Ship,passenger,obstacle,speed,Time.time>=nextRockClear,out var message);
+        if(result==RockClearResult.NotApplicable)return false;
+        Status=message;
+        if(result==RockClearResult.Waiting)rockApproachUntil=Time.time+5;
+        if(result==RockClearResult.Blocked)Pause(message);
+        if(result==RockClearResult.Cleared)
+        {rockClearAttempts=lastClearedRock==obstacle?rockClearAttempts+1:1;lastClearedRock=obstacle;nextRockClear=Time.time+1;ResetProgress();}
+        return true;
+    }
+
     private void ReplanOrPause(string reason)
     {
+        if(automaticReplans>0&&Vector3.Distance(WaterChart.AtSea(Ship.transform.position),lastReplanPosition)>48)automaticReplans=0;
         if((phase!=VoyagePhase.Cruising && phase!=VoyagePhase.Turning) || automaticReplans>=3)
         {Pause(reason+" Take the helm or choose a destination to retry.");return;}
-        automaticReplans++;
+        automaticReplans++;lastReplanPosition=WaterChart.AtSea(Ship.transform.position);
         phase=VoyagePhase.Planning;command=Ship.Speed.Stop;rudder=0;
         Status=reason+" Slowing to replot course ("+automaticReplans+"/3).";
         if(gull)gull.Speak(VoyageWords.Obstruction(reason)+" Slowing down to find another way.");
@@ -411,7 +461,7 @@ public sealed class Voyage : MonoBehaviour
         if(new Vector2(velocity.x,velocity.z).magnitude>=.4f)
         {Pause("Unable to slow enough to replan; take the helm.");yield break;}
         chart=new WaterChart(Ship);source=null;rerouting=true;
-        yield return Plan(Ship.transform.position);
+        yield return Plan(Ship.transform.position,true);
     }
 
     private void SetMode(Ship.Speed mode,bool immediate)
@@ -455,6 +505,7 @@ public sealed class Voyage : MonoBehaviour
     {
         if(phase==VoyagePhase.Finished)return;
         phase=VoyagePhase.Finished;
+        FishCollisionPass.UpdateFor(Ship,false);
         Plugin.Instance.Record("Voyage ended: "+reason);
         if(Ship && Ship.IsOwner()) {SpeedField(Ship)=Ship.Speed.Stop;RudderField(Ship)=0;}
         command=Ship.Speed.Stop;rudder=0;

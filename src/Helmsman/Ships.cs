@@ -57,6 +57,7 @@ internal sealed class ShipProfile
                 p.AirHeight=Mathf.Max(p.AirHeight,ship.transform.InverseTransformPoint(renderer.bounds.max).y);
         }
         if(sailing)p.AirHeight=Mathf.Max(p.AirHeight,ship.m_mastObject ? Mathf.Max(8,ship.transform.InverseTransformPoint(ship.m_mastObject.transform.position).y+8) : 4);
+        var final=ship.GetComponent<FinalShipPresentation>();if(final)p.AirHeight=final.AirHeight;
         if(PrefabName(ship)=="VikingShip") {p.Width=Mathf.Max(p.Width,6);p.Length=Mathf.Max(p.Length,22);p.AirHeight=Mathf.Max(p.AirHeight,20);p.Draft=Mathf.Max(p.Draft,1.5f);}
         return p;
     }

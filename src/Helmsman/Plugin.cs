@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.26")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.30")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
@@ -31,6 +31,8 @@ public sealed class Plugin : BaseUnityPlugin
     internal ConfigEntry<bool> DebugRoute = null!;
     internal ConfigEntry<float> MinimumWaterDepth = null!;
     internal ConfigEntry<bool> RelaxedDockChecks = null!;
+    internal ConfigEntry<bool> ClearNavigationRocks = null!;
+    internal ConfigEntry<bool> FishPassThrough = null!;
     internal ConfigEntry<Vector3> GullSternPerch = null!;
     internal ConfigEntry<float> GullPerchLift = null!;
     private Harmony? harmony;
@@ -51,6 +53,8 @@ public sealed class Plugin : BaseUnityPlugin
             new ConfigDescription("Allow nearby departure from the actual ship pose; treat built dock pieces and full turning-disk checks as advisories during slow dock maneuvers. Terrain and other ships still block. Disable for strict clearance checks.",null,new ConfigurationManagerAttributes { IsAdminOnly=true }));
         GullSternPerch = Config.Bind("Gull", "SternPerch", new Vector3(0,1.7f,-4.3f), "Ship-local stern perch. X/Z select a surface to probe; Y is the fallback height.");
         GullPerchLift = Config.Bind("Gull", "PerchHeightAdjustment", 0f, new ConfigDescription("Additional ship-perch height adjustment after surface probing.", new AcceptableValueRange<float>(-2,2)));
+        ClearNavigationRocks=Config.Bind("Navigation","ClearRocksAndCollectStone",false,"Optional attended-autopilot rock clearing. Break natural stone rocks blocking the hull and collect their stone into ship cargo. Changes the world permanently; excess stone stays in the world if cargo is full.");
+        FishPassThrough=Config.Bind("Navigation","FishPassThrough",true,"Ignore fish-hull collisions while the gull controls this boat. Fish stay alive. Normal collisions resume when autopilot ends.");
         Shipyard.Configure(Config);
         FishingDock.Configure(Config);
         harmony = new Harmony(Guid);
@@ -63,11 +67,13 @@ public sealed class Plugin : BaseUnityPlugin
             return;
         }
         Directory = gameObject.AddComponent<DockDirectory>();
+        gameObject.AddComponent<IslandScouting>();
+        gameObject.AddComponent<ScoutGullPresentation>();
         UI = gameObject.AddComponent<HelmsmanUI>();
         Ships=gameObject.AddComponent<ShipDirectory>();
         gameObject.AddComponent<NetworkNavigation>();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.26 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.30 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
@@ -145,6 +151,7 @@ public sealed class Plugin : BaseUnityPlugin
         ShipwrightAssets.Release();
         ShipMenuPreviews.Release();
         BoatyardModels.Release();
+        FinalFleetModels.Release();
         ImportedShipMaterials.Release();
     }
 }

@@ -9,6 +9,8 @@ internal sealed class WaterChart
     private readonly Dictionary<(int,int), bool> chart = new Dictionary<(int,int), bool>();
     private readonly Ship? ignoredShip;
     internal readonly ShipProfile Profile;
+    internal Collider? BlockingCollider {get;private set;}
+    internal bool PlanRockClearing;
     private static int Mask => LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "terrain", "vehicle");
     internal WaterChart(Ship? ignoredShip = null, ShipProfile? profile = null) { this.ignoredShip = ignoredShip; Profile=profile ?? ShipProfile.For(ignoredShip); }
     internal static float Sea => ZoneSystem.instance ? ZoneSystem.instance.m_waterLevel : 30;
@@ -27,7 +29,7 @@ internal sealed class WaterChart
         // Loaded objects refine the otherwise approximate regional chart.
         var from = Vector(a); var to = Vector(b);
         if (ZoneSystem.instance.IsZoneLoaded(from) && ZoneSystem.instance.IsZoneLoaded(to))
-            return HullSegment(from,to,Quaternion.LookRotation((to-from).sqrMagnitude > .01f ? to-from : Vector3.forward),false,out _);
+            return HullSegment(from,to,Quaternion.LookRotation((to-from).sqrMagnitude > .01f ? to-from : Vector3.forward),false,out _,allowClearableRocks:PlanRockClearing);
         return true;
     }
 
@@ -67,8 +69,9 @@ internal sealed class WaterChart
         reason="Water depth clear.";return true;
     }
 
-    internal bool HullSegment(Vector3 from, Vector3 to, Quaternion orientation, bool requireLoaded, out string reason, bool allowDockPieces = false)
+    internal bool HullSegment(Vector3 from, Vector3 to, Quaternion orientation, bool requireLoaded, out string reason, bool allowDockPieces = false,bool allowClearableRocks = false)
     {
+        BlockingCollider=null;
         from = AtSea(from)+orientation*Profile.Center; to = AtSea(to)+orientation*Profile.Center;
         int steps = Mathf.Max(1,Mathf.CeilToInt(Vector3.Distance(from,to)/2));
         for (int i=0;i<=steps;i++)
@@ -84,32 +87,36 @@ internal sealed class WaterChart
         // falsely hits dock decking/roof edges beside otherwise open water.
         var hullHalf=new Vector3(Profile.Width/2+Profile.Margin,
             (1.5f+Profile.Draft)/2,Profile.Length/2+Profile.Margin);
-        if(!Sweep(from,to,Vector3.up*((1.5f-Profile.Draft)/2),hullHalf,orientation,allowDockPieces,out reason))return false;
+        if(!Sweep(from,to,Vector3.up*((1.5f-Profile.Draft)/2),hullHalf,orientation,allowDockPieces,allowClearableRocks,out reason))return false;
         var mastHalf=new Vector3(.35f,Profile.AirHeight/2,.35f);
-        if(!Sweep(from,to,orientation*(Profile.MastCenter-Profile.Center)+Vector3.up*(Profile.AirHeight/2),mastHalf,orientation,allowDockPieces,out reason))return false;
+        if(!Sweep(from,to,orientation*(Profile.MastCenter-Profile.Center)+Vector3.up*(Profile.AirHeight/2),mastHalf,orientation,allowDockPieces,allowClearableRocks,out reason))return false;
         reason="Clear for the current ship hull and mast estimate."; return true;
     }
 
     private bool Sweep(Vector3 from,Vector3 to,Vector3 offset,Vector3 half,Quaternion orientation,
-        bool allowDockPieces,out string reason)
+        bool allowDockPieces,bool allowClearableRocks,out string reason)
     {
         foreach(var collider in Physics.OverlapBox(from+offset,half,orientation,Mask,QueryTriggerInteraction.Ignore))
-            if(Obstacle(collider,allowDockPieces))
-            {reason="Clearance blocked by "+Describe(collider)+".";return false;}
+            if(Obstacle(collider,allowDockPieces,allowClearableRocks))
+            {BlockingCollider=collider;reason="Clearance blocked by "+Describe(collider)+".";return false;}
         var delta=to-from;
         if(delta.sqrMagnitude>.01f)
             foreach(var hit in Physics.BoxCastAll(from+offset,half,delta.normalized,orientation,delta.magnitude,Mask,QueryTriggerInteraction.Ignore))
-                if(Obstacle(hit.collider,allowDockPieces))
-                {reason="Passage blocked by "+Describe(hit.collider)+".";return false;}
+                if(Obstacle(hit.collider,allowDockPieces,allowClearableRocks))
+                {BlockingCollider=hit.collider;reason="Passage blocked by "+Describe(hit.collider)+".";return false;}
         reason="Clear.";return true;
     }
 
-    private bool Obstacle(Collider collider,bool allowDockPieces)
+    private bool Obstacle(Collider collider,bool allowDockPieces,bool allowClearableRocks)
     {
         if(!collider || (ignoredShip && collider.transform.IsChildOf(ignoredShip.transform)) ||
-            collider.GetComponentInParent<Character>())return false;
+            collider.GetComponentInParent<Character>() || collider.GetComponentInParent<Fish>() ||
+            collider.GetComponentInParent<GullGuide>())return false;
         // Ships can also be build pieces; never discard another boat as a dock decoration.
         if(collider.GetComponentInParent<Ship>())return true;
+        // Loose resources left by clearing are not fixed route obstructions.
+        if(collider.GetComponentInParent<ItemDrop>()&&!collider.GetComponentInParent<Piece>())return false;
+        if(allowClearableRocks&&RockClearing.CanPlanThrough(collider))return false;
         return !(allowDockPieces && collider.GetComponentInParent<Piece>());
     }
 

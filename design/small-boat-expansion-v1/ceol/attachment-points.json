@@ -1,0 +1,41 @@
+{
+  "status": "Alignment guides only",
+  "points": [
+    {
+      "id": "seat_0",
+      "position": [
+        -1.9,
+        0,
+        0.6027
+      ],
+      "kind": "seat guide"
+    },
+    {
+      "id": "seat_1",
+      "position": [
+        -0.7,
+        0,
+        0.6027
+      ],
+      "kind": "seat guide"
+    },
+    {
+      "id": "seat_2",
+      "position": [
+        1.2,
+        0,
+        0.6027
+      ],
+      "kind": "seat guide"
+    },
+    {
+      "id": "helm",
+      "position": [
+        -2.5500000000000003,
+        0,
+        0.486
+      ],
+      "kind": "helm guide"
+    }
+  ]
+}

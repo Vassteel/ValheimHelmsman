@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-/// <summary>Small runtime deformation rig for the vanilla readable 344-vertex sitting gull.
+/// <summary>Runtime deformation rig for the refined private sitting gull.
 /// Rest vertices and materials come from the installed game; only the private clone is modified.</summary>
 internal sealed class GullMeshRig
 {
@@ -24,7 +24,7 @@ internal sealed class GullMeshRig
     private GullMeshRig(MeshFilter filter)
     {
         meshTransform=filter.transform;
-        mesh=Object.Instantiate(filter.sharedMesh);mesh.name="Helmsman private gull rig";mesh.MarkDynamic();filter.sharedMesh=mesh;
+        mesh=GullSurfaceRefinement.Create(filter.sharedMesh,true);mesh.name="Helmsman private gull rig";mesh.MarkDynamic();filter.sharedMesh=mesh;
         rest=mesh.vertices;normals=mesh.normals;vertices=new Vector3[rest.Length];animatedNormals=new Vector3[rest.Length];
         head=new float[rest.Length];body=new float[rest.Length];tail=new float[rest.Length];
         helmet=VikingGull.GullHelmet.Create(filter.transform,VikingGull.GullHelmet.Crown);

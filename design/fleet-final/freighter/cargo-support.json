@@ -1,0 +1,262 @@
+[
+  {
+    "shape": "barrel",
+    "lowered": 0.277,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.277,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.277,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.277,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.277,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.277,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.01544
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.00813
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.11473,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.11473,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.80978,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.80722,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.8718,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.86938,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.90541,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.90308,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.92146,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.91917,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.92664,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.92437,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.92708,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.92481,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.70324,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.70504,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.31942,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.35517,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.7581,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.87601,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.82043,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.8133,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 1.16363,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 1.457,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 1.22524,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.12041,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.12041,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.03385
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.0072
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.02115
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0,
+    "support_gap": -0.02115
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0,
+    "support_gap": -0.02115
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.02048
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0,
+    "support_gap": -0.0261
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0,
+    "support_gap": -0.0261
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.02228
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.01395
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.0144
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.00633
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.0198
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.0833,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.0833,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.0833,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.0833,
+    "support_gap": 0.003
+  }
+]

@@ -1,0 +1,392 @@
+[
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.055,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "barrel",
+    "lowered": 0.055,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.34904,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.26806,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.00967
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.36089,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.375,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.03418
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.21915,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.37072,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.08395,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.38635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.38635,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.07073,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.3292,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.07394,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.07678,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.35838,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.01336
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.02122,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.02658
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.00737
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.03787,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.02059
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.447,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.09989,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.13102,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.11995,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.02563,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.12385,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.36508,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.01342
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.01374
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.015
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.03391
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.02283
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.0121,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.30282,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 1.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 1.015,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.01083,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.01083,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.09539,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0.04645,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 1.075,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.032,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.10543,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0,
+    "support_gap": -0.0068
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.1805,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.03566,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 1.075,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "sack",
+    "lowered": 0.02544,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.025
+  },
+  {
+    "shape": "hide_bale",
+    "lowered": 0,
+    "support_gap": -0.03333
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.077,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.032,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.032,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.122,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.02888,
+    "support_gap": 0.003
+  },
+  {
+    "shape": "bundle",
+    "lowered": 0.00317,
+    "support_gap": 0.003
+  }
+]

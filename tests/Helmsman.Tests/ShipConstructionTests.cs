@@ -7,7 +7,7 @@ internal static class ShipConstructionTests
     internal static void Run(Action<bool,string> check)
     {
         var roster=ShipConstruction.Blueprints;
-        check(roster.Count==16,"Full fifteen-player-ship fleet and the vanilla longship");
+        check(roster.Count==17,"Original fleet plus Currach and the vanilla longship");
         check(roster.Select(b=>b.Prefab).Distinct().Count()==roster.Count,"No ship registry collisions");
         check(roster.All(b=>!b.Source.Contains("Auto")),"Autonomous enemy ships remain excluded");
         foreach(var b in roster)

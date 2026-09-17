@@ -1,4 +1,4 @@
-# Helmsman guide — 0.2.16
+# Helmsman guide — 0.2.30
 
 Existing sailing has been used in solo/local play. **This build enables multiplayer; the new fleet and server behavior still need in-game verification.** This guide describes current controls; [Testing](https://github.com/Vassteel/ValheimHelmsman/blob/master/TESTING.md) separates observed play from remaining checks.
 
@@ -6,7 +6,7 @@ Existing sailing has been used in solo/local play. **This build enables multipla
 
 Install BepInEx, Jötunn and Helmsman through your mod manager. For manual installation, copy both `ValheimHelmsman.dll` and `Helmsman.Core.dll` to `BepInEx/plugins/ValheimHelmsman/`. Install the same Helmsman patch version on every client and the server. Close Valheim before replacing client DLLs; restart the server after its files are updated. Remove original OdinShip/OdinShipPlus and LongshipUpgrades DLLs to avoid overlapping prefabs and refits. Keep a world backup from before replacement. Avoid duplicate copies in your active profile.
 
-Look for `Helmsman 0.2.16 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
+Look for `Helmsman 0.2.30 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
 
 ## Configure docks
 
@@ -80,7 +80,7 @@ Build the Carpenter's Table beside a configured Dock Ward (within 45 m). Speak t
 
 The puffin cycles hammering, chiselling and needlework; rowing boats skip sails. Time continues across unloaded areas and server restarts. Launch occurs only after the timer finishes, the table is loaded and the berth passes the hull-clearance check. An obstructed launch waits without charging again. Dismantling an unfinished table returns its materials. Keep the table and launch berth accessible.
 
-The fleet includes all 15 imported player hulls, plus vanilla longship commissioning. Original prefab identifiers and material recipes are retained. Named ships remain discoverable; old cargo records are kept while native cargo holds are populated. A locked migration warning means a saved item is unavailable or unreadable: restore the missing dependency or inspect the log before using that hold.
+The fleet retains the original player hull identities and vanilla longship commissioning. Ottar, the heavy freighter, Snekkja, Falkuša and Ceol now use the redesigned models; Currach is an additional sailing boat with six cargo slots. Original prefab identifiers and material recipes are retained. Named ships remain discoverable; old cargo records are kept while native cargo holds are populated. A locked migration warning means a saved item is unavailable or unreadable: restore the missing dependency or inspect the log before using that hold.
 
 ### Refits and styles
 
@@ -93,7 +93,7 @@ Imported ships expose their available figurehead/deck, shield, hull and sail var
 Harbor decorations, dock extensions and processing pieces appear in the Hammer's **Helmsman** category. Resin wood, caulked wood, sail canvas, rope and the wind belt are crafted at the Carpenter's Table using their original recipes.
 
 - **Fishing Dock:** the pelican catches fish during daylight into the dock chest. Default interval: 20 seconds; default cap: 50 fish. Both are configurable. Full/open storage pauses production; unloaded time does not accumulate catches.
-- **Hercule fishing boat:** board and use its net interaction to lower/stow the fishing net. Nearby fish enter its cargo hold only while the net is deployed and storage has room.
+- **Falkuša fishing boat:** board and use its net interaction to lower/stow the fishing net. Nearby fish enter its cargo hold only while the net is deployed and storage has room.
 - **Oil press:** add ten fish. One bottle of fish oil ejects after ten minutes. Destroying a press mid-batch returns fish instead of skipping the timer.
 - Eel racks, fish dryers and loose harbor nets are decorations.
 
@@ -104,3 +104,17 @@ The gull, puffin, owl and pelican have sleeping poses. Construction continues ov
 The connected caller controls their voyage; the server reserves remote ships and sends the loading data needed for a summon. Another caller cannot take the same reservation. Disconnecting ends the request, and taking the helm overrides autopilot. This is not an offline ferry service. Do not mix different Helmsman patch versions.
 
 Install Quartermaster on the server and clients for requested cargo unloading. Open cargo holds, unavailable migrated cargo, ward restrictions or ownership changes stop unloading. All holds are checked; one occupied slot moves per step across the whole boat.
+
+## Island scouting
+
+At a configured Dock Ward, choose **Scout island** and a Cartographer’s Table within 100 m. The gull surveys the connected landmass for at least five minutes, then returns to the table and squawks when you approach. Speak to him to reveal the island’s terrain and add its points of interest to your personal map. Nearby separate islands remain hidden.
+
+Uncollected reports survive reconnects. Use the dock’s scouting menu to choose a replacement return table or cancel a survey.
+
+## Navigation options
+
+Open the gull’s **Destination / Destinations** menu to toggle **Rock clearing** and **Fish pass-through**. Rock clearing starts off; fish pass-through starts on.
+
+While you are aboard under gull control, rock clearing targets natural stone rocks obstructing the hull, capped at 4 m beyond half the ship’s length (about 9 m from a Karve’s centre to the nearest rock surface, including its navigation margin). It slows before each hit and collects that rock’s stone into accessible cargo holds. Full cargo does not stop clearing: excess stone remains in the world. Clearing permanently changes rocks; terrain, ore deposits and build pieces remain obstacles. Remote-owned or ward-protected rocks cannot be cleared.
+
+Fish pass-through only changes fish collisions with the gull-controlled boat. Fish remain alive and normal collisions return when autopilot ends or the option is disabled.

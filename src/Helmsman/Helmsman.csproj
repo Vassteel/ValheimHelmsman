@@ -11,7 +11,9 @@
     <Reference><ExternallyResolved>true</ExternallyResolved></Reference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <EmbeddedResource Include="../../assets/ships/final/*.bin.gz" LogicalName="Helmsman.Ships.final.%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../assets/ships/redesign/models.bin.gz" LogicalName="Helmsman.Ships.boatyard" />
+    <EmbeddedResource Include="../../assets/birds/detail.png" LogicalName="VikingBirds.detail.png" />
     <EmbeddedResource Include="../../assets/birds/surface.png" LogicalName="VikingBirds.surface.png" />
     <EmbeddedResource Include="../../assets/ships/customization.json" LogicalName="Helmsman.Ships.customization.json" />
     <EmbeddedResource Include="../../assets/ships/helmsman-ships" LogicalName="Helmsman.Ships.bundle" />

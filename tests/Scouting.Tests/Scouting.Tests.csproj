@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><Nullable>annotations</Nullable></PropertyGroup>
+ <ItemGroup><ProjectReference Include="../../src/Helmsman.Core/Helmsman.Core.csproj" />
+ <Compile Include="../../src/Helmsman/IslandScouting.cs" Link="IslandScouting.cs" />
+ <Compile Include="../../src/Helmsman/ScoutMap.cs" Link="ScoutMap.cs" /></ItemGroup>
+</Project>

@@ -102,11 +102,13 @@ public sealed class DockMarker : MonoBehaviour, Interactable, Hoverable
         if(!GetComponent<SummonBeacon>())gameObject.AddComponent<SummonBeacon>();
         while(Ready)
         {
+            if(ScoutGullPresentation.BusyDock(Id)){yield return new WaitForSeconds(1);continue;}
             if(!gull)gull=GullGuide.Traveller(Id);
             if(!gull)gull=GullGuide.Create(transform.position+Vector3.up*2,this,null);
             yield return new WaitForSeconds(1);
         }
     }
+    internal void SendScout(){if(gull&&!gull.IsTravelling)gull.FlyAway();}
     internal GullGuide CallGuide(Ship ship)
     {
         if(!gull)gull=GullGuide.Create(transform.position+Vector3.up*2,this,null);

@@ -81,6 +81,8 @@ public sealed class ShipCosmetics : MonoBehaviour
             foreach(var path in paths){var renderer=transform.Find(path)?.GetComponent<Renderer>();if(renderer)renderer.sharedMaterial=material;}
         }
         customCloth?.Dispose();customCloth=null;
+        var final=GetComponent<FinalShipPresentation>();
+        if(final)final.Paint(data.GetInt("odinship_hull_index"),data.GetInt("odinship_sail_index"),HullStyles,SailStyles);
         Paint(new[]{Binding.SailRenderer},SailStyles,"odinship_sail_index");
         Paint(Binding.ShieldRenderers,ShieldStyles,"odinship_shield_index");
         Paint(Binding.HullRenderers,HullStyles,"odinship_hull_index");

@@ -8,7 +8,7 @@ using Object=UnityEngine.Object;
 
 namespace VikingBirds;
 
-// Original faceted geometry. All renderers use private, non-emissive world materials.
+// Authored smooth surfaces with overlapping feather and garment detail. All renderers use private, non-emissive world materials.
 // The feet stay at y=0; body, neck, wings and tools have separate animation pivots.
 internal sealed class PerchedBird : IDisposable
 {
@@ -49,11 +49,12 @@ internal sealed class PerchedBird : IDisposable
         {
             var foot=side<0?leftFoot:rightFoot;
             if(pelican&&side<0)
-            {Rod("Wooden peg leg",foot,new(-.105f,.01f,0),new(-.105f,.32f,0),.033f,brown);continue;}
+            {PegLeg(foot,brown);continue;}
             float leg=owl?.18f:pelican?.16f:.115f;
             Ellipsoid("Leg",foot,new(side*.105f,leg,0),new(.027f,leg,.026f),feet,6,3);
             for(int toe=-1;toe<=1;toe++)
                 Rod("Toe",foot,new(side*.105f,.02f,0),new(side*.105f+toe*.047f,.015f,.145f-Math.Abs(toe)*.03f),.014f,feet);
+            if(!owl) Webbing(foot,side,feet);
             Rod("Back toe",foot,new(side*.105f,.02f,0),new(side*.13f,.012f,-.07f),.012f,dark);
         }
         Ellipsoid("Body",body,new(0,.29f,-.035f),new(.245f,.34f,.195f),feather,12,7);
@@ -66,11 +67,12 @@ internal sealed class PerchedBird : IDisposable
             Ellipsoid("Folded wing",wing,new(side*.012f,-.12f,-.045f),new(.066f,.22f,.105f),feather,8,5);
             for(int f=0;f<4;f++)
                 Ellipsoid("Flight feather",wing,new(side*.005f,-.20f+f*.017f,-.105f+f*.035f),new(.035f,.135f,.029f),feather*.82f,6,3);
+            if(!owl) WingFeathers(wing,side,feather);
             Ellipsoid("Face",head,new(side*.113f,.12f,.11f),new(.118f,.142f,.086f),cream,8,5);
             var eye=Node("Blink",head,new(side*(owl?.125f:.16f),.15f,owl?.19f:.18f));eyes.Add(eye);
             Ellipsoid("Eye surround",eye,Vector3.zero,new(owl?.072f:.043f,owl?.077f:.049f,.028f),dark,10,3);
             Ellipsoid("Eye",eye,new(0,0,.024f),new(owl?.053f:.028f,owl?.055f:.032f,.014f),owl?new Color(.63f,.55f,.10f):new Color(.24f,.12f,.045f),10,3);
-            Ellipsoid("Pupil",eye,new(0,0,.037f),new(owl?.024f:.021f,owl?.032f:.028f,.009f),dark,8,3);
+            Ellipsoid("Pupil",eye,new(0,0,.037f),new(owl?.024f:.021f,owl?.032f:.028f,.009f),new Color(.012f,.015f,.018f),8,3);
             if(owl)
             {
                 var brow=Ellipsoid("Cream eyebrow",head,new(side*.115f,.232f,.16f),new(.13f,.025f,.032f),cream,6,3);
@@ -79,9 +81,8 @@ internal sealed class PerchedBird : IDisposable
                     Ellipsoid("Mottled wing spot",wing,new(side*.068f,-.02f-f*.034f,-.085f+(f%2)*.07f),new(.007f,.012f,.021f),cream,5,2);
             }
         }
-        Wedge("Beak",head,new(0,.065f,.18f),owl?new(.09f,.11f,.12f):pelican?new(.13f,.10f,.55f):new(.13f,.22f,.24f),owl?new Color(.4f,.36f,.23f):orange);
-        if(pelican)Ellipsoid("Bill pouch",head,new(0,-.015f,.37f),new(.07f,.095f,.23f),new Color(.65f,.43f,.21f),9,5);
-        if(!owl&&!pelican)Wedge("Beak stripe",head,new(0,.065f,.20f),new(.132f,.18f,.075f),new Color(.41f,.36f,.22f));
+        if(owl) Wedge("Beak",head,new(0,.065f,.18f),new(.09f,.11f,.12f),new Color(.4f,.36f,.23f));
+        else DetailedBill();
         if(owl)
         {
             var cloth=new Color(.23f,.27f,.16f);
@@ -113,9 +114,9 @@ internal sealed class PerchedBird : IDisposable
             float pocketZ=ChestSurface(.06f,.19f)+.025f;
             Ellipsoid("Apron pocket",body,new(.06f,.19f,pocketZ),new(.047f,.037f,.005f),leather*.8f,4,3);
             Rod("Carpenter pencil",body,new(.075f,.20f,pocketZ+.006f),new(.083f,.30f,pocketZ-.014f),.009f,new Color(.63f,.43f,.15f));
-            Ellipsoid("Knit cap",head,new(-.02f,.29f,-.02f),new(.244f,.14f,.20f),wool,12,6);
-            Ellipsoid("Folded wool brim",head,new(0,.25f,0),new(.252f,.047f,.20f),wool*1.2f,12,3);
-            Ellipsoid("Fuzzy pompom",head,new(-.045f,.435f,-.045f),new(.079f,.072f,.077f),cream,9,5);
+            Ellipsoid("Knit cap",head,new(-.012f,.28f,-.015f),new(.218f,.12f,.185f),wool,12,6);
+            Ellipsoid("Folded wool brim",head,new(0,.25f,0),new(.228f,.036f,.189f),wool*1.2f,12,3);
+            Ellipsoid("Fuzzy pompom",head,new(-.03f,.405f,-.03f),new(.065f,.060f,.061f),cream,9,5);
             for(int side=-1;side<=1;side+=2)
                 Rod("Apron strap",body,new(side*.16f,.38f,.16f),new(side*.10f,.52f,.08f),.018f,leather);
         }
@@ -136,22 +137,168 @@ internal sealed class PerchedBird : IDisposable
             Rod("Fishing line",fishingPole.transform,new Vector3(0,.55f,1.1f),new Vector3(0,-.65f,1.35f),.0025f,cream);
             Ellipsoid("Cork float",fishingPole.transform,new Vector3(0,-.63f,1.35f),new Vector3(.018f,.036f,.018f),orange,6,3);
         }
+        if(!owl) TailFeathers(feather);
+        if(!owl) GarmentDetails();
         SetTool(0);
         MergeStaticParts();
         }
         catch{Dispose();throw;}
     }
+    private void Feather(Transform parent,Vector3 root,Vector3 tip,float width,Color color,int side)
+    {
+        // Smooth lenticular blade with a raised rachis and pointed tip. The wing
+        // stays a single animated pivot after material batching.
+        var axis=tip-root;var across=new Vector3(0,0,width);
+        var normal=new Vector3(side*.009f,0,0);
+        var v=new List<Vector3>{root,root+axis*.28f+across,root+axis*.68f+across*.7f,tip,
+            root+axis*.68f-across*.7f,root+axis*.28f-across,root+axis*.43f+normal,root+axis*.43f-normal*.4f};
+        var faces=new List<int>();
+        for(int i=0;i<6;i++)
+        {if(side>0)faces.AddRange(new[]{i,6,(i+1)%6,i,(i+1)%6,7});else faces.AddRange(new[]{i,(i+1)%6,6,i,7,(i+1)%6});}
+        MeshPart("Layered feather",parent,Vector3.zero,v,faces,color);
+    }
+    private void WingFeathers(Transform wing,int side,Color color)
+    {
+        for(int row=0;row<3;row++)for(int f=0;f<5;f++)
+        {
+            float z=-.115f+f*.036f,y=.035f-row*.065f;
+            float x=side*(.053f+.011f*(float)Math.Sin((f+1)*Math.PI/6));
+            Feather(wing,new(x,y,z),new(x+side*.005f,y-.115f,z-.018f),.026f,color,side);
+        }
+        for(int f=0;f<6;f++)
+            Feather(wing,new(side*.05f,-.12f,-.125f+f*.037f),new(side*.035f,-.345f+f*.017f,-.16f+f*.04f),.026f,color*.82f,side);
+    }
+    private void TailFeathers(Color color)
+    {
+        for(int f=0;f<5;f++)
+        {
+            var t=Ellipsoid("Tail flight feather",body,new((f-2)*.031f,.045f,-.21f),new(.031f,.12f,.024f),color*.82f,6,5);
+            t.localRotation=Quaternion.Euler(30,0,(f-2)*-7);
+        }
+    }
+    private void PegLeg(Transform foot,Color wood)
+    {
+        const int sides=16;var v=new List<Vector3>();var faces=new List<int>();
+        for(int row=0;row<3;row++)for(int i=0;i<sides;i++)
+        {
+            float y=row==0?0:row==1?.04f:.32f,r=row==1?.034f:.027f,a=i*2*Mathf.PI/sides;
+            v.Add(new Vector3(-.105f+r*Mathf.Cos(a),y,r*Mathf.Sin(a)));
+        }
+        for(int row=0;row<2;row++)for(int i=0;i<sides;i++)
+        {int a=row*sides+i,b=row*sides+(i+1)%sides,c=a+sides,d=b+sides;faces.AddRange(new[]{a,b,c,b,d,c});}
+        v.Add(new Vector3(-.105f,0,0));v.Add(new Vector3(-.105f,.32f,0));
+        for(int i=0;i<sides;i++){int j=(i+1)%sides;faces.AddRange(new[]{48,j,i,49,32+i,32+j});}
+        MeshPart("Wooden peg leg",foot,Vector3.zero,v,faces,wood);
+    }
+    private void Webbing(Transform foot,int side,Color color)
+    {
+        float x=side*.105f;
+        var v=new List<Vector3>{new(x,.024f,.024f),new(x-.047f,.016f,.11f),new(x-.018f,.017f,.128f),
+            new(x,.016f,.145f),new(x+.018f,.017f,.128f),new(x+.047f,.016f,.11f)};
+        var faces=new List<int>();for(int i=1;i<5;i++)faces.AddRange(new[]{0,i+1,i});
+        MeshPart("Webbed foot",foot,Vector3.zero,v,faces,color);
+        for(int k=0;k<4;k++)Rod("Foot scale",foot,new(x-.016f,.04f+k*.022f,.018f),new(x+.016f,.04f+k*.022f,.018f),.002f,color*.82f);
+    }
+    private void DetailedBill()
+    {
+        var amber=new Color(.70f,.36f,.095f);var seam=new Color(.25f,.15f,.075f);
+        if(pelican)
+        {
+            // Dorsal bill, tapered lower mandible and soft suspended throat pouch.
+            Ellipsoid("Long upper bill",head,new(0,.07f,.426f),new(.068f,.045f,.282f),amber,12,8);
+            Ellipsoid("Lower mandible",head,new(0,.025f,.405f),new(.061f,.025f,.263f),amber*.9f,12,8);
+            Ellipsoid("Throat pouch",head,new(0,-.045f,.35f),new(.075f,.105f,.204f),new Color(.63f,.43f,.24f),12,8);
+            for(int side=-1;side<=1;side+=2)
+            {
+                Rod("Bill mouth seam",head,new(side*.065f,.04f,.23f),new(side*.025f,.038f,.665f),.003f,seam);
+                Ellipsoid("Nostril",head,new(side*.063f,.087f,.275f),new(.003f,.007f,.018f),seam,6,4);
+                for(int i=0;i<4;i++)Rod("Pouch fold",head,new(side*(.03f+i*.008f),-.10f+i*.015f,.30f),new(side*.022f,-.026f,.52f),.002f,new Color(.56f,.37f,.20f));
+            }
+            Ellipsoid("Bill hook",head,new(0,.058f,.699f),new(.018f,.034f,.026f),amber,8,6);
+        }
+        else
+        {
+            // Puffin bill is a deep, laterally compressed curved wedge, with
+            // alternating keratin bands and a continuous mouth seam.
+            var v=new List<Vector3>();var faces=new List<int>();const int rows=12,segments=24;
+            for(int row=0;row<=rows;row++)
+            {
+                float t=row/(float)rows,z=.175f+t*.235f;
+                float width=.068f*(1-t*t)+.002f,height=.112f*(1-t)+.003f;
+                for(int i=0;i<segments;i++)
+                {float a=i*2*Mathf.PI/segments;v.Add(new(width*Mathf.Cos(a),.065f+height*Mathf.Sin(a)-.025f*t,z));}
+            }
+            for(int row=0;row<rows;row++)for(int i=0;i<segments;i++)
+            {int a=row*segments+i,b=row*segments+(i+1)%segments,c=a+segments,d=b+segments;faces.AddRange(new[]{a,c,b,b,c,d});}
+            MeshPart("Curved puffin bill",head,Vector3.zero,v,faces,new Color(.79f,.25f,.055f));
+            for(int row=2;row<=6;row+=2)
+            {
+                float t=row/(float)rows,z=.175f+t*.235f,width=.068f*(1-t*t)+.003f,height=.112f*(1-t)+.004f;
+                for(int i=0;i<12;i++)
+                {
+                    float a=i*2*Mathf.PI/12,b=(i+1)*2*Mathf.PI/12;
+                    Rod("Bill keratin band",head,new(width*Mathf.Cos(a),.065f+height*Mathf.Sin(a)-.025f*t,z),new(width*Mathf.Cos(b),.065f+height*Mathf.Sin(b)-.025f*t,z),.003f,amber);
+                }
+            }
+            for(int side=-1;side<=1;side+=2)
+            {
+                Rod("Bill mouth seam",head,new(side*.067f,.028f,.19f),new(side*.004f,.038f,.407f),.003f,seam);
+                Ellipsoid("Bill rosette",head,new(side*.069f,.035f,.181f),new(.009f,.019f,.018f),amber,7,5);
+                Rod("Puffin eye accent",head,new(side*.178f,.121f,.197f),new(side*.17f,.08f,.197f),.005f,seam);
+            }
+        }
+    }
+    private void GarmentDetails()
+    {
+        if(pelican)
+        {
+            var cloth=new Color(.32f,.30f,.16f);
+            for(int i=0;i<32;i++)
+            {
+                float a=i*2*Mathf.PI/32,b=(i+.55f)*2*Mathf.PI/32;
+                Rod("Hat brim stitch",head,new(.303f*Mathf.Cos(a),.244f,.249f*Mathf.Sin(a)),new(.303f*Mathf.Cos(b),.244f,.249f*Mathf.Sin(b)),.0018f,cloth*1.2f);
+            }
+            for(int side=-1;side<=1;side+=2)
+            {
+                Rod("Hat band",head,new(side*.25f,.265f,-.04f),new(side*.24f,.265f,.066f),.009f,cloth*.8f);
+                Ellipsoid("Hat eyelet",head,new(side*.245f,.295f,.018f),new(.003f,.009f,.009f),new Color(.27f,.24f,.16f),6,4);
+            }
+        }
+        else
+        {
+            var leather=new Color(.31f,.20f,.10f);var thread=new Color(.50f,.37f,.22f);var wool=new Color(.12f,.17f,.22f);
+            for(int side=-1;side<=1;side+=2)
+            {
+                for(int i=0;i<17;i++)
+                {
+                    float y=.085f+i*.021f;float x=side*(.14f+.043f*(float)Math.Sin((y-.085f)/.38f*Math.PI));
+                    Rod("Apron stitch",body,new(x,y,ChestSurface(x,y)+.022f),new(x,y+.009f,ChestSurface(x,y+.009f)+.022f),.0018f,thread);
+                }
+                Ellipsoid("Apron strap rivet",body,new(side*.15f,.395f,ChestSurface(side*.15f,.395f)+.025f),new(.007f,.007f,.004f),thread,6,4);
+            }
+            for(int i=0;i<40;i++)
+            {
+                float a=i*2*Mathf.PI/40;
+                Rod("Wool cuff rib",head,new(.227f*Mathf.Cos(a),.235f,.189f*Mathf.Sin(a)),new(.227f*Mathf.Cos(a),.266f,.189f*Mathf.Sin(a)),.0025f,wool*1.2f);
+            }
+            for(int i=0;i<24;i++)
+            {
+                float y=1-2*(i+.5f)/24,a=i*2.399963f,r=(float)Math.Sqrt(1-y*y);
+                Ellipsoid("Pompom tuft",head,new(-.03f+.058f*r*Mathf.Cos(a),.405f+.054f*y,-.03f+.054f*r*Mathf.Sin(a)),new(.023f,.023f,.023f),new Color(.68f,.63f,.48f),6,4);
+            }
+        }
+    }
     private void FisherHat(Transform parent,Color color)
     {
         // One continuous cloth shell: no intersecting crown/brim ellipsoids.
-        float[] y={.18f,.192f,.215f,.30f,.365f,.385f};
-        float[] radius={.30f,.32f,.235f,.218f,.16f,0};
-        const int sides=32;var vertices=new List<Vector3>();var faces=new List<int>();
-        for(int row=0;row<y.Length;row++)for(int side=0;side<sides;side++)
-        {float a=side*2*Mathf.PI/sides;vertices.Add(new Vector3(radius[row]*Mathf.Cos(a),y[row],radius[row]*.82f*Mathf.Sin(a)));}
+        float[] y={.224f,.238f,.258f,.328f,.398f,.418f};
+        float[] radius={.30f,.32f,.255f,.23f,.16f,0};
+        const int sides=32;var vertices=new List<Vector3>();var faces=new List<int>();var tex=new List<Vector2>();
+        for(int row=0;row<y.Length;row++)for(int side=0;side<=sides;side++)
+        {tex.Add(new Vector2(side/(float)sides,row/(float)(y.Length-1)));float a=side*2*Mathf.PI/sides;vertices.Add(new Vector3(radius[row]*Mathf.Cos(a),y[row],radius[row]*.82f*Mathf.Sin(a)));}
         for(int row=0;row<y.Length-1;row++)for(int side=0;side<sides;side++)
-        {int a=row*sides+side,b=row*sides+(side+1)%sides,c=a+sides,d=b+sides;faces.AddRange(new[]{a,b,c,b,d,c});}
-        MeshPart("Fisherman's cloth hat",parent,Vector3.zero,vertices,faces,color);
+        {int a=row*(sides+1)+side,b=a+1,c=a+sides+1,d=b+sides+1;faces.AddRange(new[]{a,b,c,b,d,c});}
+        MeshPart("Fisherman's cloth hat",parent,Vector3.zero,vertices,faces,color,tex);
     }
     private static float ChestSurface(float x,float y)
     {
@@ -161,7 +308,7 @@ internal sealed class PerchedBird : IDisposable
     }
     private void ClothPanel(string name,Transform parent,int side,Color color)
     {
-        var v=new List<Vector3>();var faces=new List<int>();
+        var v=new List<Vector3>();var faces=new List<int>();var tex=new List<Vector2>();
         float[] ys={.045f,.09f,.14f,.20f,.26f,.32f,.38f,.425f,.47f};
         float[] outer={.115f,.15f,.177f,.188f,.19f,.184f,.17f,.15f,.12f};
         float[] inner={.012f,.01f,.008f,.008f,.008f,.02f,.035f,.067f,.103f};
@@ -170,6 +317,7 @@ internal sealed class PerchedBird : IDisposable
         {
             float t=col/(float)columns;
             float x=side==0?(-outer[row]+2*outer[row]*t):side*(inner[row]+(outer[row]-inner[row])*t);
+            tex.Add(new Vector2(t,row/(float)(ys.Length-1)));
             float y=ys[row];v.Add(new Vector3(x,y,ChestSurface(x,y)+.018f));
         }
         for(int row=0;row<ys.Length-1;row++)for(int col=0;col<columns;col++)
@@ -178,7 +326,7 @@ internal sealed class PerchedBird : IDisposable
             // MeshPart reverses its input winding. Both panels must face outward.
             if(side<0)faces.AddRange(new[]{a,b,c,b,d,c});else faces.AddRange(new[]{a,c,b,b,c,d});
         }
-        MeshPart(name,parent,Vector3.zero,v,faces,color);
+        MeshPart(name,parent,Vector3.zero,v,faces,color,tex);
     }
     private void MergeStaticParts()
     {
@@ -273,53 +421,85 @@ internal sealed class PerchedBird : IDisposable
     private Texture2D Surface()
     {
         if(surface)return surface;
-        using var resource=typeof(PerchedBird).Assembly.GetManifestResourceStream("VikingBirds.surface.png");
+        using var resource=typeof(PerchedBird).Assembly.GetManifestResourceStream("VikingBirds.detail.png");
         if(resource==null)return Texture2D.whiteTexture;
         using var stream=new MemoryStream();resource.CopyTo(stream);
-        var loaded=new Texture2D(2,2,TextureFormat.RGBA32,false);
+        var loaded=new Texture2D(2,2,TextureFormat.RGBA32,true);
         if(!loaded.LoadImage(stream.ToArray())){Object.Destroy(loaded);return Texture2D.whiteTexture;}
-        var pixels=loaded.GetPixels32();var small=new Color32[64*64];
-        for(int y=0;y<64;y++)for(int x=0;x<64;x++)small[y*64+x]=pixels[y*loaded.height/64*loaded.width+x*loaded.width/64];
-        surface=new Texture2D(64,64,TextureFormat.RGBA32,true){name="Bird coarse surface",filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Repeat};
-        surface.SetPixels32(small);surface.Apply();Object.Destroy(loaded);assets.Add(surface);return surface;
+        loaded.name="Bird detailed plumage";loaded.filterMode=FilterMode.Trilinear;loaded.wrapMode=TextureWrapMode.Repeat;
+        loaded.Apply(true,true);surface=loaded;assets.Add(surface);return surface;
     }
-    private Material Paint(Color color,bool garment=false)
+    private Material Paint(Color color,int tile=-1,bool polished=false)
     {
-        string key=ColorUtility.ToHtmlStringRGB(color)+(garment?" cloth":" feathers");
+        string key=ColorUtility.ToHtmlStringRGB(color)+" tile "+tile+(polished?" polished":"");
         if(palette.TryGetValue(key,out var found))return found;
         var m=new Material(source.shader){name="Bird matte "+key,color=color};
-        if(m.HasProperty("_MainTex"))m.SetTexture("_MainTex",garment?Texture2D.whiteTexture:Surface());
+        if(m.HasProperty("_MainTex"))m.SetTexture("_MainTex",tile<0?Texture2D.whiteTexture:Surface());
         foreach(var p in new[]{"_EmissionColor","_EmissiveColor","_NoiseGlowColor"})if(m.HasProperty(p))m.SetColor(p,Color.black);
         foreach(var p in new[]{"_NoiseGlowEnabled","_Glossiness","_Metallic","_MetalGloss","_TriplanarMap","_ValueNoise","_ValueNoiseVertex","_AddRain","_AddSnow"})if(m.HasProperty(p))m.SetFloat(p,0);
+        if(polished&&m.HasProperty("_Glossiness"))m.SetFloat("_Glossiness",.45f);
         if(m.HasProperty("_MoveableObject"))m.SetFloat("_MoveableObject",1);
         m.DisableKeyword("_EMISSION");m.DisableKeyword("NOISEGLOW");m.globalIlluminationFlags=MaterialGlobalIlluminationFlags.EmissiveIsBlack;
         assets.Add(m);palette[key]=m;return m;
     }
-    private Transform MeshPart(string name,Transform parent,Vector3 position,List<Vector3> vertices,List<int> triangles,Color color)
+    private static int SurfaceTile(string name)
     {
-        // Duplicate triangle vertices for flat normals, making the silhouette visibly faceted.
-        var flat=new Vector3[triangles.Count];var indices=new int[flat.Length];var uv=new Vector2[flat.Length];
-        for(int i=0;i<flat.Length;i++){flat[i]=vertices[triangles[i]];indices[i]=i;uv[i]=new Vector2(flat[i].x*3+flat[i].z*1.7f+.5f,flat[i].y*3+flat[i].z*.3f+.5f);}
-        // The parametric rings traverse clockwise viewed from inside. Reverse each
-        // triangle so Unity lights and culls the exterior, not the inside of the bird.
-        for(int i=0;i<indices.Length;i+=3){indices[i+1]=i+2;indices[i+2]=i+1;}
-        var mesh=new Mesh{name=name,vertices=flat,triangles=indices,uv=uv};mesh.RecalculateNormals();mesh.RecalculateBounds();assets.Add(mesh);
+        name=name.ToLowerInvariant();
+        if(name.Contains("wool")||name.Contains("knit")||name.Contains("pompom"))return 1;
+        if(name.Contains("hat")||name.Contains("linen")||name.Contains("cloth"))return 2;
+        if(name.Contains("apron")||name.Contains("leather")||name.Contains("peg")||name.Contains("cap crown")||name.Contains("short brim"))return 3;
+        if(name.Contains("feather")||name=="body"||name=="breast"||name=="head"||name=="face"||name.Contains("neck")||name=="folded wing")return 0;
+        return -1;
+    }
+    private Transform MeshPart(string name,Transform parent,Vector3 position,List<Vector3> vertices,List<int> triangles,Color color,List<Vector2>? coordinates=null,List<Vector3>? authoredNormals=null)
+    {
+        // Weld only coincident positions within this authored surface. Ellipsoid
+        // poles then shade continuously; separate feather/garment edges stay sharp.
+        var unique=new List<Vector3>();var map=new int[vertices.Count];
+        var lookup=new Dictionary<(int,int,int),int>();
+        for(int i=0;i<vertices.Count;i++)
+        {
+            if(coordinates!=null){map[i]=unique.Count;unique.Add(vertices[i]);continue;}
+            var v=vertices[i];var key=((int)Math.Round(v.x*1000000),(int)Math.Round(v.y*1000000),(int)Math.Round(v.z*1000000));
+            if(!lookup.TryGetValue(key,out int at)){at=unique.Count;lookup.Add(key,at);unique.Add(v);}map[i]=at;
+        }
+        var indices=new List<int>();
+        for(int i=0;i<triangles.Count;i+=3)
+        {
+            int a=map[triangles[i]],b=map[triangles[i+2]],c=map[triangles[i+1]];
+            if(a!=b&&b!=c&&c!=a&&Vector3.Cross(unique[b]-unique[a],unique[c]-unique[a]).sqrMagnitude>1e-16f)indices.AddRange(new[]{a,b,c});
+        }
+        int tile=SurfaceTile(name);
+        float loU=unique.Min(v=>v.x+v.z*.65f),hiU=unique.Max(v=>v.x+v.z*.65f);
+        float loV=unique.Min(v=>v.y+v.z*.25f),hiV=unique.Max(v=>v.y+v.z*.25f);
+        var uv=unique.Select(v=>new Vector2((tile%2)*.5f+.018f+.464f*(v.x+v.z*.65f-loU)/Math.Max(.0001f,hiU-loU),
+            (1-tile/2)*.5f+.018f+.464f*(v.y+v.z*.25f-loV)/Math.Max(.0001f,hiV-loV))).ToArray();
+        if(coordinates!=null)uv=coordinates.Select(v=>new Vector2((tile%2)*.5f+.018f+.464f*v.x,(1-tile/2)*.5f+.018f+.464f*v.y)).ToArray();
+        var mesh=new Mesh{name=name,vertices=unique.ToArray(),triangles=indices.ToArray(),uv=uv};
+        mesh.RecalculateNormals();if(authoredNormals!=null)mesh.normals=authoredNormals.ToArray();mesh.RecalculateBounds();assets.Add(mesh);
         var t=Node(name,parent,position);t.gameObject.AddComponent<MeshFilter>().sharedMesh=mesh;
-        var renderer=t.gameObject.AddComponent<MeshRenderer>();renderer.sharedMaterial=Paint(color,name.IndexOf("cloth",StringComparison.OrdinalIgnoreCase)>=0||name.IndexOf("apron",StringComparison.OrdinalIgnoreCase)>=0||name.IndexOf("cap",StringComparison.OrdinalIgnoreCase)>=0||name.IndexOf("brim",StringComparison.OrdinalIgnoreCase)>=0);
+        var renderer=t.gameObject.AddComponent<MeshRenderer>();renderer.sharedMaterial=Paint(color,tile,name=="Pupil"||name=="Eye");
         renderer.receiveShadows=true;renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.On;return t;
     }
-    private Transform Ellipsoid(string name,Transform parent,Vector3 position,Vector3 size,Color color,int sides,int rings)
+    private Transform Ellipsoid(string name,Transform parent,Vector3 position,Vector3 size,Color color,int sides,int rings,bool fine=true)
     {
-        sides *= 2;
-        var v=new List<Vector3>();var faces=new List<int>();
-        for(int j=0;j<=rings;j++)for(int i=0;i<sides;i++)
-        {float a=i*2*Mathf.PI/sides,b=j*Mathf.PI/rings;v.Add(Vector3.Scale(size,new Vector3(Mathf.Sin(b)*Mathf.Cos(a),Mathf.Cos(b),Mathf.Sin(b)*Mathf.Sin(a))));}
+        sides = fine?Math.Max(16,sides*3):8;
+        rings = fine?Math.Max(8,rings*2):3;
+        var v=new List<Vector3>();var faces=new List<int>();var tex=new List<Vector2>();var normals=new List<Vector3>();
+        for(int j=0;j<=rings;j++)for(int i=0;i<=sides;i++)
+        {
+            float a=i*2*Mathf.PI/sides,b=j*Mathf.PI/rings;
+            var n=new Vector3(Mathf.Sin(b)*Mathf.Cos(a),Mathf.Cos(b),Mathf.Sin(b)*Mathf.Sin(a));
+            v.Add(Vector3.Scale(size,n));normals.Add(new Vector3(n.x/size.x,n.y/size.y,n.z/size.z).normalized);
+            tex.Add(new Vector2(i/(float)sides,1-j/(float)rings));
+        }
         for(int j=0;j<rings;j++)for(int i=0;i<sides;i++)
-        {int a=j*sides+i,b=j*sides+(i+1)%sides,c=a+sides,d=b+sides;faces.AddRange(new[]{a,c,b,b,c,d});}
-        return MeshPart(name,parent,position,v,faces,color);
+        {int a=j*(sides+1)+i,b=a+1,c=a+sides+1,d=b+sides+1;faces.AddRange(new[]{a,c,b,b,c,d});}
+        return MeshPart(name,parent,position,v,faces,color,tex,normals);
     }
+
     private void Rod(string name,Transform parent,Vector3 a,Vector3 b,float radius,Color color)
-    {var t=Ellipsoid(name,parent,(a+b)*.5f,new Vector3(radius,(b-a).magnitude*.5f,radius),color,6,3);t.localRotation=Quaternion.FromToRotation(Vector3.up,b-a);}
+    {var t=Ellipsoid(name,parent,(a+b)*.5f,new Vector3(radius,(b-a).magnitude*.5f,radius),color,6,3,false);t.localRotation=Quaternion.FromToRotation(Vector3.up,b-a);}
     private void Wedge(string name,Transform parent,Vector3 position,Vector3 size,Color color)
     {
         var v=new List<Vector3>{new(-size.x*.5f,size.y*.5f,0),new(size.x*.5f,size.y*.5f,0),new(-size.x*.5f,-size.y*.5f,0),new(size.x*.5f,-size.y*.5f,0),new(0,-size.y*.3f,size.z)};

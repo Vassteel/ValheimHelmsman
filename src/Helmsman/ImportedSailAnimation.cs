@@ -9,6 +9,7 @@ namespace Helmsman;
 // synchronized speed settings still run normally.
 public sealed class ImportedSailAnimation : MonoBehaviour
 {
+    public bool FixedMast;
     private Transform? sail;
     private Vector3 fullScale;
     internal void Tick(Ship ship,float delta)
@@ -25,7 +26,7 @@ public sealed class ImportedSailAnimation : MonoBehaviour
             scale.y=Mathf.MoveTowards(sail.localScale.y,fullScale.y*amount,Mathf.Abs(fullScale.y)*delta);
             sail.localScale=scale;
         }
-        if(!ship.m_mastObject || !EnvMan.instance)return;
+        if(FixedMast || !ship.m_mastObject || !EnvMan.instance)return;
         var root=ship.transform;
         var wind=EnvMan.instance.GetWindDir();wind=Vector3.Cross(Vector3.Cross(wind,root.up),root.up);
         if(wind.sqrMagnitude<.0001f)return;

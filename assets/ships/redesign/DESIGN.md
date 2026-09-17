@@ -2,7 +2,7 @@
 
 All 42 imported public prefab entries have a design in `designs.json`. Native Valheim base models and the separately generated bird models are outside this imported-content pass.
 
-- Fifteen ships: individual upper-stem profiles; corresponding static end fittings follow the new profile; new stern racks, net gantries or cloth working shelters; separate merchant/Taurus ornaments replaced with seabird carvings. Separate deck/floor/hatch meshes are protected; combined hull surfaces below the configured deck-clearance threshold remain unchanged. Mast/sail hierarchies, separate rigging parts, native animated sails/oars/rudders, cargo paths and ship physics remain in place.
+- Fifteen ships: individual upper-stem profiles; corresponding static end fittings follow the new profile; new stern racks and net gantries; added cloth aft awnings and their support posts removed; separate merchant/Taurus ornaments replaced with seabird carvings. Separate deck/floor/hatch meshes are protected; combined hull surfaces below the configured deck-clearance threshold remain unchanged. Mast/sail hierarchies, separate rigging parts, native animated sails/oars/rudders, cargo paths and ship physics remain in place.
 - Carpenter's Table: pegged frame, vise, rib jig, tool tray, shelf and hand tools.
 - Fishing dock and extension: full-length compatible plank footprints, bracing, sorting shelf and net roller. The dock chest keeps its original components and visuals.
 - Oil press: new frame, screw, wooden tubs and collection channel.
@@ -27,4 +27,4 @@ The supplied source bundle is not modified by this build. Replacements attach to
 
 CPU review renders are diagnostic geometry views, not Unity screenshots. They do not reproduce final materials, alpha clipping, skinning or sail animation. The source review only extracted active visual states. Native animated meshes and inactive customization variants are deliberately not replaced.
 
-In-game checks are still required: shoreline placement, static mesh-collider cooking, ship deck/head clearance, cargo/helm access, sail states, canopy overlap, item pickup/equip appearance, build icons, multiplayer loading and save/reload. Ship shelters are visual fittings; they do not automatically grant the purchased native-longship canopy upgrade's gameplay effects.
+In-game checks are still required: shoreline placement, static mesh-collider cooking, ship deck/head clearance, cargo/helm access, sail states, item pickup/equip appearance, build icons, multiplayer loading and save/reload. The separately purchased native-longship canopy upgrade is unchanged.

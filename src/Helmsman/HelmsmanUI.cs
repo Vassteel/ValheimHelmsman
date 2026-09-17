@@ -145,6 +145,7 @@ public sealed partial class HelmsmanUI : MonoBehaviour
         // Rebuild after the input callback has completed, preserving live input controls while typing.
         if(whistle!=null && !ReferenceEquals(whistleRequestSnapshot,Plugin.Instance.Summon))rebuild=true;
         if(CargoAvailable!=hadCargoTab) { if(!CargoAvailable && tab==4)tab=2;rebuild=true; }
+        if(dock&&!onboard&&tab==4&&scoutSnapshot!=ScoutState)rebuild=true;
         if(rebuild){BuildMenu();rebuild=false;}
         FitModal();
         if(editing && draft!=null)
@@ -160,7 +161,7 @@ public sealed partial class HelmsmanUI : MonoBehaviour
         {
             nextLabels=Time.unscaledTime+.2f;
             foreach(var update in refreshLabels)update();
-            if(status)status.text=notice.Length>0 ? notice : yard ? yard.Status : whistle!=null ? (Plugin.Instance.Summon ? Plugin.Instance.Summon.Status : "Stand near shore. The gull finds safe water nearby; no Dock Ward needed.") : tab==4 ? "Cargo moves only after your request." : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
+            if(status)status.text=notice.Length>0 ? notice : yard ? yard.Status : whistle!=null ? (Plugin.Instance.Summon ? Plugin.Instance.Summon.Status : "Stand near shore. The gull finds safe water nearby; no Dock Ward needed.") : tab==4&&!onboard ? IslandScouting.Instance.Status : tab==4 ? "Cargo moves only after your request." : calledGull ? "Choose a dock and the gull will guide you there." : onboard && Plugin.Instance.Voyage ? Plugin.Instance.Voyage.Status :
                 naming ? "Ship names are saved with the world." : tab==3 ? "Choose an empty named ship to summon." :
                 editing && tab<2 ? (valid ? "Clearance: " : "Advisory: ")+validation : "Select a named dock to set sail.";
         }
@@ -214,19 +215,20 @@ public sealed partial class HelmsmanUI : MonoBehaviour
             });
             status=theme.Text(rect,"",24,-280,672,70,19,MenuTheme.Gold);FitModal();return;
         }
-        theme.Text(rect,tab==4 ? "Let me carry that cargo ashore, Viking." : calledGull ? "Where shall we sail? Choose a named dock below." : onboard ? "Speak to the gull to change course or end the voyage." : tab>=2 ? "Sail to a dock or summon a named ship" : "Ghost setup · No ship required",24,-60,onboard ? 672 : 482,28,18,MenuTheme.Muted);
+        theme.Text(rect,tab==4&&!onboard ? "Ask the gull to chart this island." : tab==4 ? "Let me carry that cargo ashore, Viking." : calledGull ? "Where shall we sail? Choose a named dock below." : onboard ? "Speak to the gull to change course or end the voyage." : tab>=2 ? "Sail to a dock or summon a named ship" : "Ghost setup · No ship required",24,-60,onboard ? 672 : 482,28,18,MenuTheme.Muted);
         if(!onboard && tab<2)Button(rect,"Adjust view",522,-58,174,AdjustView);
         hadCargoTab=CargoAvailable;
-        var tabs=onboard ? hadCargoTab ? new[]{"Destination","Unload cargo"} : new[]{"Destination"} : new[]{"Berth","Departure","Destinations","Summon ship"};
+        var tabs=onboard ? hadCargoTab ? new[]{"Destination","Unload cargo"} : new[]{"Destination"} : new[]{"Berth","Departure","Destinations","Summon ship","Scout island"};
         for(int i=0;i<tabs.Length;i++)
         {
             int index=i;
-            float spacing=onboard ? (hadCargoTab ? 344 : 680) : 170;
-            var button=Button(rect,tabs[i],24+i*spacing,-101,onboard ? (hadCargoTab ? 328 : 672) : 162,()=>SwitchTab(index));
+            float spacing=onboard ? (hadCargoTab ? 344 : 680) : 136;
+            var button=Button(rect,tabs[i],24+i*spacing,-101,onboard ? (hadCargoTab ? 328 : 672) : 128,()=>SwitchTab(index));
+            if(!onboard){var label=button.GetComponentInChildren<TMP_Text>();label.enableAutoSizing=true;label.fontSizeMin=13;label.fontSizeMax=18;}
             if((onboard ? (tab==4 ? 1 : 0) : tab)==i)button.GetComponent<Image>().color=MenuTheme.SelectedTab;
         }
         body=MenuTheme.Rect("Contents",rect,24,-155,672,382);
-        if(tab==4 && onboard)BuildCargo();else if(tab==3 && !onboard)BuildSummon();else if(onboard || tab==2)BuildDestinations();else if(tab==0)BuildBerth();else BuildDeparture();
+        if(tab==4 && onboard)BuildCargo();else if(tab==4)BuildScouting();else if(tab==3 && !onboard)BuildSummon();else if(onboard || tab==2)BuildDestinations();else if(tab==0)BuildBerth();else BuildDeparture();
         status=theme.Text(rect,"",24,-546,672,46,17,MenuTheme.Gold);
         status.enableAutoSizing=true;status.fontSizeMin=14;status.fontSizeMax=17;
         theme.Text(rect,"D-pad ↑↓: select   ←→: adjust   A: activate   B / Esc: close",24,-596,672,18,15,MenuTheme.Muted);
@@ -352,17 +354,29 @@ public sealed partial class HelmsmanUI : MonoBehaviour
         }
         theme!.Text(body!,calledGull ? "Choose a dock to start your voyage." : onboard ? "Choose a dock to change destination or replot the course." : "Choose a named dock. Departure allows time to board.",0,-52,672,35,18,MenuTheme.Muted);
         var destinations=Plugin.Instance.Directory.Records.Where(d=>!dock || d.Id!=dock.Id).OrderBy(d=>d.Berth.name).ToList();
-        int pages=Math.Max(1,(destinations.Count+3)/4);page=Mathf.Clamp(page,0,pages-1);
-        for(int i=0;i<4 && page*4+i<destinations.Count;i++)
+        int pages=Math.Max(1,(destinations.Count+2)/3);page=Mathf.Clamp(page,0,pages-1);
+        for(int i=0;i<3 && page*3+i<destinations.Count;i++)
         {
-            var destination=destinations[page*4+i];var berth=destination.Berth;
+            var destination=destinations[page*3+i];var berth=destination.Berth;
             Button(body!,berth.name+" — "+berth.position.x.ToString("0")+", "+berth.position.z.ToString("0"),0,-99-i*49,672,()=>SelectDestination(destination));
         }
         if(destinations.Count==0)theme.Text(body!,"No other configured docks found.\nSave another berth, then refresh the list.",0,-110,672,96,21,MenuTheme.Muted);
-        var previous=Button(body!,"Previous",0,-313,160,()=>{page--;rebuild=true;});previous.interactable=page>0;
-        theme.Text(body!,(page+1)+" / "+pages,178,-313,90,38,18,MenuTheme.Muted);
-        var next=Button(body!,"Next",282,-313,160,()=>{page++;rebuild=true;});next.interactable=page<pages-1;
-        Button(body!,"Refresh docks",460,-313,212,()=>{notice="";rebuild=true;});
+        var previous=Button(body!,"Previous",0,-258,160,()=>{page--;rebuild=true;});previous.interactable=page>0;
+        theme.Text(body!,(page+1)+" / "+pages,178,-258,90,38,18,MenuTheme.Muted);
+        var next=Button(body!,"Next",282,-258,160,()=>{page++;rebuild=true;});next.interactable=page<pages-1;
+        Button(body!,"Refresh docks",460,-258,212,()=>{notice="";rebuild=true;});
+        Button(body!,Plugin.Instance.ClearNavigationRocks.Value?"Rock clearing: ON":"Rock clearing: OFF",0,-313,328,()=>
+        {
+            Plugin.Instance.ClearNavigationRocks.Value=!Plugin.Instance.ClearNavigationRocks.Value;
+            notice=Plugin.Instance.ClearNavigationRocks.Value?"Clears natural stone rocks while you sail with the gull. Changes to rocks are permanent.":"Rock clearing disabled.";
+            rebuild=true;
+        });
+        Button(body!,Plugin.Instance.FishPassThrough.Value?"Fish pass-through: ON":"Fish pass-through: OFF",344,-313,328,()=>
+        {
+            Plugin.Instance.FishPassThrough.Value=!Plugin.Instance.FishPassThrough.Value;
+            notice=Plugin.Instance.FishPassThrough.Value?"Fish pass through this boat while the gull steers.":"Normal fish collisions restored.";
+            rebuild=true;
+        });
     }
     private void BuildCargo()
     {
@@ -406,6 +420,7 @@ public sealed partial class HelmsmanUI : MonoBehaviour
             var ship=ships[page*4+i];var delta=ship.Position-dock.transform.position;
             Button(body!,ship.Name+" ("+ship.Prefab+") · "+new Vector2(delta.x,delta.z).magnitude.ToString("0")+" m "+Helmsman.Core.ShipText.Bearing(delta.x,delta.z),0,-80-i*49,672,()=>
             {
+                if(ScoutGullPresentation.BusyDock(dock.Id)){notice="This gull is scouting. Collect or cancel his survey first.";return;}
                 if(SummonRequest.Begin(dock,ship,out var reason)){Close();Plugin.Message(reason);}else notice=reason;
             });
         }
@@ -457,6 +472,7 @@ public sealed partial class HelmsmanUI : MonoBehaviour
             var voyage=Plugin.Instance.Voyage;
             if(voyage)voyage.ChangeDestination(fresh);Close();return;
         }
+        if(dock&&ScoutGullPresentation.BusyDock(dock.Id)){notice="This gull is scouting. Collect his report before asking him to sail.";return;}
         if(!dock || !selectedShip){notice="Select the ship to use.";return;}
         var from=DockDirectory.Resolve(dock.Id);
         if(from==null){notice="Configure and save this ward's berth first.";return;}

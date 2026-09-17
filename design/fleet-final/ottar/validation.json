@@ -1,0 +1,11 @@
+{
+  "mast_clear": true,
+  "stern_clear": true,
+  "materials": 37,
+  "batches": 48,
+  "vertices": 436301,
+  "triangles": 233330,
+  "walk_slabs": 104,
+  "cargo_supports": 144,
+  "settled_props": 78
+}

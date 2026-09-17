@@ -29,9 +29,10 @@ internal static partial class ImportedHulls
         var visualBindings=ShipCosmetics.ReadBindings();
         foreach(var blueprint in ShipConstruction.Blueprints.Where(b=>b.Id!="longship"))
         {
-            var prefab=Clone(blueprint.Source,blueprint.Prefab);
-            ImportedShipMaterials.Apply(prefab,blueprint.Source);
-            BoatyardModels.Apply(prefab,blueprint.Source);
+            var prefab=Clone(FinalFleetModels.Template(blueprint.Source),blueprint.Prefab);
+            ImportedShipMaterials.Apply(prefab,FinalFleetModels.Template(blueprint.Source));
+            if(FinalFleetModels.Has(blueprint.Source))FinalFleetModels.Apply(prefab,blueprint.Source);
+            else BoatyardModels.Apply(prefab,blueprint.Source);
             // The merchant lamp's animated point light sweeps full-strength shadows
             // across nearby hull surfaces. Keep its warm light steady on a moving ship.
             if(blueprint.Source=="MercantShip")
@@ -49,7 +50,7 @@ internal static partial class ImportedHulls
             if(!ship || !ship.m_floatCollider || !ship.m_shipControlls || !prefab.GetComponent<ZNetView>())
                 throw new InvalidOperationException(blueprint.Name+" is missing native ship components.");
             prefab.AddComponent<ShipOarAnimation>();
-            prefab.AddComponent<ImportedSailAnimation>();
+            prefab.AddComponent<ImportedSailAnimation>().FixedMast=FinalFleetModels.Has(blueprint.Source);
             ship.m_hasSail=blueprint.HasSail;
             if(!blueprint.HasSail)ship.m_sailForceFactor=0;
             var piece=prefab.GetComponent<Piece>();piece.m_name=blueprint.Name;piece.m_usage=Piece.UsageTagFlags.Transport;
@@ -80,7 +81,8 @@ internal static partial class ImportedHulls
                 void Default(Material[] choices,string path){var renderer=path.Length>0?prefab.transform.Find(path)?.GetComponent<Renderer>():null;if(choices.Length>0&&renderer)choices[0]=renderer.sharedMaterial;}
                 Default(cosmetics.SailStyles,binding.SailRenderer);Default(cosmetics.HullStyles,binding.HullRenderers.FirstOrDefault()??"");
             }
-            if(blueprint.Source=="HerculeShip")
+            FinalFleetModels.ConfigureStyles(prefab,cosmetics);
+            if(blueprint.Source=="HerculeShip"&&!FinalFleetModels.Has(blueprint.Source))
             {
                 var net=prefab.transform.Find("FishingNetSystem/CatchTrigger").gameObject.AddComponent<ShipFishingNet>();
                 net.Chest=prefab.transform.Find("piece_chest").GetComponent<Container>();

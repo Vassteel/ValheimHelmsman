@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>annotations</Nullable></PropertyGroup>
+<ItemGroup><Compile Include="../../src/Helmsman/RockClearing.cs" Link="RockClearing.cs" /><Compile Include="../../src/Helmsman/RockCargo.cs" Link="RockCargo.cs" /><Compile Include="../../src/Helmsman/FishCollisionPass.cs" Link="FishCollisionPass.cs" /></ItemGroup>
+</Project>

@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.30
+
+- Add the redesigned Ottar, heavy freighter, Snekkja, Falkuša, Ceol and six-slot Currach to puffin shipbuilding.
+- Improve rigging, steering clearance, paint options and boarding; restore natural cargo stacks with smooth walking collision.
+
+## 0.2.29
+
+- Add optional close-range rock clearing with automatic stone collection into ship cargo. Excess stone stays in the world when cargo is full.
+- Enable fish pass-through during gull steering by default, with a separate menu toggle.
+
+## 0.2.28
+
+- Ignore fish during route obstruction checks and try finer local detours around blocked passages.
+- Restore replan attempts after substantial progress instead of limiting an entire voyage to three obstructions.
+- Make the gull’s interaction collider non-solid and disable it before takeoff detaches it from a ship.
+
+## 0.2.27
+
+- Ask the dock gull to scout its island, then collect terrain discoveries and points of interest at a nearby Cartographer’s Table.
+- Save uncollected surveys across reconnects and server restarts.
+
 ## 0.2.26
 
 - Refresh the README with current features, setup and controls.
