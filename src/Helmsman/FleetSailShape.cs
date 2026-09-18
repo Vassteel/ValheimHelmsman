@@ -26,6 +26,16 @@ internal static class FleetSailShape
         float u=Mathf.Clamp01(.5f+p.x/(2*halfWidth));float v=Mathf.Clamp01((p.y-bottom)/Mathf.Max(.1f,top-bottom));
         return Mathf.Sin(Mathf.PI*u)*Mathf.Sin(Mathf.PI*v);
     }
+    internal static float Flutter(string kind,Vector3 p,float top,float bottom,float halfWidth,float time,float wind,float amount)
+    {
+        // Keep cloth visibly alive when reefed too; scaling the old wave by .1
+        // reduced it to sub-centimetre motion. The fixed spar/luff still has zero weight.
+        float exposure=.35f+.65f*Mathf.Clamp01(amount);
+        float gust=.5f+.5f*Mathf.Clamp01(wind);
+        float height=Mathf.Clamp((top-bottom)*.035f,.10f,.24f);
+        return (Mathf.Sin(time*2.3f+p.y*1.5f+p.x)*height+Mathf.Sin(time*4.1f-p.y*2+p.z)*height*.35f)
+            *gust*exposure*Weight(kind,p,top,bottom,halfWidth);
+    }
     private static float Triangle(Vector3 p,Vector2 a,Vector2 b,Vector2 c)
     {
         float d=(b.y-c.y)*(a.x-c.x)+(c.x-b.x)*(a.y-c.y);

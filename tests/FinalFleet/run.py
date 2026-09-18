@@ -17,6 +17,14 @@ for name in sorted(expected):
  assert sum(p['kind']=='helm' for p in s['points'])==1
  assert sum(p['kind']=='ladder' for p in s['points'])==2
  assert sum(p['kind']=='mast' for p in s['points'])==1
+ assert len(s['waterMask'])>=40 and len(s['waterMask'])%2==0
+ for left,right in zip(s['waterMask'][::2],s['waterMask'][1::2]):
+  assert left[0]<right[0] and left[1]==right[1] and left[2]==right[2]
+  assert left[1]>s['waterline']+.12,'Water mask below waterline'
+ for point in s['points']:
+  if point['kind']=='ladder':
+   assert len(point['size'])==3 and all(n>0 for n in point['size'])
+   assert point['position'][1]-point['size'][1]/2<s['waterline']<point['position'][1]+point['size'][1]/2
  assert len(s['hullSolids'])==18
  for h in s['hullSolids']:
   assert len(h['vertices'])==24 and all(math.isfinite(v) for v in h['vertices'])

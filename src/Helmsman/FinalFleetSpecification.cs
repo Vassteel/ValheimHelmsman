@@ -7,7 +7,7 @@ namespace Helmsman;
 
 internal static partial class FinalFleetModels
 {
-    [Serializable] internal sealed class Point {public string kind="";public float[] position=Array.Empty<float>(),exit=Array.Empty<float>(),facing=Array.Empty<float>();}
+    [Serializable] internal sealed class Point {public string kind="";public float[] position=Array.Empty<float>(),exit=Array.Empty<float>(),facing=Array.Empty<float>(),size=Array.Empty<float>();}
     [Serializable] internal sealed class Solid {public float[] position=Array.Empty<float>(),size=Array.Empty<float>();}
     [Serializable] internal sealed class HullSolid {public float[] vertices=Array.Empty<float>();public int[] triangles=Array.Empty<int>();}
     [Serializable] internal sealed class Sheet {public float[] head=Array.Empty<float>(),foot=Array.Empty<float>();}
@@ -17,6 +17,7 @@ internal static partial class FinalFleetModels
         public float length=0,beam=0,walkHeight=0,waterline=0,airHeight=0,cargoHeight=0;
         public float[] sailPivot=Array.Empty<float>(),rudderPivot=Array.Empty<float>();
         public HullSolid[] hullSolids=Array.Empty<HullSolid>(),cargoSolids=Array.Empty<HullSolid>();
+        public float[][] waterMask=Array.Empty<float[]>();
         public Point[] points=Array.Empty<Point>();public Solid[] colliders=Array.Empty<Solid>();public Sheet[] sheets=Array.Empty<Sheet>();
     }
     // Decode authored metadata with the game's managed serializer, so runtime

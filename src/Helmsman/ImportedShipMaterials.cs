@@ -12,7 +12,7 @@ internal static class ImportedShipMaterials
 {
     private static readonly Dictionary<string,Material> owned=new();
     private static readonly Dictionary<string,Shader> native=new();
-    private static Material? wood,cloth;
+    private static Material? wood,cloth,waterMask;
     private static readonly Dictionary<string,Material> effects=new();
     internal static void Prepare()
     {
@@ -24,6 +24,8 @@ internal static class ImportedShipMaterials
                 .SelectMany(r=>r.sharedMaterials).Where(m=>m&&m.shader).ToArray():Array.Empty<Material>();
         }
         var materials=From("VikingShip");
+        waterMask=materials.FirstOrDefault(m=>m.shader.name=="Custom/WaterMask")??From("Karve").FirstOrDefault(m=>m.shader.name=="Custom/WaterMask");
+        if(!waterMask)throw new InvalidOperationException("Native ship water mask missing.");
         var building=From("piece_workbench").Concat(From("piece_chest_wood")).ToArray();
         // Current ships can use cloth sails outside the legacy m_sailObject and
         // hull shaders other than Custom/Piece. Resolve actual renderer materials.
@@ -40,6 +42,7 @@ internal static class ImportedShipMaterials
                 if(material&&material.shader){effects[material.name.Replace(" (Instance)","")]=material;native[material.shader.name]=material.shader;}
         Plugin.Instance.Record("Maritime materials: wood="+wood.name+" ("+wood.shader.name+"); cloth="+cloth.name+" ("+cloth.shader.name+").");
     }
+    internal static Material WaterMask()=>waterMask!;
     internal static bool WorldSurface(string shader)=>shader.StartsWith("Custom/",StringComparison.Ordinal)&&
         shader.IndexOf("Water",StringComparison.OrdinalIgnoreCase)<0&&shader.IndexOf("Shadow",StringComparison.OrdinalIgnoreCase)<0&&
         shader.IndexOf("Particle",StringComparison.OrdinalIgnoreCase)<0&&shader.IndexOf("Unlit",StringComparison.OrdinalIgnoreCase)<0;
@@ -58,10 +61,12 @@ internal static class ImportedShipMaterials
                     string shaderName=original.shader?original.shader.name:"";
                     bool fabric=IsFabric(original.name);
                     // Masks, shadows and particles need their native rendering behavior.
-                    bool special=shaderName.Contains("WaterMask")||shaderName.Contains("ShadowBlob")||renderer is ParticleSystemRenderer;
+                    bool special=shaderName.Contains("WaterMask")||original.name.IndexOf("watermask",StringComparison.OrdinalIgnoreCase)>=0||shaderName.Contains("ShadowBlob")||renderer is ParticleSystemRenderer;
                     if(special)
                     {
-                        if(renderer is ParticleSystemRenderer && effects.TryGetValue(original.name.Replace(" (Instance)",""),out var effect))
+                        if(shaderName.Contains("WaterMask")||original.name.IndexOf("watermask",StringComparison.OrdinalIgnoreCase)>=0)
+                            material=new Material(WaterMask());
+                        else if(renderer is ParticleSystemRenderer && effects.TryGetValue(original.name.Replace(" (Instance)",""),out var effect))
                             material=new Material(effect);
                         else
                         {

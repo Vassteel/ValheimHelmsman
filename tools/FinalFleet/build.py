@@ -267,7 +267,7 @@ def finish(kind):
     vertex.co.y+=(1 if vertex.co.y>0 else -1)*.009
  # Thin cloth must render from inside and outside with native, backface-culling shaders.
  for ob in ship.objects:
-  if any(k in ob.name.lower() for k in ['sail panel','sewn wool','red sailing cloth']) and not any(m.type=='SOLIDIFY' for m in ob.modifiers):
+  if any(k in ob.name.lower() for k in ['sail panel','sewn wool','red sailing cloth','lateen mainsail','jib']) and not any(k in ob.name.lower() for k in ['rope','seam']) and not any(m.type=='SOLIDIFY' for m in ob.modifiers):
    ob.modifiers.new('Two sided cloth','SOLIDIFY').thickness=.004
  # Close the currach's rounded bow: the original skin stopped short of the
  # centreline, leaving a visible slot between port and starboard gunwales.
@@ -284,6 +284,8 @@ def finish(kind):
    rail=ship.objects['Gunwale '+str(side)];end=[v.co for v in rail.data.vertices if v.co.x>L-.06]
    tips.append(sum(end,Vector())/len(end))
   tube('Bow gunwale joint',[tips[0],Vector((L+.025,0,(tips[0].z+tips[1].z)/2)),tips[1]],.045,oak,8)
+  # A fitted timber bow cap covers the rail joint and supports the skin seam.
+  box('Currach bow cap',(L-.025,0,tips[0].z+.017),(.18,abs(tips[0].y-tips[1].y)+.075,.065),oak,.012)
  from ropework import finish as finish_ropework
  rope_report=finish_ropework(kind,ship,globals(),length,beam,walkz)
  (dest/'rope-support.json').write_text(json.dumps(rope_report,indent=2))
@@ -291,7 +293,20 @@ def finish(kind):
  # culling prevents the inner/back surface fighting with its close outer face.
  for ob in ship.objects:
   if ob.type!='MESH':continue
-  bm=bmesh.new();bm.from_mesh(ob.data);bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(ob.data);bm.free()
+  bm=bmesh.new();bm.from_mesh(ob.data)
+  # Open staves, hide flaps and skin end panels have no well-defined outside.
+  # Give them actual thickness before orienting, rather than guessing a face side.
+  if any(e.is_boundary for e in bm.edges) and not any(m.type=='SOLIDIFY' for m in ob.modifiers):
+   mod=ob.modifiers.new('Closed surface thickness','SOLIDIFY');mod.thickness=.018 if 'barrel' in ob.name.lower() else .012
+   bm.free()
+   bpy.context.view_layer.objects.active=ob;bpy.ops.object.modifier_apply(modifier=mod.name)
+   bm=bmesh.new();bm.from_mesh(ob.data)
+  bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.normal_update()
+  # Concave sack mouths can make Blender choose a consistent but inward shell.
+  # Signed volume supplies the unambiguous outside for a closed solid.
+  if all(e.is_manifold for e in bm.edges) and bm.calc_volume(signed=True)<0:
+   bmesh.ops.reverse_faces(bm,faces=list(bm.faces));bm.normal_update()
+  bm.to_mesh(ob.data);bm.free()
  # Render state from the saved model, not the deck-only inspection pose.
  for ob in ship.objects:ob.hide_render=False
  ship.name='Helmsman '+kind+' final';scene=bpy.context.scene
@@ -318,12 +333,35 @@ def finish(kind):
   m=ob.data.materials[0]
   if m not in materials:materials.append(m)
   key=(group(ob),materials.index(m));v,t=meshdata(ob);dst=groups.setdefault(key,([],[]));offset=len(dst[0]);dst[0].extend(v);dst[1].extend(i+offset for i in t)
+ # Water occlusion belongs at the opening, above the water, not beneath the sole.
+ # Export each rail profile from the actual model (the currach has a broad stern).
+ water_mask=[]
+ for x in sorted(set(round(v.x,4) for v in hv)):
+  near=[v for v in hv if abs(v.x-x)<.00015]
+  if not near:continue
+  top=max(v.z for v in near);width=max(abs(v.y) for v in near)
+  water_mask.extend([unity((x,max(.006,width-.025),top-.025)),unity((x,-max(.006,width-.025),top-.025))])
  # Cargo collision bridges small gaps independently of individual prop render meshes.
- metadata={'prefab':prefab,'name':kind,'length':length,'beam':beam,'walkHeight':walkz,'waterline':{'ottar':.60,'freighter':.60,'snekkja':.22,'falkusa':.48,'ceol':.40,'currach':.34}[kind],'points':[], 'colliders':collisions,'hullSolids':hull_solids,'cargoSolids':cargo_solids,'cargoHeight':cargo_height,'sheets':sheets}
+ metadata={'prefab':prefab,'name':kind,'length':length,'beam':beam,'walkHeight':walkz,'waterline':{'ottar':.60,'freighter':.60,'snekkja':.22,'falkusa':.48,'ceol':.40,'currach':.34}[kind],'points':[], 'colliders':collisions,'hullSolids':hull_solids,'cargoSolids':cargo_solids,'cargoHeight':cargo_height,'sheets':sheets,'waterMask':water_mask}
  for p in points:
   k=p['kind'].lower();id=p['id'].lower()
   typ='helm' if 'helm' in k or 'helm' in id else 'ladder' if 'ladder' in k else 'mast' if 'mast' in id or 'holdfast' in k else 'seat'
   metadata['points'].append({'kind':typ,'position':unity(p['position']),'exit':unity(p.get('exit_position',p.get('exit',p['position']))),'facing':unity(p.get('facing_blender',p.get('facing',[1,0,0])))})
+ # Match interaction strips to the hull at the visible boarding rope, all the
+ # way from the waterline to the rail. Exits face inboard and clear the gunwale.
+ for point in metadata['points']:
+  if point['kind']!='ladder':continue
+  z=point['position'][2];side=1 if point['position'][0]>=0 else -1
+  near=[v for v in hv if abs(v.x-z)<length/50]
+  rail=max(v.z for v in near);width=max(abs(v.y) for v in near)
+  low=metadata['waterline']-.28;high=rail+.18
+  point['position']=[side*(width+.13),(low+high)/2,z]
+  point['size']=[.32,high-low,.65]
+  exitx=side*(width-.46)
+  if merchant:
+   # Side walkways have level support and avoid the mast/cargo in the centre.
+   exitx=side*(1.65 if kind=='ottar' else 2.20)
+  point['exit']=[exitx,walkz+.18,z];point['facing']=[-side,0,0]
  sailv=[v for (g,m),(vs,ts) in groups.items() if g=='sail' for v in vs]
  metadata['sailPivot']=[0,max(v[1] for v in sailv),0];metadata['airHeight']=max(v[1] for vs,ts in groups.values() for v in vs)+.15
  pivots={'ottar':(-6.06,-2.17,2.13),'freighter':(-6.06*1.23,-2.17*1.38,2.13*1.28),'snekkja':(-7.05,-1.15,1.15)}

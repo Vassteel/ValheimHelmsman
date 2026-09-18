@@ -13,10 +13,26 @@ public sealed class ImportedSailFlutter : MonoBehaviour
     }
     private readonly List<Panel> panels=new();
     private float nextTick;
+    private Cloth[] nativeCloth=System.Array.Empty<Cloth>();
+    private Transform? sail;
+    private Vector3 previousScale;
     private void Start()
     {
         if(ZNet.instance&&ZNet.instance.IsDedicated())return;
         var ship=GetComponent<Ship>();if(!ship||!ship.m_sailObject)return;
+        sail=ship.m_sailObject.transform;previousScale=sail.localScale;
+        nativeCloth=sail.GetComponentsInChildren<Cloth>(true);
+        foreach(var c in nativeCloth)
+        {
+            // Retain the working legacy cloth simulation, but tether it to its rig.
+            // The source used acceleration 100, no tethers and up to 2m travel.
+            var driver=c.GetComponent<GlobalWind>();if(driver){driver.CancelInvoke();driver.enabled=false;}
+            c.useTethers=true;c.useGravity=false;c.damping=.35f;
+            var coefficients=c.coefficients;
+            float travel=.35f/Mathf.Max(.1f,Mathf.Max(sail.lossyScale.x,sail.lossyScale.z));
+            for(int i=0;i<coefficients.Length;i++)coefficients[i].maxDistance=Mathf.Min(coefficients[i].maxDistance,travel);
+            c.coefficients=coefficients;
+        }
         foreach(var filter in ship.m_sailObject.GetComponentsInChildren<MeshFilter>(true))
         {
             if(!filter.sharedMesh||!filter.sharedMesh.isReadable)continue;
@@ -28,6 +44,20 @@ public sealed class ImportedSailFlutter : MonoBehaviour
     {
         if(Time.time<nextTick)return;nextTick=Time.time+.05f;
         float wind=EnvMan.instance?EnvMan.instance.GetWindIntensity():0;
+        if(sail)
+        {
+            bool resizing=(sail.localScale-previousScale).sqrMagnitude>.000001f;
+            foreach(var c in nativeCloth)
+            {
+                if(!c)continue;
+                bool resume=!c.enabled&&!resizing;c.enabled=!resizing;
+                if(resume)c.ClearTransformMotion();
+                var direction=EnvMan.instance?EnvMan.instance.GetWindDir():transform.forward;
+                c.externalAcceleration=direction*(4+8*wind);
+                c.randomAcceleration=Vector3.one*(1+2*wind);
+            }
+            previousScale=sail.localScale;
+        }
         foreach(var p in panels)
         {
             for(int i=0;i<p.Rest.Length;i++)

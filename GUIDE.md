@@ -1,4 +1,4 @@
-# Helmsman guide — 0.2.32
+# Helmsman guide — 0.2.33
 
 Existing sailing has been used in solo/local play. **This build enables multiplayer; the new fleet and server behavior still need in-game verification.** This guide describes current controls; [Testing](https://github.com/Vassteel/ValheimHelmsman/blob/master/TESTING.md) separates observed play from remaining checks.
 
@@ -6,7 +6,7 @@ Existing sailing has been used in solo/local play. **This build enables multipla
 
 Install BepInEx, Jötunn and Helmsman through your mod manager. For manual installation, copy both `ValheimHelmsman.dll` and `Helmsman.Core.dll` to `BepInEx/plugins/ValheimHelmsman/`. Install the same Helmsman patch version on every client and the server. Close Valheim before replacing client DLLs; restart the server after its files are updated. Remove original OdinShip/OdinShipPlus and LongshipUpgrades DLLs to avoid overlapping prefabs and refits. Keep a world backup from before replacement. Avoid duplicate copies in your active profile.
 
-Look for `Helmsman 0.2.32 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
+Look for `Helmsman 0.2.33 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
 
 ## Configure docks
 

@@ -65,12 +65,14 @@ internal static partial class FinalFleetModels
     internal static void Apply(GameObject prefab,string name)
     {
         var model=Load(name);var spec=model.Spec;var ship=prefab.GetComponent<Ship>();var root=prefab.transform;
-        var maskMaterial=prefab.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).FirstOrDefault(m=>m&&m.shader&&m.shader.name.Contains("WaterMask"));
+        var maskMaterial=ImportedShipMaterials.WaterMask();
         var controls=ship.m_shipControlls;var holds=prefab.GetComponentsInChildren<Container>(true);
         // Old meshes/LOD switching/animators and colliders cannot remain as invisible obstacles.
         foreach(var renderer in prefab.GetComponentsInChildren<Renderer>(true)){renderer.enabled=false;renderer.forceRenderingOff=true;}
         foreach(var group in prefab.GetComponentsInChildren<LODGroup>(true))Object.DestroyImmediate(group);
         foreach(var animator in prefab.GetComponentsInChildren<Animator>(true))animator.enabled=false;
+        foreach(var cloth in prefab.GetComponentsInChildren<Cloth>(true))
+        {cloth.enabled=false;var wind=cloth.GetComponent<GlobalWind>();if(wind){wind.CancelInvoke();wind.enabled=false;}}
         foreach(var light in prefab.GetComponentsInChildren<Light>(true))light.enabled=false;
         foreach(var area in prefab.GetComponentsInChildren<EffectArea>(true))Object.DestroyImmediate(area);
         foreach(var c in prefab.GetComponentsInChildren<Collider>(true))
@@ -97,7 +99,7 @@ internal static partial class FinalFleetModels
         rig.HullRenderers=visual.GetComponentsInChildren<MeshRenderer>(true).Where(r=>r.name.StartsWith("hull ")).ToArray();
         rig.Decorations=visual.GetComponentsInChildren<MeshRenderer>(true).Where(r=>r.name.StartsWith("decoration ")).Select(r=>r.gameObject).ToArray();
         rig.SailRenderers=sail.GetComponentsInChildren<MeshRenderer>(true);rig.AirHeight=spec.airHeight;
-        var motion=prefab.AddComponent<FleetSailMotion>();motion.Kind=spec.name;motion.Sail=sail;motion.Top=spec.sailPivot[1];
+        var motion=prefab.AddComponent<FleetSailMotion>();motion.Kind=spec.name;motion.Sail=sail;motion.Top=spec.sailPivot[1];motion.AuthoredMeshes=sail.GetComponentsInChildren<MeshFilter>(true).Select(f=>f.sharedMesh).ToArray();
         rig.Motion=motion;rig.Sculling=spec.name=="freighter";
         foreach(var solid in spec.colliders)
         {var node=Node("Hull solid",root,V(solid.position));node.gameObject.layer=LayerMask.NameToLayer("vehicle");var box=node.gameObject.AddComponent<BoxCollider>();box.size=V(solid.size);}
@@ -115,7 +117,7 @@ internal static partial class FinalFleetModels
         var onboard=prefab.GetComponentsInChildren<BoxCollider>(true).FirstOrDefault(c=>c.name=="OnboardTrigger");
         if(!onboard)throw new InvalidDataException("Native onboard trigger missing for "+name);
         Rehome(onboard.transform,root,new Vector3(0,spec.walkHeight+.8f,0));onboard.center=Vector3.zero;onboard.size=new Vector3(spec.beam,3.4f,spec.length);onboard.isTrigger=true;
-        if(maskMaterial)AddWaterMask(root,spec,maskMaterial);
+        AddWaterMask(root,spec,maskMaterial);
         var body=prefab.GetComponent<Rigidbody>();body.centerOfMass=new Vector3(0,.25f,0);
         ship.m_stearForceOffset=-spec.length*.35f;ship.m_forceDistance=Mathf.Min(2,spec.length*.16f);
         // Native buoyancy applies mass * (dt * 50) impulses. Account for its
@@ -128,14 +130,14 @@ internal static partial class FinalFleetModels
             var facing=V(point.facing);if(facing.sqrMagnitude>.1f)node.localRotation=Quaternion.LookRotation(facing);
             if(point.kind=="helm")
             {
-                Rehome(controls.transform,root,position);controls.m_attachPoint=node;controls.m_attachAnimation=spec.name=="freighter"?"attach_mast":spec.name=="snekkja"?"sit":"attach_sitship";controls.m_maxUseRange=2.5f;controls.m_detachOffset=new Vector3(0,.1f,.7f);
-                var collider=controls.gameObject.AddComponent<BoxCollider>();collider.size=new Vector3(.65f,.16f,.35f);collider.center=new Vector3(0,-.08f,0);
+                Rehome(controls.transform,root,position);controls.gameObject.SetActive(true);controls.gameObject.layer=LayerMask.NameToLayer("piece_nonsolid");controls.enabled=true;controls.m_attachPoint=node;controls.m_attachAnimation=spec.name=="freighter"?"attach_mast":spec.name=="snekkja"?"sit":"attach_sitship";controls.m_maxUseRange=2.5f;controls.m_detachOffset=new Vector3(0,.1f,.7f);
+                var collider=controls.gameObject.AddComponent<BoxCollider>();collider.size=new Vector3(.70f,.65f,.55f);collider.center=new Vector3(0,spec.name=="freighter"?.85f:.25f,0);
                 ship.m_controlGuiPos=Node("Helm UI",root,position+Vector3.up);
             }
             else if(point.kind=="ladder")
             {
-                var ladder=node.gameObject.AddComponent<Ladder>();ladder.m_name="$piece_ship_ladder";ladder.m_useDistance=3;ladder.m_targetPos=Node("Boarding exit",root,V(point.exit)+Vector3.up*.12f);
-                var box=node.gameObject.AddComponent<BoxCollider>();box.size=new Vector3(.24f,.55f,.65f);
+                var ladder=node.gameObject.AddComponent<Ladder>();ladder.m_name="$piece_ship_ladder";ladder.m_useDistance=3;ladder.m_targetPos=Node("Boarding exit",root,V(point.exit));ladder.m_targetPos.localRotation=node.localRotation;node.localRotation=Quaternion.identity;
+                var box=node.gameObject.AddComponent<BoxCollider>();box.size=V(point.size);
             }
             else
             {
@@ -169,14 +171,11 @@ internal static partial class FinalFleetModels
     }
     private static void AddWaterMask(Transform root,Spec spec,Material material)
     {
-        var vertices=new List<Vector3>();var triangles=new List<int>();
-        for(int i=0;i<=24;i++)
-        {
-            float t=-1+2*i/24f;float width=spec.beam*.36f*Mathf.Pow(Mathf.Max(.02f,1-t*t),.7f);
-            vertices.Add(new Vector3(-width,spec.walkHeight-.01f,t*spec.length*.43f));vertices.Add(new Vector3(width,spec.walkHeight-.01f,t*spec.length*.43f));
-            if(i>0){int a=(i-1)*2;triangles.AddRange(new[]{a,a+2,a+1,a+1,a+2,a+3});}
-        }
-        var mesh=new Mesh{name="Fitted interior water mask"};owned.Add(mesh);mesh.SetVertices(vertices);mesh.SetTriangles(triangles,0);mesh.RecalculateBounds();
+        if(spec.waterMask.Length<4||spec.waterMask.Length%2!=0)throw new InvalidDataException("Missing fitted water mask");
+        var vertices=spec.waterMask.Select(V).ToArray();var triangles=new List<int>();
+        for(int i=2;i<vertices.Length;i+=2)
+        {int a=i-2;triangles.AddRange(new[]{a,a+2,a+1,a+1,a+2,a+3});}
+        var mesh=new Mesh{name="Fitted interior water mask"};owned.Add(mesh);mesh.vertices=vertices;mesh.SetTriangles(triangles,0);mesh.RecalculateNormals();mesh.RecalculateBounds();
         var node=Node("Interior water mask",root,Vector3.zero);node.gameObject.AddComponent<MeshFilter>().sharedMesh=mesh;
         var renderer=node.gameObject.AddComponent<MeshRenderer>();renderer.sharedMaterial=material;renderer.shadowCastingMode=ShadowCastingMode.Off;renderer.receiveShadows=false;
     }

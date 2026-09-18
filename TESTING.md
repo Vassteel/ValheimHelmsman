@@ -1,4 +1,4 @@
-# Helmsman validation — 0.2.32
+# Helmsman validation — 0.2.33
 
 ## Observed local play
 
@@ -22,7 +22,7 @@ Host doubles do not simulate Unity physics, GPU output or real network latency.
 
 | Area | Check |
 |---|---|
-| Startup | Matching 0.2.32 clients/server; no original Odin/LongshipUpgrades DLLs. Fleet, table, harbor items and whistle register without missing-script/shader errors. |
+| Startup | Matching 0.2.33 clients/server; no original Odin/LongshipUpgrades DLLs. Fleet, table, harbor items and whistle register without missing-script/shader errors. |
 | Existing world | Old hulls, names, styles and every cargo hold survive replacement/save/reload. Missing cargo items lock migration instead of losing contents. |
 | Construction | Two players try one table; materials are charged once. Restart midway; timer resumes. Occupied/shallow berth waits. Dismantling refunds once. Each hull fits its berth. |
 | Birds | Puffin tools, owl three-toss sorting, pelican peg leg/fishing and all sleeping poses. Feet stay on surfaces; no self-lit feathers indoors or at night. |
@@ -60,13 +60,13 @@ In-game acceptance remains pending: enable rock clearing on a Karve and approach
 
 Fish pass-through defaults on. Check fish remain alive, fishing/net interactions remain usable, and manual takeover/ending the voyage restores normal hull contact. Repeat with two clients; clearing requires the local peer to own both boat and rock.
 
-## Redesigned fleet acceptance (0.2.32)
+## Redesigned fleet acceptance (0.2.33)
 
 Automated geometry and binary-resource checks cover all six redesigned ships, rudder sweep, sail clearance, closed convex keel sections and continuous merchant cargo supports. The compiled DLL embeds the checked resources. These do not constitute an in-game physics test.
 
 Pending in-game: place each ship from Hammer → Helmsman; check maritime supply recipes at the Workbench and the puffin decoration-only menu; test stop/half/full sails and steering; board both ladders; sit and use the mast holdfast; open cargo (Currach: 3 × 2); walk the merchant load from end to end; change paint/cloth and reload. Check existing ships retain saved cargo and names, and test a second client observing seating, cargo and net fishing. Hull dimensions changed, so inspect existing moorings as well as newly launched ships.
 
-## Fleet rendering and movement pass (0.2.32)
+## Fleet rendering and movement pass (0.2.33)
 
 Automated checks cover authored sail anchors, recovery from a furled spawn, native-material selection, all six mesh payloads, cargo walking continuity and rudder clearance. Blender previews check walkway and rope placement; these are not in-game shader or sailing tests.
 
@@ -78,3 +78,12 @@ In-game acceptance still required:
 - Row and reverse the heavy freighter; check its standing helm position and moving steering oar.
 - Walk the widened Ottar/freighter decks and packed hold; check cargo, boarding and rope coils for clipping.
 - Slam into waves at speed; confirm vanilla translucent splashes, without black rectangles. Place Big Cargo without EffectArea errors.
+
+## Screenshot regression pass (0.2.33)
+
+The model checks now verify closed outward barrel/skin/sack shells, upward-facing water masks above the waterline, ladder reach from the water and supported boarding exits. Sail checks require visible bounded movement at reefed, half and full settings. These checks do not replace a live playtest.
+
+- Load existing ships as well as newly built ones. Swim to both rope ladders on all six redesigned hulls and use them to board.
+- Aim at the heavy freighter's tiller from the aft deck; take and release the helm.
+- Inspect barrels from every side, the Currach transom/bow joint, and water masking while looking down into Ceol and Currach in calm and rough water.
+- Cycle every sail setting on redesigned and retained ships, including after a reload. Watch for stretched legacy cloth, frozen sails, detached sheets or clipping.

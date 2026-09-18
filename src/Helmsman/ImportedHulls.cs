@@ -54,7 +54,14 @@ internal static partial class ImportedHulls
             prefab.AddComponent<ShipOarAnimation>();
             var sailAnimation=prefab.AddComponent<ImportedSailAnimation>();
             sailAnimation.FixedMast=sailAnimation.MeshFurl=FinalFleetModels.Has(blueprint.Source);
-            if(ship.m_sailObject){sailAnimation.RestScale=ship.m_sailObject.transform.localScale;sailAnimation.ConfiguredScale=true;}
+            if(ship.m_sailObject)
+            {
+                sailAnimation.RestScale=ship.m_sailObject.transform.localScale;
+                // These legacy Cloth rigs are stored reefed in the source bundle.
+                if(!sailAnimation.MeshFurl&&ship.m_sailObject.GetComponentInChildren<Cloth>(true)&&Mathf.Abs(sailAnimation.RestScale.y-.1f)<.001f)
+                    sailAnimation.RestScale.y=1;
+                sailAnimation.ConfiguredScale=true;
+            }
             ImportedShipMaterials.NativeWaterImpact(ship);
             if(!sailAnimation.MeshFurl&&blueprint.HasSail)prefab.AddComponent<ImportedSailFlutter>();
             ship.m_hasSail=blueprint.HasSail;

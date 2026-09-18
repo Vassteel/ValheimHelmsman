@@ -57,3 +57,15 @@ foreach(var kind in new[]{"ottar","freighter","snekkja","ceol"})
  Check(FleetSailShape.Weight(kind,new Vector3(0,5,.3f),8,2,2)>.99f,"Square sail middle billows");
 }
 Console.WriteLine($"PASS: {count} production sail checks including all six anchored sail shapes.");
+
+foreach(var kind in new[]{"ottar","freighter","snekkja","ceol","currach","falkusa"})
+{
+ var middle=kind=="currach"?new Vector3(.2f,2.1066667f,.23f):kind=="falkusa"?new Vector3(.7f,4.1166667f,-1.1f):new Vector3(0,5,.3f);
+ foreach(float amount in new[]{.1f,.5f,1f})
+ {
+  var samples=Enumerable.Range(0,100).Select(i=>FleetSailShape.Flutter(kind,middle,8,2,2,i*.05f,.6f,amount)).ToArray();
+  Check(samples.Max()-samples.Min()>.04f,kind+" has visible cloth motion even reefed");
+  Check(samples.All(v=>float.IsFinite(v)&&Math.Abs(v)<.33f),kind+" cloth motion stays bounded");
+ }
+}
+Console.WriteLine($"PASS: {count} sail checks including visible and bounded flutter at every reef setting.");

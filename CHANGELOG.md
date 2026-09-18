@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.33
+
+- Make rope ladders reachable from the water and place boarding exits on supported deck areas.
+- Restore the heavy freighter's helm interaction above the deck.
+- Close barrel staves, repair inward cargo surfaces, and seal the Currach stern and bow joint.
+- Fit native water masks to each redesigned hull opening to hide water inside the boats.
+- Increase wind motion on redesigned sails, retain fully deployed source meshes, and tether legacy cloth to prevent excessive stretching.
+- Correct legacy sails saved in a reefed pose so they can deploy fully.
+
 ## 0.2.32
 
 - Match redesigned ships to native wood and cloth materials; separate overlapping plank surfaces and restore vanilla water-impact splashes.
