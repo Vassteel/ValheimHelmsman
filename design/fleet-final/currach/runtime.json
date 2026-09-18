@@ -4,7 +4,7 @@
   "length": 5.5,
   "beam": 1.5,
   "walkHeight": 0.245,
-  "waterline": 0.22,
+  "waterline": 0.34,
   "points": [
     {
       "kind": "seat",
@@ -2351,6 +2351,8 @@
       ]
     }
   ],
+  "cargoSolids": [],
+  "cargoHeight": 0,
   "sheets": [
     {
       "head": [
@@ -2370,7 +2372,7 @@
     4.407448,
     0
   ],
-  "airHeight": 4.707447999999999,
+  "airHeight": 4.60458,
   "rudderPivot": [
     0,
     0.45,

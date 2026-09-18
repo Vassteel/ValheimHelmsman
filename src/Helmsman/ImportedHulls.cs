@@ -52,7 +52,11 @@ internal static partial class ImportedHulls
             if(!ship || !ship.m_floatCollider || !ship.m_shipControlls || !prefab.GetComponent<ZNetView>())
                 throw new InvalidOperationException(blueprint.Name+" is missing native ship components.");
             prefab.AddComponent<ShipOarAnimation>();
-            prefab.AddComponent<ImportedSailAnimation>().FixedMast=FinalFleetModels.Has(blueprint.Source);
+            var sailAnimation=prefab.AddComponent<ImportedSailAnimation>();
+            sailAnimation.FixedMast=sailAnimation.MeshFurl=FinalFleetModels.Has(blueprint.Source);
+            if(ship.m_sailObject){sailAnimation.RestScale=ship.m_sailObject.transform.localScale;sailAnimation.ConfiguredScale=true;}
+            ImportedShipMaterials.NativeWaterImpact(ship);
+            if(!sailAnimation.MeshFurl&&blueprint.HasSail)prefab.AddComponent<ImportedSailFlutter>();
             ship.m_hasSail=blueprint.HasSail;
             if(!blueprint.HasSail)ship.m_sailForceFactor=0;
             var piece=prefab.GetComponent<Piece>();piece.m_name=blueprint.Name;piece.m_usage=Piece.UsageTagFlags.Transport;

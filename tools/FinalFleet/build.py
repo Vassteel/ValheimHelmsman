@@ -2,7 +2,7 @@
 Run with the project's bpy Python. Earlier review assets are kept intact.
 """
 from pathlib import Path
-import bpy, ast, json, math, struct, gzip, io, sys, random, os
+import bpy, bmesh, ast, json, math, struct, gzip, io, sys, random, os
 import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
@@ -59,6 +59,9 @@ def finish(kind):
  points=json.loads((src/'attachment-points.json').read_text())['points']
  random.seed(1030)
  merchant=kind in ['ottar','freighter']
+ if kind=='freighter':
+  helm=next(p for p in points if 'helm' in p['kind'].lower())
+  helm['position']=[-6.45,-.5,2.34+.09*(6.45-4.85)+.047]
  # Clear stern clipping: head and bent tiller clear the entire raised stem/transom.
  if kind in ['currach','ceol','falkusa']:
   remove(ship.objects['Carved stern rudder']);remove(ship.objects['Rudder tiller'])
@@ -104,6 +107,15 @@ def finish(kind):
   for n in tree.body:
    if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id in ['L','beam','profile_w','profile_z'] for t in n.targets):exec(compile(ast.Module(body=[n],type_ignores=[]),'hull','exec'),env)
    if isinstance(n,ast.FunctionDef) and n.name in ['interp','hull','inside_width_at']:exec(compile(ast.Module(body=[n],type_ignores=[]),'hull','exec'),env)
+  # Extend the narrow side strips inboard to the width of the working landings.
+  # Original review models remain untouched; both hulls retain an open freight well.
+  for side in [-1,1]:
+   ys=[1.29,1.52] if kind=='ottar' else [1.54,1.81,2.08]
+   z=1.78 if kind=='ottar' else 2.33
+   for j,y in enumerate(ys):
+    xmax=edge-.12
+    while xmax>.2 and env['inside_width_at'](xmax,z)<y+.14:xmax-=.025
+    box('Side working extension',(0,side*y,z),(2*xmax,.214 if kind=='ottar' else .26,.082 if kind=='ottar' else .10),deckm[j%4],.005)
   cargo_report=restore(kind,src,ship,globals(),ROOT)
   cargo_solids,coverage,cargo_at=walking(kind,ship,edge,walkz,env['inside_width_at'],unity)
   cargo_height=cargo_at(-length*.13,beam*.17)+.06
@@ -113,18 +125,60 @@ def finish(kind):
   (dest/'cargo-support.json').write_text(json.dumps(cargo_report,indent=2))
  # Bow/stern working detail and belayed lines, kept away from player attachment points.
  for side in [-1,1]:
-  x=side*L*.70;z=walkz+(.11 if merchant else .03)
-  for y in [-beam*.18,beam*.18]:
+  x=side*L*.70
+  for yside in [-1,1]:
+   y=yside*beam*.18
+   if merchant:z=(1.80+.11*(abs(x)-3.98)+.0415) if kind=='ottar' else (2.34+.09*(abs(x)-4.85)+.047)
+   else:
+    rails=[o for o in ship.objects if 'gunwale' in o.name.lower()]
+    nearby=[o.matrix_world@v.co for o in rails for v in o.data.vertices if abs((o.matrix_world@v.co).x-x)<.15 and (o.matrix_world@v.co).y*yside>0]
+    y=sum(v.y for v in nearby)/len(nearby);z=max(v.z for v in nearby)
    box('Mooring cleat foot',(x,y,z+.035),(.24,.09,.07),oak,.006)
    tube('Mooring cleat horn',[(x-.17,y,z+.11),(x+.17,y,z+.11)],.025,oak,6)
-   for j in range(3):hoop('Belayed rope',(x,y,z+.13+j*.012),.115,.075,rope,.010)
+   pts=[]
+   for i in range(121):
+    t=i/120*6*pi;layer=i/120
+    pts.append((x+.145*cos(t),y+.042*sin(2*t),z+.11+.020*cos(2*t)+layer*.016))
+   tube('Cleat figure-eight belay',pts,.010,rope,6)
  # Belaying pegs, leather collars and low coil at each mast.
  mast=next((ob for ob in ship.objects if ob.name in ['Mast','Raked mast','Light mast','Heavy mast']),None)
  if mast:
-  lo,hi=bounds(mast);mx=(lo[0]+hi[0])/2 if kind!='falkusa' else .15
+  verts=[mast.matrix_world@v.co for v in mast.data.vertices];n=len(verts)//2
+  base=sum(verts[:n],Vector())/n;head=sum(verts[n:],Vector())/n
+  r0=sum((v-base).length for v in verts[:n])/n;r1=sum((v-head).length for v in verts[n:])/n
+  def mast_at(z):return base.lerp(head,(z-base.z)/(head.z-base.z))
+  pegcenter=mast_at(walkz+.68)
   for side in [-1,1]:
-   tube('Mast belaying peg',[(mx-.1,side*.08,walkz+.68),(mx-.1,side*.23,walkz+.68)],.024,oak,6)
-  for j in range(4):hoop('Mast foot rope serving',(mx,0,walkz+.17+j*.025),.18 if merchant else .09,.18 if merchant else .09,rope,.017)
+   tube('Mast belaying peg',[pegcenter,pegcenter+Vector((0,side*(.23 if merchant else .16),0))],.024,oak,6)
+  for j in range(4):
+   z=walkz+.17+j*.021;center=mast_at(z);t=(z-base.z)/(head.z-base.z);radius=r0+(r1-r0)*t+.011
+   hoop('Mast foot rope serving',center,radius,radius,rope,.012)
+ # Wooden blocks and rope seizings at real shroud attachments, not floating trim.
+ for ob in list(ship.objects):
+  if not ob.name.startswith(('Mast shroud','Standing shroud','Shroud')) or 'lashing' in ob.name.lower():continue
+  vs=[ob.matrix_world@v.co for v in ob.data.vertices]
+  if not vs:continue
+  low=min(v.z for v in vs);foot=sum((v for v in vs if v.z<low+.06),Vector())/sum(v.z<low+.06 for v in vs)
+  high=max(vs,key=lambda v:v.z);axis=(high-foot).normalized()
+  u=axis.cross(Vector((0,1,0))).normalized();v=axis.cross(u)
+  size=.065 if merchant else .042
+  for distance in [.17,.40]:
+   center=foot+axis*distance
+   # Two oval cheeks surround a transverse sheave; strop follows the shell.
+   for cheek in [-1,1]:
+    verts=[]
+    for depth in [cheek*size*.65-.009,cheek*size*.65+.009]:
+     verts.extend(center+u*depth+axis*(size*1.45*cos(t*pi/6))+v*(size*sin(t*pi/6)) for t in range(12))
+    faces=[tuple(reversed(range(12))),tuple(range(12,24))]+[(t,(t+1)%12,(t+1)%12+12,t+12) for t in range(12)]
+    mesh('Rigging pulley cheek',verts,faces,oak)
+   tube('Rigging pulley sheave',[center-u*size*.46,center+u*size*.46],size*.65,oak,10)
+   tube('Rigging pulley pin',[center-u*size*.87,center+u*size*.87],.010,iron,6)
+   tube('Rigging block strop',[center+axis*(size*1.65*cos(t*pi/16))+v*(size*1.15*sin(t*pi/16)) for t in range(33)],.010,rope,6)
+  for offset in [-.65,.65]:
+   line('Rigging pulley reeving',foot+axis*.17+v*size*offset,foot+axis*.40+v*size*offset,.010,rope)
+  for k in range(4):
+   center=foot+axis*(.07+k*.012)
+   tube('Shroud seizing knot',[center+u*.025*cos(t*pi/8)+v*.025*sin(t*pi/8) for t in range(17)],.007,rope,5)
  # Geometry checks directly address the reported clipping.
  def bvh(ob):return BVHTree.FromPolygons([ob.matrix_world@v.co for v in ob.data.vertices],[list(f.vertices) for f in ob.data.polygons])
  if kind in ['currach','ceol','falkusa']:
@@ -196,10 +250,48 @@ def finish(kind):
      x=-L*.75+i*L*1.5/96;p=env['hull'](x,.91,side,-.025)
      pts.append((x,p[1],p[2]+.040*sin(i*pi/4+row*pi)))
     tube('Carved merchant rope border',pts,.009,oak,5)
+ # Clinker laps need a physical lip. Previously adjacent bands shared nearly
+ # coplanar outer faces along each lap, producing moving moire/flicker.
+ for ob in ship.objects:
+  n=ob.name.lower()
+  if 'clinker strake' not in n and 'hull band' not in n:continue
+  if kind=='currach':continue # Skin strips butt together rather than overlap.
+  # Snekkja's top strake has boolean-cut ports rather than regular rings.
+  if len(ob.data.vertices)%4:
+   for vertex in ob.data.vertices:vertex.co.y+=(1 if vertex.co.y>0 else -1)*.009
+   continue
+  # Authored band vertices are lower outer, upper outer, lower inner, upper inner.
+  for i in range(0,len(ob.data.vertices),4):
+   for index in [i,i+2]:
+    vertex=ob.data.vertices[index]
+    vertex.co.y+=(1 if vertex.co.y>0 else -1)*.009
  # Thin cloth must render from inside and outside with native, backface-culling shaders.
  for ob in ship.objects:
   if any(k in ob.name.lower() for k in ['sail panel','sewn wool','red sailing cloth']) and not any(m.type=='SOLIDIFY' for m in ob.modifiers):
    ob.modifiers.new('Two sided cloth','SOLIDIFY').thickness=.004
+ # Close the currach's rounded bow: the original skin stopped short of the
+ # centreline, leaving a visible slot between port and starboard gunwales.
+ if kind=='currach':
+  bands=[o for o in ship.objects if 'hull band' in o.name]
+  for j in range(9):
+   pair=[o for o in bands if o.name.endswith('%02d'%j)]
+   a,b=pair
+   av=sorted([v.co.copy() for v in a.data.vertices if abs(v.co.x-L)<.001],key=lambda v:v.z)
+   bv=sorted([v.co.copy() for v in b.data.vertices if abs(v.co.x-L)<.001],key=lambda v:v.z)
+   mesh('Bow skin closure',[(L+.001,av[0].y,av[0].z),(L+.001,bv[0].y,bv[0].z),(L+.001,bv[-1].y,bv[-1].z),(L+.001,av[-1].y,av[-1].z)],[(0,1,2,3)],a.data.materials[0])
+  tips=[]
+  for side in [-1,1]:
+   rail=ship.objects['Gunwale '+str(side)];end=[v.co for v in rail.data.vertices if v.co.x>L-.06]
+   tips.append(sum(end,Vector())/len(end))
+  tube('Bow gunwale joint',[tips[0],Vector((L+.025,0,(tips[0].z+tips[1].z)/2)),tips[1]],.045,oak,8)
+ from ropework import finish as finish_ropework
+ rope_report=finish_ropework(kind,ship,globals(),length,beam,walkz)
+ (dest/'rope-support.json').write_text(json.dumps(rope_report,indent=2))
+ # Closed solids need outward normals on both sides of the hull. Backface
+ # culling prevents the inner/back surface fighting with its close outer face.
+ for ob in ship.objects:
+  if ob.type!='MESH':continue
+  bm=bmesh.new();bm.from_mesh(ob.data);bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(ob.data);bm.free()
  # Render state from the saved model, not the deck-only inspection pose.
  for ob in ship.objects:ob.hide_render=False
  ship.name='Helmsman '+kind+' final';scene=bpy.context.scene
@@ -227,7 +319,7 @@ def finish(kind):
   if m not in materials:materials.append(m)
   key=(group(ob),materials.index(m));v,t=meshdata(ob);dst=groups.setdefault(key,([],[]));offset=len(dst[0]);dst[0].extend(v);dst[1].extend(i+offset for i in t)
  # Cargo collision bridges small gaps independently of individual prop render meshes.
- metadata={'prefab':prefab,'name':kind,'length':length,'beam':beam,'walkHeight':walkz,'waterline':.60 if merchant else .22,'points':[], 'colliders':collisions,'hullSolids':hull_solids,'cargoSolids':cargo_solids,'cargoHeight':cargo_height,'sheets':sheets}
+ metadata={'prefab':prefab,'name':kind,'length':length,'beam':beam,'walkHeight':walkz,'waterline':{'ottar':.60,'freighter':.60,'snekkja':.22,'falkusa':.48,'ceol':.40,'currach':.34}[kind],'points':[], 'colliders':collisions,'hullSolids':hull_solids,'cargoSolids':cargo_solids,'cargoHeight':cargo_height,'sheets':sheets}
  for p in points:
   k=p['kind'].lower();id=p['id'].lower()
   typ='helm' if 'helm' in k or 'helm' in id else 'ladder' if 'ladder' in k else 'mast' if 'mast' in id or 'holdfast' in k else 'seat'

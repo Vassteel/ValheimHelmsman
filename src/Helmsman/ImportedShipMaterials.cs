@@ -13,6 +13,7 @@ internal static class ImportedShipMaterials
     private static readonly Dictionary<string,Material> owned=new();
     private static readonly Dictionary<string,Shader> native=new();
     private static Material? wood,cloth;
+    private static readonly Dictionary<string,Material> effects=new();
     internal static void Prepare()
     {
         Material[] From(string name)
@@ -26,11 +27,17 @@ internal static class ImportedShipMaterials
         var building=From("piece_workbench").Concat(From("piece_chest_wood")).ToArray();
         // Current ships can use cloth sails outside the legacy m_sailObject and
         // hull shaders other than Custom/Piece. Resolve actual renderer materials.
-        wood=building.Concat(materials).FirstOrDefault(m=>m.shader.name=="Custom/Piece")
+        wood=materials.FirstOrDefault(m=>m.name.IndexOf("ship_wood",StringComparison.OrdinalIgnoreCase)>=0)
+            ??materials.FirstOrDefault(m=>m.shader.name=="Custom/Piece")
             ??materials.Concat(building).FirstOrDefault(m=>WorldSurface(m.shader.name));
-        cloth=materials.FirstOrDefault(m=>WorldSurface(m.shader.name)&&m.name.IndexOf("sail",StringComparison.OrdinalIgnoreCase)>=0)??wood;
+        cloth=From("Karve").FirstOrDefault(m=>m.name.StartsWith("sail_white",StringComparison.OrdinalIgnoreCase))
+            ??materials.FirstOrDefault(m=>WorldSurface(m.shader.name)&&m.name.IndexOf("sail",StringComparison.OrdinalIgnoreCase)>=0)??wood;
         if(!wood||!cloth)throw new InvalidOperationException("No native world-surface material is available for maritime content.");
         foreach(var material in materials.Concat(building))native[material.shader.name]=material.shader;
+        var shipPrefab=PrefabManager.Instance.GetPrefab("VikingShip");
+        foreach(var renderer in shipPrefab?shipPrefab.GetComponentsInChildren<ParticleSystemRenderer>(true):Array.Empty<ParticleSystemRenderer>())
+            foreach(var material in renderer.sharedMaterials)
+                if(material&&material.shader){effects[material.name.Replace(" (Instance)","")]=material;native[material.shader.name]=material.shader;}
         Plugin.Instance.Record("Maritime materials: wood="+wood.name+" ("+wood.shader.name+"); cloth="+cloth.name+" ("+cloth.shader.name+").");
     }
     internal static bool WorldSurface(string shader)=>shader.StartsWith("Custom/",StringComparison.Ordinal)&&
@@ -45,7 +52,7 @@ internal static class ImportedShipMaterials
             for(int i=0;i<materials.Length;i++)
             {
                 var original=materials[i];if(!original)continue;
-                string key=source+"/"+original.GetInstanceID();
+                string key=source+"/"+renderer.GetType().Name+"/"+original.GetInstanceID();
                 if(!owned.TryGetValue(key,out var material))
                 {
                     string shaderName=original.shader?original.shader.name:"";
@@ -54,9 +61,14 @@ internal static class ImportedShipMaterials
                     bool special=shaderName.Contains("WaterMask")||shaderName.Contains("ShadowBlob")||renderer is ParticleSystemRenderer;
                     if(special)
                     {
-                        if(!native.TryGetValue(shaderName,out var shader))shader=Shader.Find(shaderName);
-                        if(!shader || !shader.isSupported){renderer.enabled=false;continue;}
-                        material=new Material(original){shader=shader};
+                        if(renderer is ParticleSystemRenderer && effects.TryGetValue(original.name.Replace(" (Instance)",""),out var effect))
+                            material=new Material(effect);
+                        else
+                        {
+                            if(!native.TryGetValue(shaderName,out var shader))shader=Shader.Find(shaderName);
+                            if(!shader || !shader.isSupported){renderer.enabled=false;continue;}
+                            material=new Material(original){shader=shader};
+                        }
                     }
                     else
                     {
@@ -114,7 +126,47 @@ internal static class ImportedShipMaterials
         foreach(var p in new[]{"_EmissionColor","_EmissiveColor","_NoiseGlowColor"})if(material.HasProperty(p))material.SetColor(p,Color.black);
         foreach(var p in new[]{"_Glossiness","_Metallic","_MetalGloss","_NoiseGlowEnabled"})if(material.HasProperty(p))material.SetFloat(p,0);
         material.DisableKeyword("_EMISSION");material.DisableKeyword("NOISEGLOW");
+        if(material.HasProperty("_MoveableObject"))material.SetFloat("_MoveableObject",1);
+        if(material.HasProperty("_AddSnow"))material.SetFloat("_AddSnow",0);
         material.globalIlluminationFlags=MaterialGlobalIlluminationFlags.EmissiveIsBlack;return material;
+    }
+    internal static Material FleetMaterial(string label,Color authored)
+    {
+        string n=label.ToLowerInvariant();
+        bool fabric=n.Contains("sail")||n.Contains("wool")||n.Contains("sack")||n.Contains("wrapping")||n.Contains("hide");
+        var mat=new Material(fabric?cloth!:wood!){name="Helmsman native "+label};
+        // These meshes already contain both cloth faces and closed plank thickness.
+        if(mat.HasProperty("_Cull"))mat.SetFloat("_Cull",2);
+        foreach(var property in new[]{"_MoveableObject"})if(mat.HasProperty(property))mat.SetFloat(property,1);
+        foreach(var property in new[]{"_AddSnow","_SwayDistance","_NoiseGlowEnabled"})if(mat.HasProperty(property))mat.SetFloat(property,0);
+        Color tint=Color.white;
+        if(n.Contains("tarred skin"))tint=new Color(.30f,.32f,.32f);
+        else if(n.Contains("iron")&&!n.Contains("oxide"))tint=new Color(.30f,.31f,.30f);
+        else if(n.Contains("red")||n.Contains("blue")||n.Contains("oxide")||n.Contains("ochre")&&!n.Contains("sail"))
+            tint=new Color(Mathf.Min(1,authored.r*2.2f),Mathf.Min(1,authored.g*2.2f),Mathf.Min(1,authored.b*2.2f));
+        else if(n.Contains("hide")||n.Contains("green")||n.Contains("striped wool"))tint=authored.gamma;
+        else if(n.Contains("sack")||n.Contains("knapsack")||n.Contains("wrapping"))tint=new Color(.92f,.84f,.65f);
+        else if(n.Contains("tarred standing"))tint=new Color(.42f,.40f,.36f);
+        else if(n.Contains("rope")||n.Contains("hemp")||n.Contains("bast"))tint=new Color(1,.94f,.77f);
+        else if(n.Contains("cloth")||n.Contains("sail")||n.Contains("wool"))tint=new Color(1,.96f,.84f);
+        else if(n.Contains("pine")||n.Contains("oak")||n.Contains("timber"))tint=new Color(1,.98f,.94f);
+        if(n.Contains("chalk"))
+        {
+            mat.mainTexture=cloth!.mainTexture;tint=new Color(.95f,.90f,.75f);
+            if(mat.HasProperty("_BumpMap"))mat.SetTexture("_BumpMap",null);
+        }
+        mat.color=tint;
+        mat.mainTextureScale=fabric?new Vector2(.3f,.3f):new Vector2(.35f,.5f);
+        mat.mainTextureOffset=Vector2.zero;
+        if(mat.HasProperty("_BumpMap"))mat.SetTextureScale("_BumpMap",mat.mainTextureScale);
+        return mat;
+    }
+    internal static void NativeWaterImpact(Ship ship)
+    {
+        var nativeShip=PrefabManager.Instance.GetPrefab("VikingShip").GetComponent<Ship>();
+        // Impact particles are spawned from an EffectList, outside the ship renderer
+        // hierarchy. Rebinding hull materials cannot repair these bundled shaders.
+        ship.m_waterImpactEffect=nativeShip.m_waterImpactEffect;
     }
     private static bool IsFabric(string name)=>name.StartsWith("Sail",StringComparison.OrdinalIgnoreCase)||name.StartsWith("Vela",StringComparison.OrdinalIgnoreCase)||name=="Cloth"||name=="HerculeSail"||name=="Roman Sail";
     private static Texture2D? Replacement(string source,string name,bool fabric)
@@ -162,5 +214,5 @@ internal static class ImportedShipMaterials
         owned[key]=material;return material;
     }
     internal static void Release()
-    {foreach(var material in owned.Values)if(material)UnityEngine.Object.Destroy(material);owned.Clear();native.Clear();wood=null;cloth=null;}
+    {foreach(var material in owned.Values)if(material)UnityEngine.Object.Destroy(material);owned.Clear();native.Clear();effects.Clear();wood=null;cloth=null;}
 }

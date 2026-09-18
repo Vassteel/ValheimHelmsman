@@ -14,6 +14,7 @@ public sealed class ShipOarAnimation : MonoBehaviour
     private IEnumerator Start()
     {
         if(ZNet.instance&&ZNet.instance.IsDedicated())yield break;
+        if(GetComponent<FinalShipPresentation>())yield break;
         ship=GetComponent<Ship>();
         oars=GetComponentsInChildren<Animator>(true).Where(a=>a.name=="Remos"||a.transform.parent&&a.transform.parent.name=="Remos").ToArray();
         foreach(var animator in oars){animator.Rebind();animator.Update(0);animator.enabled=false;}

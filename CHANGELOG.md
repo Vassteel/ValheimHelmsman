@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.32
+
+- Match redesigned ships to native wood and cloth materials; separate overlapping plank surfaces and restore vanilla water-impact splashes.
+- Repair sail furling, add wind movement, lower the small boats in the water and correct their helm poses.
+- Widen both merchant ships’ side walkways, improve rope coils and working pulley details, and close Currach’s bow gap.
+- Animate the heavy freighter’s steering oar in rowing gear and remove obsolete ship effect triggers.
+
 ## 0.2.31
 
 - Build ships and harbor pieces from Hammer → Helmsman; the puffin now handles paint and decoration.

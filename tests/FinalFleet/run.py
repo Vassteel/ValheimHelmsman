@@ -73,6 +73,14 @@ for name in sorted(expected):
     if i:assert abs(hs[i][j]-hs[i-1][j])/(x-xs[i-1])<=.361
     if j:assert abs(hs[i][j]-hs[i][j-1])/(y-ys[j-1])<=.361
   assert max(map(max,hs))-min(map(min,hs))>.1,'Cargo collision flattened into a floor'
+ rope=json.loads((ROOT/'design/fleet-final'/s['name']/'rope-support.json').read_text())
+ assert sum(p['kind']=='deck' and p['supported_samples']==241 for p in rope)==2,'Missing supported mooring coils'
+ assert sum(p['kind']=='hanging' for p in rope)==2,'Missing belaying-pin hanks'
+ if s['name'] in ['falkusa','ceol','currach']:
+  assert s['waterline']> .30,'Small boat draft was not lowered'
+ if s['name']=='freighter':
+  helm=next(p for p in s['points'] if p['kind']=='helm')
+  assert helm['position'][1]<2.7,'Standing helm must be on the deck, not the bench'
  assert 0<s['sailPivot'][1]<=s['airHeight']<25
  checks+=1;print(f'PASS: {name}: {triangles:,} triangles, {parts} material batches; sail, helm, boarding and collision resources valid.')
 print(f'PASS: all {checks} final fleet assets, closed keel sections and merchant hold coverage.')

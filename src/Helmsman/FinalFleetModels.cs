@@ -39,9 +39,9 @@ internal static partial class FinalFleetModels
         for(int i=0;i<nm;i++)
         {
             string label=Text(r);var png=Bytes(r,1024*1024);var color=new Color(Number(r),Number(r),Number(r),Number(r));
-            var mat=ImportedShipMaterials.BoatyardMaterial(png.Length>0?Color.white:color,false);mat.name="Helmsman final "+label;owned.Add(mat);
-            if(png.Length>0){var texture=new Texture2D(2,2,TextureFormat.RGBA32,true);owned.Add(texture);if(!ImageConversion.LoadImage(texture,png))throw new InvalidDataException("Bad final ship texture");texture.filterMode=FilterMode.Point;texture.wrapMode=TextureWrapMode.Repeat;mat.mainTexture=texture;}
-            if(mat.HasProperty("_Cull"))mat.SetFloat("_Cull",0);
+            // Read the packed study image to keep HMF compatibility; use the running
+            // game's corresponding wood/cloth texture and shader for the playable ship.
+            var mat=ImportedShipMaterials.FleetMaterial(label,color);owned.Add(mat);
             materials[i]=mat;
         }
         int parts=Count(r,256);
@@ -72,6 +72,7 @@ internal static partial class FinalFleetModels
         foreach(var group in prefab.GetComponentsInChildren<LODGroup>(true))Object.DestroyImmediate(group);
         foreach(var animator in prefab.GetComponentsInChildren<Animator>(true))animator.enabled=false;
         foreach(var light in prefab.GetComponentsInChildren<Light>(true))light.enabled=false;
+        foreach(var area in prefab.GetComponentsInChildren<EffectArea>(true))Object.DestroyImmediate(area);
         foreach(var c in prefab.GetComponentsInChildren<Collider>(true))
             if(c!=ship.m_floatCollider && c.name!="OnboardTrigger")Object.DestroyImmediate(c);
         foreach(var chair in prefab.GetComponentsInChildren<Chair>(true))Object.DestroyImmediate(chair);
@@ -88,7 +89,7 @@ internal static partial class FinalFleetModels
             var node=Node(part.Group+" "+parent.childCount,parent,part.Group=="sail"?-V(spec.sailPivot):part.Group=="rudder"?-V(spec.rudderPivot):Vector3.zero);
             node.gameObject.AddComponent<MeshFilter>().sharedMesh=part.Mesh;
             var renderer=node.gameObject.AddComponent<MeshRenderer>();renderer.sharedMaterial=part.Material;
-            renderer.shadowCastingMode=ShadowCastingMode.TwoSided;renderer.receiveShadows=true;
+            renderer.shadowCastingMode=ShadowCastingMode.On;renderer.receiveShadows=true;
         }
         var rig=prefab.AddComponent<FinalShipPresentation>();rig.Sail=sail;rig.Rudder=rudder;rig.Pivot=V(spec.sailPivot);
         rig.SheetHeads=spec.sheets.Select(s=>V(s.head)).ToArray();rig.SheetFeet=spec.sheets.Select(s=>V(s.foot)).ToArray();
@@ -96,6 +97,8 @@ internal static partial class FinalFleetModels
         rig.HullRenderers=visual.GetComponentsInChildren<MeshRenderer>(true).Where(r=>r.name.StartsWith("hull ")).ToArray();
         rig.Decorations=visual.GetComponentsInChildren<MeshRenderer>(true).Where(r=>r.name.StartsWith("decoration ")).Select(r=>r.gameObject).ToArray();
         rig.SailRenderers=sail.GetComponentsInChildren<MeshRenderer>(true);rig.AirHeight=spec.airHeight;
+        var motion=prefab.AddComponent<FleetSailMotion>();motion.Kind=spec.name;motion.Sail=sail;motion.Top=spec.sailPivot[1];
+        rig.Motion=motion;rig.Sculling=spec.name=="freighter";
         foreach(var solid in spec.colliders)
         {var node=Node("Hull solid",root,V(solid.position));node.gameObject.layer=LayerMask.NameToLayer("vehicle");var box=node.gameObject.AddComponent<BoxCollider>();box.size=V(solid.size);}
         foreach(var solid in spec.hullSolids.Concat(spec.cargoSolids??Array.Empty<HullSolid>()))
@@ -125,7 +128,7 @@ internal static partial class FinalFleetModels
             var facing=V(point.facing);if(facing.sqrMagnitude>.1f)node.localRotation=Quaternion.LookRotation(facing);
             if(point.kind=="helm")
             {
-                Rehome(controls.transform,root,position);controls.m_attachPoint=node;controls.m_attachAnimation="sit";controls.m_maxUseRange=2.5f;controls.m_detachOffset=new Vector3(0,.1f,.7f);
+                Rehome(controls.transform,root,position);controls.m_attachPoint=node;controls.m_attachAnimation=spec.name=="freighter"?"attach_mast":spec.name=="snekkja"?"sit":"attach_sitship";controls.m_maxUseRange=2.5f;controls.m_detachOffset=new Vector3(0,.1f,.7f);
                 var collider=controls.gameObject.AddComponent<BoxCollider>();collider.size=new Vector3(.65f,.16f,.35f);collider.center=new Vector3(0,-.08f,0);
                 ship.m_controlGuiPos=Node("Helm UI",root,position+Vector3.up);
             }
@@ -195,7 +198,7 @@ public sealed class FinalShipPresentation : MonoBehaviour
 {
     public Transform Sail=null!,Rudder=null!;public GameObject[] Decorations=Array.Empty<GameObject>();public Vector3 Pivot;public Vector3[] SheetHeads=Array.Empty<Vector3>(),SheetFeet=Array.Empty<Vector3>();
     public Material RopeMaterial=null!;public MeshRenderer[] HullRenderers=Array.Empty<MeshRenderer>(),SailRenderers=Array.Empty<MeshRenderer>();
-    public float AirHeight;
+    public float AirHeight;public FleetSailMotion? Motion;public bool Sculling;
     private LineRenderer[] sheets=Array.Empty<LineRenderer>();
     private readonly Dictionary<Renderer,Material> originals=new();private readonly List<Material> painted=new();
     private void Start()
@@ -207,10 +210,15 @@ public sealed class FinalShipPresentation : MonoBehaviour
     private void LateUpdate()
     {
         if(!Sail)return;
-        var ship=GetComponent<Ship>();if(Rudder&&ship)Rudder.localRotation=Quaternion.Euler(0,-8*ship.GetRudderValue(),0);
+        var ship=GetComponent<Ship>();if(Rudder&&ship)
+        {
+            bool rowing=Sculling&&(ship.GetSpeedSetting()==Ship.Speed.Slow||ship.GetSpeedSetting()==Ship.Speed.Back);
+            float stroke=rowing?Mathf.Sin(Time.time*2.4f)*5:0;
+            Rudder.localRotation=Quaternion.Euler(0,Mathf.Clamp(-8*ship.GetRudderValue()+stroke,-8,8),0);
+        }
         for(int i=0;i<sheets.Length;i++)
         {
-            var head=Pivot+Vector3.Scale(SheetHeads[i]-Pivot,Sail.localScale);
+            var head=Motion?Motion.Furl(SheetHeads[i]):Pivot+Vector3.Scale(SheetHeads[i]-Pivot,Sail.localScale);
             for(int j=0;j<9;j++){float t=j/8f;var p=Vector3.Lerp(head,SheetFeet[i],t);p.y-=Mathf.Sin(t*Mathf.PI)*.09f;sheets[i].SetPosition(j,p);}
         }
     }

@@ -26,3 +26,34 @@ int characterTicks=0;
 for(int i=0;i<50;i++) {if(ImportedSailCompatibility.Prefix(legacy,.02f))throw new NullReferenceException("Old ship has no current cloth rig");characterTicks++;}
 Check(characterTicks==50,"Compatibility path allows later character updates to execute every tick");
 Console.WriteLine($"PASS: {count} legacy sail regression checks using production code with game doubles.");
+
+var spawned=Make();var authored=spawned.GetComponent<ImportedSailAnimation>();authored.ConfiguredScale=true;authored.RestScale=new Vector3(1,1,1);
+spawned.m_sailObject.transform.localScale=new Vector3(1,.1f,1);spawned.Setting=Ship.Speed.Full;
+for(int i=0;i<100;i++)ImportedSailCompatibility.Prefix(spawned,.02f);
+Check(Math.Abs(spawned.m_sailObject.transform.localScale.y-1)<.0001f,"A ship spawned with a furled preview must still unfold to its authored size");
+authored.MeshFurl=true;spawned.Setting=Ship.Speed.Stop;
+for(int i=0;i<100;i++)ImportedSailCompatibility.Prefix(spawned,.02f);
+Check(Math.Abs(authored.FurlAmount-.1f)<.0001f&&spawned.m_sailObject.transform.localScale.y==1,"Diagonal sails furl through mesh anchors without collapsing their transform vertically");
+spawned.Setting=Ship.Speed.Full;
+for(int i=0;i<100;i++)ImportedSailCompatibility.Prefix(spawned,.02f);
+Check(Math.Abs(authored.FurlAmount-1)<.0001f,"Anchored sails reopen fully after reefing");
+Console.WriteLine($"PASS: {count} sail regression checks including furled spawn recovery and mesh furling.");
+
+void Close(Vector3 a,Vector3 b,string message)=>Check((a-b).sqrMagnitude<.000001f,message);
+var lateenA=new Vector3(.45f,1.95f,3.4f);var lateenB=new Vector3(.45f,8.65f,-3.25f);var clew=new Vector3(.45f,1.75f,-3.45f);
+Close(FleetSailShape.Anchor("falkusa",lateenA,9),lateenA,"Lateen tack stays on diagonal yard");
+Close(FleetSailShape.Anchor("falkusa",lateenB,9),lateenB,"Lateen peak stays on diagonal yard");
+var reef=Vector3.Lerp(FleetSailShape.Anchor("falkusa",clew,9),clew,.1f);
+Check(reef.y>4.8f&&reef.y<5,"Lateen clew reefs upward toward the diagonal spar rather than flattening horizontally");
+Check(FleetSailShape.Weight("falkusa",lateenA,9,0,4)<.001f,"Spar pin does not flutter away from its attachment");
+Check(FleetSailShape.Weight("falkusa",new Vector3(.7f,4.1166667f,-1.1f),9,0,4)>.9f,"Lateen interior has a free billowing area");
+var jibA=new Vector3(-.25f,1.48f,5.45f);Close(FleetSailShape.Anchor("falkusa",jibA,9),jibA,"Jib reefs to its own stay, independently of the main");
+var currachA=new Vector3(.125f,4.4f,1.12f);var currachC=new Vector3(.135f,.95f,1.12f);
+Close(FleetSailShape.Anchor("currach",currachA,5),currachA,"Currach sailhead stays on mast");Close(FleetSailShape.Anchor("currach",currachC,5),currachC,"Currach tack stays on mast");
+foreach(var kind in new[]{"ottar","freighter","snekkja","ceol"})
+{
+ var head=new Vector3(2,8,.3f);Close(FleetSailShape.Anchor(kind,head,8),head,"Square sailhead stays on its yard");
+ Check(FleetSailShape.Weight(kind,head,8,2,2)<.001f,"Square sail pinned edge does not flutter");
+ Check(FleetSailShape.Weight(kind,new Vector3(0,5,.3f),8,2,2)>.99f,"Square sail middle billows");
+}
+Console.WriteLine($"PASS: {count} production sail checks including all six anchored sail shapes.");

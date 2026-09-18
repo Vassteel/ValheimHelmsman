@@ -9,7 +9,9 @@ namespace Helmsman;
 // synchronized speed settings still run normally.
 public sealed class ImportedSailAnimation : MonoBehaviour
 {
-    public bool FixedMast;
+    public bool FixedMast,MeshFurl,ConfiguredScale;
+    public Vector3 RestScale;
+    public float FurlAmount=1;
     private Transform? sail;
     private Vector3 fullScale;
     internal void Tick(Ship ship,float delta)
@@ -20,11 +22,15 @@ public sealed class ImportedSailAnimation : MonoBehaviour
         if(ship.m_sailObject)
         {
             if(sail!=ship.m_sailObject.transform)
-            {sail=ship.m_sailObject.transform;fullScale=sail.localScale;}
+            {sail=ship.m_sailObject.transform;fullScale=ConfiguredScale?RestScale:sail.localScale;}
             float amount=speed==Ship.Speed.Full?1:speed==Ship.Speed.Half?.5f:.1f;
+            FurlAmount=Mathf.MoveTowards(FurlAmount,amount,delta);
+            if(!MeshFurl)
+            {
             var scale=fullScale;
             scale.y=Mathf.MoveTowards(sail.localScale.y,fullScale.y*amount,Mathf.Abs(fullScale.y)*delta);
             sail.localScale=scale;
+            }
         }
         if(FixedMast || !ship.m_mastObject || !EnvMan.instance)return;
         var root=ship.transform;

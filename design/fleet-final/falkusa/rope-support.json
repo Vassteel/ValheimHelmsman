@@ -1,0 +1,26 @@
+[
+  {
+    "kind": "deck",
+    "center": [
+      -2.3850000000000002,
+      0
+    ],
+    "supported_samples": 241
+  },
+  {
+    "kind": "deck",
+    "center": [
+      2.3850000000000002,
+      0
+    ],
+    "supported_samples": 241
+  },
+  {
+    "kind": "hanging",
+    "pin": "Mast belaying peg"
+  },
+  {
+    "kind": "hanging",
+    "pin": "Mast belaying peg.001"
+  }
+]

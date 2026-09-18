@@ -3599,6 +3599,8 @@
       ]
     }
   ],
+  "cargoSolids": [],
+  "cargoHeight": 0,
   "sheets": [
     {
       "head": [
@@ -3630,7 +3632,7 @@
     9.037314,
     0
   ],
-  "airHeight": 9.337314000000001,
+  "airHeight": 9.59,
   "rudderPivot": [
     1.15,
     1.15,

@@ -3,9 +3,9 @@
   "stern_clear": true,
   "materials": 37,
   "batches": 48,
-  "vertices": 436301,
-  "triangles": 233330,
-  "walk_slabs": 104,
+  "vertices": 507227,
+  "triangles": 268386,
+  "walk_slabs": 108,
   "cargo_supports": 144,
   "settled_props": 78
 }

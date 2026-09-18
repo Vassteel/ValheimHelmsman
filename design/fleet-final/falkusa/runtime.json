@@ -4,7 +4,7 @@
   "length": 9.0,
   "beam": 2.7,
   "walkHeight": 0.32,
-  "waterline": 0.22,
+  "waterline": 0.48,
   "points": [
     {
       "kind": "seat",
@@ -2681,6 +2681,8 @@
       ]
     }
   ],
+  "cargoSolids": [],
+  "cargoHeight": 0,
   "sheets": [
     {
       "head": [

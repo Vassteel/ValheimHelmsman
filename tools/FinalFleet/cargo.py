@@ -71,6 +71,16 @@ def restore(kind, src, ship, env, root):
     for name, objects in groups:
         solid = [ob for ob in objects if not any(k in ob.name.lower() for k in ['binding', 'neck tie', 'seam', 'joint', 'knot', 'hoop', 'edge'])]
         vertices = [ob.matrix_world @ v.co for ob in solid for v in ob.data.vertices]
+        # Stow side props within the narrower freight well, below the walking decks.
+        half = 1.16 if kind == 'ottar' else 1.39
+        edge = 3.98 if kind == 'ottar' else 4.85
+        xmin,xmax=min(v.x for v in vertices),max(v.x for v in vertices)
+        ymin,ymax=min(v.y for v in vertices),max(v.y for v in vertices)
+        if xmin>-edge and xmax<edge and (ymax>half or ymin<-half):
+            shift=half-ymax if (ymin+ymax)>0 else -half-ymin
+            for ob in objects:ob.location.y+=shift
+            bpy.context.view_layer.update()
+            vertices=[ob.matrix_world@v.co for ob in solid for v in ob.data.vertices]
         low = min(v.z for v in vertices)
         support = tree(base)
         gaps = []
@@ -98,7 +108,7 @@ def walking(kind, ship, edge, walkz, width, unity):
     nx, ny = 12, 6
     xs = np.linspace(-edge, edge, nx + 1)
     # Join the real side walkways rather than covering the entire gunwale.
-    half = 1.74 if kind == 'ottar' else 2.24
+    half = 1.19 if kind == 'ottar' else 1.42
     ys = np.linspace(-half, half, ny + 1)
     heights = np.full((nx + 1, ny + 1), walkz)
     for i, x in enumerate(xs):
