@@ -62,6 +62,7 @@ internal static partial class ImportedHulls
                     sailAnimation.RestScale.y=1;
                 sailAnimation.ConfiguredScale=true;
             }
+            FleetStability.Apply(ship);
             ImportedShipMaterials.NativeWaterImpact(ship);
             if(!sailAnimation.MeshFurl&&blueprint.HasSail)prefab.AddComponent<ImportedSailFlutter>();
             ship.m_hasSail=blueprint.HasSail;

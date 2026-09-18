@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.34
+
+- Reduce excessive heeling across imported ships with hull-sized sail leverage and stronger roll damping.
+- Lower Big Cargo’s ride height by 20 cm.
+- Add working halyard and jib rigging, fish-filled crates, a rolled net, bait bucket and lashed supplies to Falkuša.
+
 ## 0.2.33
 
 - Make rope ladders reachable from the water and place boarding exits on supported deck areas.

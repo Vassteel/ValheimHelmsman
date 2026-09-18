@@ -17,6 +17,10 @@ for kind in ['ottar','freighter','snekkja','falkusa','ceol','currach']:
   assert all(e.is_manifold for e in bm.edges),(kind,ob.name,'open surface disappears from one side')
   assert bm.calc_volume(signed=True)>1e-8,(kind,ob.name,'inward-facing solid')
   bm.free();ev.to_mesh_clear();checked+=1
+ if kind=='falkusa':
+  for ob in objects:
+   if ob.name.startswith(('Jib turning block','Jib belaying cleat','Jib supporting stay')):
+    assert not any(m.type=='SOLIDIFY' for m in ob.modifiers),(ob.name,'Solid rig fittings mistaken for cloth')
  if kind=='currach':assert 'Currach bow cap' in objects
  s=json.loads((folder/'runtime.json').read_text());mask=s['waterMask']
  assert len(mask)>=40 and len(mask)%2==0

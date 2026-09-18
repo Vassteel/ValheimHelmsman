@@ -92,6 +92,11 @@ def finish(kind):
   for t in [.12,.32,.53,.73,.9]:
    a=Vector((3.4,-.45,1.95)).lerp(Vector((-3.25,-.45,8.65)),t)
    tube('Lateen yard robands',[a+Vector((0,-.035,-.025)),a+Vector((0,.08,.035)),a+Vector((0,0,.085)),a+Vector((0,-.035,-.025))],.012,rope,6)
+ if kind=='falkusa':
+  from falkusa_rigging import finish as rig_fishing
+  rig_fishing(ship,globals())
+  from falkusa_cargo import finish as dress_fishing
+  dress_fishing(ship,globals())
  if kind=='currach':
   for ob in ship.objects:
    if ob.name.startswith('Red sailing cloth'):translate(ob,(0,-.105,0))
@@ -267,7 +272,7 @@ def finish(kind):
     vertex.co.y+=(1 if vertex.co.y>0 else -1)*.009
  # Thin cloth must render from inside and outside with native, backface-culling shaders.
  for ob in ship.objects:
-  if any(k in ob.name.lower() for k in ['sail panel','sewn wool','red sailing cloth','lateen mainsail','jib']) and not any(k in ob.name.lower() for k in ['rope','seam']) and not any(m.type=='SOLIDIFY' for m in ob.modifiers):
+  if (ob.name.lower()=='jib' or any(k in ob.name.lower() for k in ['sail panel','sewn wool','red sailing cloth','lateen mainsail'])) and not any(k in ob.name.lower() for k in ['rope','seam']) and not any(m.type=='SOLIDIFY' for m in ob.modifiers):
    ob.modifiers.new('Two sided cloth','SOLIDIFY').thickness=.004
  # Close the currach's rounded bow: the original skin stopped short of the
  # centreline, leaving a visible slot between port and starboard gunwales.
@@ -322,7 +327,7 @@ def finish(kind):
   if n.startswith('carved merchant'):return 'decoration'
   if n in ['steering oar / single carved oak','steering oar single carved oak','carved stern rudder','raised bent tiller']:return 'rudder'
   if 'sail' in n and not any(k in n for k in ['yard','spare','roll','mast lacing']):return 'sail'
-  if n.startswith(('lateen mainsail','jib','red sailing cloth')):return 'sail'
+  if n=='jib' or n.startswith(('lateen mainsail','jib bolt rope','jib stitched seam','red sailing cloth')):return 'sail'
   if 'clinker strake' in n or 'hull band' in n:return 'hull'
   return 'fixed'
  for ob in ship.objects:
@@ -342,7 +347,7 @@ def finish(kind):
   top=max(v.z for v in near);width=max(abs(v.y) for v in near)
   water_mask.extend([unity((x,max(.006,width-.025),top-.025)),unity((x,-max(.006,width-.025),top-.025))])
  # Cargo collision bridges small gaps independently of individual prop render meshes.
- metadata={'prefab':prefab,'name':kind,'length':length,'beam':beam,'walkHeight':walkz,'waterline':{'ottar':.60,'freighter':.60,'snekkja':.22,'falkusa':.48,'ceol':.40,'currach':.34}[kind],'points':[], 'colliders':collisions,'hullSolids':hull_solids,'cargoSolids':cargo_solids,'cargoHeight':cargo_height,'sheets':sheets,'waterMask':water_mask}
+ metadata={'prefab':prefab,'name':kind,'length':length,'beam':beam,'walkHeight':walkz,'waterline':{'ottar':.60,'freighter':.80,'snekkja':.22,'falkusa':.48,'ceol':.40,'currach':.34}[kind],'points':[], 'colliders':collisions,'hullSolids':hull_solids,'cargoSolids':cargo_solids,'cargoHeight':cargo_height,'sheets':sheets,'waterMask':water_mask}
  for p in points:
   k=p['kind'].lower();id=p['id'].lower()
   typ='helm' if 'helm' in k or 'helm' in id else 'ladder' if 'ladder' in k else 'mast' if 'mast' in id or 'holdfast' in k else 'seat'

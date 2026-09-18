@@ -1,4 +1,4 @@
-# Helmsman validation — 0.2.33
+# Helmsman validation — 0.2.34
 
 ## Observed local play
 
@@ -6,7 +6,7 @@ Earlier builds have been used for departure, ongoing land avoidance, gull intera
 
 ## Automated verification
 
-Release compilation: zero warnings/errors. Current checks:
+Release compilation: zero errors and six existing unused construction-field warnings. Current checks:
 
 - 357 Core checks: routing, boarding, shoreline clearance, ship eligibility, construction phases/durations and upgrade costs.
 - 64 production interaction/cargo checks; 28 whistle checks; 16 summon-lifetime checks.
@@ -22,7 +22,7 @@ Host doubles do not simulate Unity physics, GPU output or real network latency.
 
 | Area | Check |
 |---|---|
-| Startup | Matching 0.2.33 clients/server; no original Odin/LongshipUpgrades DLLs. Fleet, table, harbor items and whistle register without missing-script/shader errors. |
+| Startup | Matching 0.2.34 clients/server; no original Odin/LongshipUpgrades DLLs. Fleet, table, harbor items and whistle register without missing-script/shader errors. |
 | Existing world | Old hulls, names, styles and every cargo hold survive replacement/save/reload. Missing cargo items lock migration instead of losing contents. |
 | Construction | Two players try one table; materials are charged once. Restart midway; timer resumes. Occupied/shallow berth waits. Dismantling refunds once. Each hull fits its berth. |
 | Birds | Puffin tools, owl three-toss sorting, pelican peg leg/fishing and all sleeping poses. Feet stay on surfaces; no self-lit feathers indoors or at night. |
@@ -87,3 +87,11 @@ The model checks now verify closed outward barrel/skin/sack shells, upward-facin
 - Aim at the heavy freighter's tiller from the aft deck; take and release the helm.
 - Inspect barrels from every side, the Currach transom/bow joint, and water masking while looking down into Ceol and Currach in calm and rough water.
 - Cycle every sail setting on redesigned and retained ships, including after a reload. Watch for stretched legacy cloth, frozen sails, detached sheets or clipping.
+
+## Stability and fishing gear pass (0.2.34)
+
+Production stability tests compare native buoyancy and crosswind torque at 15 degrees for all six redesigned beams. This is a flat-water calculation, not a hard roll limit or a live wave simulation.
+
+- Sail every imported hull across strong wind, turn and reverse; check roll recovers naturally without the earlier excessive heel.
+- Compare Big Cargo’s draft in deep calm water: hull immersion increases by 20 cm; recheck helm, both boarding ladders and dry deck.
+- Inspect Falkuša fish crates, tied net, bucket and supply bundle for support and clear movement; cycle both sails and check new blocks stay fixed while sheets follow the clews.

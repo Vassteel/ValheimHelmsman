@@ -1,10 +1,10 @@
 {
   "mast_clear": true,
   "stern_clear": true,
-  "materials": 22,
-  "batches": 24,
-  "vertices": 185893,
-  "triangles": 93040,
+  "materials": 24,
+  "batches": 26,
+  "vertices": 200539,
+  "triangles": 101390,
   "walk_slabs": 113,
   "cargo_supports": 0,
   "settled_props": 0

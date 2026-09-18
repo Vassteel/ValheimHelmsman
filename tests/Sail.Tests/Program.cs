@@ -69,3 +69,19 @@ foreach(var kind in new[]{"ottar","freighter","snekkja","ceol","currach","falkus
  }
 }
 Console.WriteLine($"PASS: {count} sail checks including visible and bounded flutter at every reef setting.");
+
+// Flat-water static torque model from Ship.CustomFixedUpdate: four buoyancy
+// samples use signed squared immersion; sail impulse is applied every step.
+foreach(var beam in new[]{1.5f,1.8f,2.47f,2.7f,4.8f,6.3f})
+{
+ var boat=Make();boat.m_floatCollider.size=new Vector3(beam,.5f,6);boat.m_sailForceOffset=2;
+ FleetStability.Apply(boat);
+ Check(boat.m_sailForceOffset<=.22f&&boat.m_sailForceOffset>0,"Gentle nonzero sail leverage for every hull");
+ Check(boat.m_angularDamping>=.12f,"Small hull roll oscillations are damped");
+ double angle=15*Math.PI/180;
+ double restoring=50*2*(beam/2)*Math.Cos(angle)*Math.Pow(.15*(beam/2)*Math.Sin(angle),2);
+ double heeling=50*.06*.7071*boat.m_sailForceOffset*Math.Cos(angle);
+ Check(restoring>heeling,"Native restoring torque exceeds strong crosswind by 15 degrees");
+ var lever=boat.m_sailForceOffset;FleetStability.Apply(boat);Check(boat.m_sailForceOffset==lever,"Stability settings are idempotent");
+}
+Console.WriteLine($"PASS: {count} sail and fleet stability checks.");
