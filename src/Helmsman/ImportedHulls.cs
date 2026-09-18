@@ -31,29 +31,15 @@ internal static partial class ImportedHulls
         var visualBindings=ShipCosmetics.ReadBindings();
         foreach(var blueprint in ShipConstruction.Blueprints.Where(b=>b.Id!="longship"))
         {
-            var prefab=Clone(FinalFleetModels.Template(blueprint.Source),blueprint.Prefab);
-            ImportedShipMaterials.Apply(prefab,FinalFleetModels.Template(blueprint.Source));
-            if(FinalFleetModels.Has(blueprint.Source))FinalFleetModels.Apply(prefab,blueprint.Source);
-            else BoatyardModels.Apply(prefab,blueprint.Source);
-            // The merchant lamp's animated point light sweeps full-strength shadows
-            // across nearby hull surfaces. Keep its warm light steady on a moving ship.
-            if(blueprint.Source=="MercantShip")
-            {
-                var lamp=prefab.transform.Find("ship/visual/Customize/TraderLamp");
-                if(lamp)
-                {
-                    foreach(var flicker in lamp.GetComponentsInChildren<LightFlicker>(true))
-                    {flicker.m_flickerIntensity=0;flicker.m_flickerSpeed=0;flicker.m_movement=0;}
-                    foreach(var light in lamp.GetComponentsInChildren<Light>(true))
-                    {light.shadows=LightShadows.None;light.color=new Color(1f,.78f,.52f);light.intensity=1.5f;light.range=7f;}
-                }
-            }
+            var model=blueprint.Source;
+            var prefab=NativeFleetFactory.Create(blueprint);
+            FinalFleetModels.Apply(prefab,model);
             var ship=prefab.GetComponent<Ship>();
             if(!ship || !ship.m_floatCollider || !ship.m_shipControlls || !prefab.GetComponent<ZNetView>())
                 throw new InvalidOperationException(blueprint.Name+" is missing native ship components.");
             prefab.AddComponent<ShipOarAnimation>();
             var sailAnimation=prefab.AddComponent<ImportedSailAnimation>();
-            sailAnimation.FixedMast=sailAnimation.MeshFurl=FinalFleetModels.Has(blueprint.Source);
+            sailAnimation.FixedMast=sailAnimation.MeshFurl=true;
             if(ship.m_sailObject)
             {
                 sailAnimation.RestScale=ship.m_sailObject.transform.localScale;
@@ -87,31 +73,9 @@ internal static partial class ImportedHulls
             var binding=visualBindings.FirstOrDefault(b=>b.prefab==blueprint.Prefab);
             var cosmetics=prefab.AddComponent<ShipCosmetics>();
             cosmetics.Binding=binding??new ShipCosmeticBinding {prefab=blueprint.Prefab};
-            Material[] Styles(string[] paths,bool cloth)=>paths.Select(path=>ImportedShipMaterials.Style(bundle!.LoadAsset<Material>(path),cloth)).ToArray();
-            if(binding!=null)
-            {
-                cosmetics.SailStyles=Styles(binding.SailMaterials,true);cosmetics.ShieldStyles=Styles(binding.ShieldMaterials,false);cosmetics.HullStyles=Styles(binding.HullMaterials,false);
-                // Index zero uses the freshly painted default hull/sail, retaining the
-                // original material variants as optional saved style choices.
-                void Default(Material[] choices,string path){var renderer=path.Length>0?prefab.transform.Find(path)?.GetComponent<Renderer>():null;if(choices.Length>0&&renderer)choices[0]=renderer.sharedMaterial;}
-                Default(cosmetics.SailStyles,binding.SailRenderer);Default(cosmetics.HullStyles,binding.HullRenderers.FirstOrDefault()??"");
-            }
             FinalFleetModels.ConfigureStyles(prefab,cosmetics);
-            if(blueprint.Source=="HerculeShip"&&!FinalFleetModels.Has(blueprint.Source))
-            {
-                var net=prefab.transform.Find("FishingNetSystem/CatchTrigger").gameObject.AddComponent<ShipFishingNet>();
-                net.Chest=prefab.transform.Find("piece_chest").GetComponent<Container>();
-                net.Visual=prefab.transform.Find("FishingNetSystem/RedePesca").gameObject;
-                var handle=prefab.transform.Find("FishingNetSystem/RedePesca").gameObject.AddComponent<NetInteraction>();
-                handle.Net=net;
-                // A separate handle stays visible when the net is stowed.
-                var handleObject=new GameObject("Fishing net handle");handleObject.transform.SetParent(net.transform.parent,false);
-                handleObject.transform.localPosition=new Vector3(0,.8f,0);
-                var trigger=handleObject.AddComponent<SphereCollider>();trigger.radius=.45f;
-                handleObject.AddComponent<NetInteraction>().Net=net;
-            }
             BoatyardModels.RefreshIcon(prefab);
-            PieceManager.Instance.AddPiece(new CustomPiece(prefab,true,new PieceConfig {
+            PieceManager.Instance.AddPiece(new CustomPiece(prefab,false,new PieceConfig {
                 Name=blueprint.Name,Description=piece.m_description,PieceTable="Hammer",Category="Helmsman",
                 CraftingStation="piece_workbench",Requirements=Costs(blueprint.Recipe)
             }));

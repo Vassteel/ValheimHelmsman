@@ -1,13 +1,6 @@
 {
   "entries": [
     {
-      "prefab": "HerculeShip",
-      "kind": "net",
-      "path": "FishingNetSystem/CatchTrigger",
-      "container": "piece_chest",
-      "visual": "FishingNetSystem/RedePesca"
-    },
-    {
       "prefab": "FishingDock",
       "kind": "dock",
       "path": "",

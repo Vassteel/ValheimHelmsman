@@ -17,8 +17,8 @@ internal static partial class FinalFleetModels
     private sealed class Model {internal Spec Spec=null!;internal readonly List<Part> Parts=new();}
     private static readonly Dictionary<string,Model> cache=new();
     private static readonly List<Object> owned=new();
-    internal static bool Has(string name)=>new[]{"MercantShip","BigCargoShip","WarShip","HerculeShip","LittleBoat","HelmsmanCurrach"}.Contains(name);
-    internal static string Template(string name)=>name=="HelmsmanCurrach"?"LittleBoat":name;
+    internal static bool Has(string name)=>new[]{"MercantShip","BigCargoShip","WarShip","HerculeShip","LittleBoat","HelmsmanCurrach","HelmsmanDugout","HelmsmanFinewoodKayak","HelmsmanTandemKayak"}.Contains(name);
+    internal static bool PaddleCraft(string name)=>name is "HelmsmanDugout" or "HelmsmanFinewoodKayak" or "HelmsmanTandemKayak";
     private static Vector3 V(float[] values)
     {if(values.Length!=3||values.Any(v=>float.IsNaN(v)||float.IsInfinity(v)))throw new InvalidDataException("Invalid final fleet vector");return new Vector3(values[0],values[1],values[2]);}
     private static int Count(BinaryReader r,int max)
@@ -83,16 +83,19 @@ internal static partial class FinalFleetModels
         var mast=Node("Rig",visual,Vector3.zero);
         var sail=Node("Sail",mast,V(spec.sailPivot));
         var rudder=Node("Steering rudder",visual,V(spec.rudderPivot));
+        var paddle=Node("Paddle template",visual,Vector3.zero);
         ship.m_mastObject=mast.gameObject;ship.m_sailObject=sail.gameObject;
         ship.m_rudderObject=null!; // Retired source rudder must not rotate an unrelated hidden hierarchy.
         foreach(var part in model.Parts)
         {
-            var parent=part.Group=="sail"?sail:part.Group=="rudder"?rudder:visual;
+            var parent=part.Group=="paddle"?paddle:part.Group=="sail"?sail:part.Group=="rudder"?rudder:visual;
             var node=Node(part.Group+" "+parent.childCount,parent,part.Group=="sail"?-V(spec.sailPivot):part.Group=="rudder"?-V(spec.rudderPivot):Vector3.zero);
             node.gameObject.AddComponent<MeshFilter>().sharedMesh=part.Mesh;
             var renderer=node.gameObject.AddComponent<MeshRenderer>();renderer.sharedMaterial=part.Material;
             renderer.shadowCastingMode=ShadowCastingMode.On;renderer.receiveShadows=true;
         }
+        paddle.gameObject.SetActive(false);
+        if(PaddleCraft(name)){var craft=prefab.AddComponent<PaddleCraftRig>();craft.PaddleTemplate=paddle.gameObject;craft.DoubleBlade=name!="HelmsmanDugout";}
         var rig=prefab.AddComponent<FinalShipPresentation>();rig.Sail=sail;rig.Rudder=rudder;rig.Pivot=V(spec.sailPivot);
         rig.SheetHeads=spec.sheets.Select(s=>V(s.head)).ToArray();rig.SheetFeet=spec.sheets.Select(s=>V(s.foot)).ToArray();
         rig.RopeMaterial=ImportedShipMaterials.BoatyardMaterial(new Color(.38f,.29f,.16f),false);owned.Add(rig.RopeMaterial);
@@ -133,6 +136,7 @@ internal static partial class FinalFleetModels
                 Rehome(controls.transform,root,position);controls.gameObject.SetActive(true);controls.gameObject.layer=LayerMask.NameToLayer("piece_nonsolid");controls.enabled=true;controls.m_attachPoint=node;controls.m_attachAnimation=spec.name=="freighter"?"attach_mast":spec.name=="snekkja"?"sit":"attach_sitship";controls.m_maxUseRange=2.5f;controls.m_detachOffset=new Vector3(0,.1f,.7f);
                 var collider=controls.gameObject.AddComponent<BoxCollider>();collider.size=new Vector3(.70f,.65f,.55f);collider.center=new Vector3(0,spec.name=="freighter"?.85f:.25f,0);
                 ship.m_controlGuiPos=Node("Helm UI",root,position+Vector3.up);
+                if(PaddleCraft(name))controls.m_attachAnimation="sit";
             }
             else if(point.kind=="ladder")
             {
@@ -150,6 +154,7 @@ internal static partial class FinalFleetModels
         for(int i=0;i<holds.Length;i++)
         {
             var hold=holds[i];var position=new Vector3((i%2==0?1:-1)*spec.beam*.17f,(spec.cargoHeight>0?spec.cargoHeight:spec.walkHeight+.06f),-spec.length*.13f+(i/2)*.85f);
+            if(PaddleCraft(name))position=new Vector3(0,spec.name=="dugout"?.415f:.68f,spec.name=="tandem"?0:spec.length*.29f);
             if(spec.name=="ceol")position=new Vector3(-.27f,.65f,-1.28f);
             if(spec.name=="currach")position=new Vector3(.32f,.5f,-.8f);
             if(spec.name=="snekkja")position=new Vector3(i%2==0?-.3f:.3f,1.04f,i<2?-6.3f:6.3f);
@@ -188,7 +193,7 @@ internal static partial class FinalFleetModels
         Material Choice(string name,Color color){var m=ImportedShipMaterials.BoatyardMaterial(color,false);m.name=name;owned.Add(m);return m;}
         cosmetics.HullStyles=new[]{Choice("Weathered timber",Color.white),Choice("Red ochre",new Color(.65f,.25f,.14f)),Choice("Deep blue",new Color(.21f,.39f,.57f)),Choice("Ochre",new Color(.82f,.62f,.27f)),Choice("Carved timber",Color.white)};
         if(prefab.name!="MercantShip"&&prefab.name!="BigCargoShip")cosmetics.HullStyles=cosmetics.HullStyles.Take(4).ToArray();
-        cosmetics.SailStyles=new[]{Choice("Original cloth",Color.white),Choice("Unbleached linen",new Color(1,.95f,.8f)),Choice("Red wool",new Color(.65f,.23f,.16f)),Choice("Blue wool",new Color(.37f,.54f,.7f))};
+        cosmetics.SailStyles=PaddleCraft(prefab.name)?Array.Empty<Material>():new[]{Choice("Original cloth",Color.white),Choice("Unbleached linen",new Color(1,.95f,.8f)),Choice("Red wool",new Color(.65f,.23f,.16f)),Choice("Blue wool",new Color(.37f,.54f,.7f))};
     }
     internal static void Release(){foreach(var obj in owned)if(obj)Object.Destroy(obj);owned.Clear();cache.Clear();}
 }

@@ -21,13 +21,19 @@ foreach(var name in new[]{"icon.png","model.json","model.bin"})
  var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Gullcall."+name);
  if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,"assets/gullcall",name))))throw new Exception("Stale embedded "+name);
 }
-// Check the exact six runtime mesh payloads, including new sail and collision data.
+// Check the exact nine runtime mesh payloads, including new sail and collision data.
 foreach(var file in Directory.GetFiles(Path.Combine(root,"assets/ships/final"),"*.bin.gz"))
 {
  var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Ships.final."+Path.GetFileName(file));
  if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(file)))throw new Exception("Stale final fleet asset "+file);
 }
-if(mod.Resources.Count(r=>r.Name.StartsWith("Helmsman.Ships.final."))!=6)throw new Exception("Missing final fleet resources");
+if(mod.Resources.Count(r=>r.Name.StartsWith("Helmsman.Ships.final."))!=9)throw new Exception("Missing final fleet resources");
+foreach(var pair in new[]{("Helmsman.Ships.bundle","assets/ships/helmsman-ships"),("Helmsman.Ships.boatyard","assets/ships/redesign/models.bin.gz")})
+{
+ var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name==pair.Item1);
+ if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,pair.Item2))))throw new Exception("Stale stripped content: "+pair.Item1);
+}
+if(mod.Resources.Any(r=>r.Name.StartsWith("Helmsman.Shipwright.hulls/")))throw new Exception("Retired ship textures still embedded");
 var hook=mod.Types.Single(t=>t.Name=="UseGullcallWhistle").Methods.Single(m=>m.Name=="Prefix");
 var target=resolver.Resolve(new AssemblyNameReference("assembly_valheim",new Version(0,0,0,0))).MainModule.Types.Single(t=>t.Name=="Humanoid").Methods.Single(m=>m.Name=="UseItem");
 if(target.ReturnType.FullName!="System.Void")throw new Exception("Unexpected UseItem return type");
@@ -74,12 +80,6 @@ foreach(var name in new[]{"sail-sea-flax","canopy-sea-flax","ballista-weathered"
 {
  var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Shipwright."+name+".png");
  if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,"assets/shipwright",name+".png"))))throw new Exception("Stale ship texture "+name);
-}
-foreach(var file in Directory.GetFiles(Path.Combine(root,"assets/shipwright/hulls"),"*.png"))
-{
- var name="Helmsman.Shipwright.hulls/"+Path.GetFileName(file);
- var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name==name);
- if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(file)))throw new Exception("Stale hull texture "+name);
 }
 // Every native cargo key/RPC access must pass through the scoped transpiler. This
 // catches added game methods, not merely the currently expected method count.

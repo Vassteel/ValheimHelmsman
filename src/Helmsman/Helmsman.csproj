@@ -18,7 +18,6 @@
     <EmbeddedResource Include="../../assets/ships/customization.json" LogicalName="Helmsman.Ships.customization.json" />
     <EmbeddedResource Include="../../assets/ships/helmsman-ships" LogicalName="Helmsman.Ships.bundle" />
     <EmbeddedResource Include="../../assets/shipwright/*.png" LogicalName="Helmsman.Shipwright.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="../../assets/shipwright/hulls/*.png" LogicalName="Helmsman.Shipwright.hulls/%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../assets/gullcall/model.bin" LogicalName="Helmsman.Gullcall.model.bin" />
     <EmbeddedResource Include="../../assets/gullcall/model.json" LogicalName="Helmsman.Gullcall.model.json" />
     <EmbeddedResource Include="../../assets/gullcall/icon.png" LogicalName="Helmsman.Gullcall.icon.png" />

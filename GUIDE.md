@@ -1,4 +1,4 @@
-# Helmsman guide — 0.2.34
+# Helmsman guide — 0.2.35
 
 Existing sailing has been used in solo/local play. **This build enables multiplayer; the new fleet and server behavior still need in-game verification.** This guide describes current controls; [Testing](https://github.com/Vassteel/ValheimHelmsman/blob/master/TESTING.md) separates observed play from remaining checks.
 
@@ -6,7 +6,7 @@ Existing sailing has been used in solo/local play. **This build enables multipla
 
 Install BepInEx, Jötunn and Helmsman through your mod manager. For manual installation, copy both `ValheimHelmsman.dll` and `Helmsman.Core.dll` to `BepInEx/plugins/ValheimHelmsman/`. Install the same Helmsman patch version on every client and the server. Close Valheim before replacing client DLLs; restart the server after its files are updated. Remove original OdinShip/OdinShipPlus and LongshipUpgrades DLLs to avoid overlapping prefabs and refits. Keep a world backup from before replacement. Avoid duplicate copies in your active profile.
 
-Look for `Helmsman 0.2.34 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
+Look for `Helmsman 0.2.35 loaded`, `Registered Dock Ward` and `Registered hand-crafted Gullcall Whistle` in `BepInEx/LogOutput.log`.
 
 ## Configure docks
 
@@ -80,7 +80,9 @@ Build ships and harbor pieces with **Hammer → Helmsman**, using their displaye
 
 The puffin handles paint and decoration at the Carpenter's Table. New timed commissions are disabled for now. Previously paid orders still finish at their saved berth, and dismantling an unfinished table returns paid materials.
 
-The fleet retains the original player hull identities and the vanilla longship. Ottar, the heavy freighter, Snekkja, Falkuša and Ceol now use the redesigned models; Currach is an additional sailing boat with six cargo slots. Original prefab identifiers and material recipes are retained. Named ships remain discoverable; old cargo records are kept while native cargo holds are populated. A locked migration warning means a saved item is unavailable or unreadable: restore the missing dependency or inspect the log before using that hold.
+The fleet has nine authored models: Dugout, Finewood Kayak, Tandem Finewood Kayak, Currach, Ceol, Falkuša, Ottar, the large freighter and Snekkja. The native longship is also available. The dugout costs 12 wood and paddles slowly; the kayaks cost fine wood, ordinary wood and resin. Use the seated helm to paddle forward or backward. The tandem's front passenger follows the paddling animation while seated. Side grab loops provide boarding interactions from the water.
+
+The eight remaining source-model ships and the two old canoe IDs have been removed. This testing-world build does not provide compatibility aliases for them. The retained harbor and décor assets have a separate replacement plan.
 
 ### Refits and styles
 

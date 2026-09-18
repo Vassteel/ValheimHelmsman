@@ -1,4 +1,4 @@
-# Helmsman validation — 0.2.34
+# Helmsman validation — 0.2.35
 
 ## Observed local play
 
@@ -8,12 +8,12 @@ Earlier builds have been used for departure, ongoing land avoidance, gull intera
 
 Release compilation: zero errors and six existing unused construction-field warnings. Current checks:
 
-- 357 Core checks: routing, boarding, shoreline clearance, ship eligibility, construction phases/durations and upgrade costs.
+- 2543 Core checks: routing, boarding, shoreline clearance, ship eligibility, construction phases/durations and upgrade costs.
 - 64 production interaction/cargo checks; 28 whistle checks; 16 summon-lifetime checks.
 - 18 production server reservation/loading checks: competing callers, missing manifests, expiry/disconnect, occupied ships and manual ownership takeover.
 - 13 production workshop checks: authority handoff, competing players, duplicate clicks, timeout, impersonation and one payment per accepted action.
 - Native binary inspection resolves game/Unity/Jötunn members, Harmony targets, reflected fields and the two empty-crew branch sites. Container checks cover 6 save-key accesses and 19 RPC-name accesses.
-- Asset verification: 42 public roots, 15 native player ships, 24 containers, 38 material variants and 156 component/visual bindings. No original Odin plugin scripts or enemy roots remain.
+- Asset verification: nine authored ship payloads; the remaining imported bundle has 27 harbor/decor roots, zero Ship components, one container and zero optional ship-style materials. No original Odin plugin scripts or enemy roots remain.
 - Production bird geometry exported for CPU preview with finite vertices and valid triangle indices. This does not reproduce Unity shaders or lighting.
 
 Host doubles do not simulate Unity physics, GPU output or real network latency.
@@ -22,8 +22,8 @@ Host doubles do not simulate Unity physics, GPU output or real network latency.
 
 | Area | Check |
 |---|---|
-| Startup | Matching 0.2.34 clients/server; no original Odin/LongshipUpgrades DLLs. Fleet, table, harbor items and whistle register without missing-script/shader errors. |
-| Existing world | Old hulls, names, styles and every cargo hold survive replacement/save/reload. Missing cargo items lock migration instead of losing contents. |
+| Startup | Matching 0.2.35 clients/server; no original Odin/LongshipUpgrades DLLs. Fleet, table, harbor items and whistle register without missing-script/shader errors. |
+| Existing world | Retired source hulls and both old canoe IDs are deliberately absent. Validate fresh paddle boats in the testing world; no compatibility aliases are provided. |
 | Construction | Two players try one table; materials are charged once. Restart midway; timer resumes. Occupied/shallow berth waits. Dismantling refunds once. Each hull fits its berth. |
 | Birds | Puffin tools, owl three-toss sorting, pelican peg leg/fishing and all sleeping poses. Feet stay on surfaces; no self-lit feathers indoors or at night. |
 | Ship textures | Inspect all hulls and style variants in sunlight, rain and darkness; UV alignment, coarse texture scale, water masks, sail motion and transparent parts. |
@@ -95,3 +95,15 @@ Production stability tests compare native buoyancy and crosswind torque at 15 de
 - Sail every imported hull across strong wind, turn and reverse; check roll recovers naturally without the earlier excessive heel.
 - Compare Big Cargo’s draft in deep calm water: hull immersion increases by 20 cm; recheck helm, both boarding ladders and dry deck.
 - Inspect Falkuša fish crates, tied net, bucket and supply bundle for support and clear movement; cycle both sails and check new blocks stay fixed while sheets follow the clews.
+
+
+## Paddle fleet and source removal (0.2.35)
+
+Static tests validate the nine HMF resources, native API references, seated anchors, closed hull collision and paddle geometry. The native player skeleton was inspected to verify the bone chains. Stroke tests check periodicity, reversal, both kayak blades entering the water, dugout recovery and hand targets within the measured native arm reach. These are not an in-game animation or physics acceptance pass.
+
+Live checks still required:
+- Build all three paddle craft, board from either side, paddle forward/backward, stop, dismount and equip weapons again. No residual bone pose or duplicate paddle may remain.
+- Check female/male players, clothing and armor, hands on shaft, leg clearance and stable water masking during turns/waves.
+- On two clients, observe the pilot and tandem passenger together, then test passenger departure, disconnect and ship destruction.
+- Compare dugout speed and effort with both kayaks; confirm all vessels can turn and brake.
+- Recheck the six sailboats on native component foundations: sails, helm, every cargo hold, water effects, docking and summon behavior.

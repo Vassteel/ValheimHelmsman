@@ -43,5 +43,6 @@ for binding in json.loads((root/'assets/ships/component-bindings.json').read_tex
  for key in ['path','container','visual','output']:
   if key in binding:assert binding[key] in paths,(binding['prefab'],key,binding[key]);checks+=1
 for material in scripts.values():assert 'ShipManualTurret' not in material.m_ClassName
-assert ships==15,ships
+assert ships==0,ships
+assert len(roots)==27 and len(styles)==0 and len(bindings)==0
 print(f'PASS: {len(roots)} public content roots, {ships} native player ships, {holds} native containers, {len(styles)} material variants, {checks} component/visual bindings; no original plugin scripts or enemy roots.')

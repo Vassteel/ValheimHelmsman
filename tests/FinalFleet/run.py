@@ -2,7 +2,7 @@
 from pathlib import Path
 import gzip,io,struct,json,math
 ROOT=Path(__file__).resolve().parents[2]
-expected={'MercantShip','BigCargoShip','WarShip','HerculeShip','LittleBoat','HelmsmanCurrach'}
+expected={'MercantShip','BigCargoShip','WarShip','HerculeShip','LittleBoat','HelmsmanCurrach','HelmsmanDugout','HelmsmanFinewoodKayak','HelmsmanTandemKayak'}
 actual={p.name[:-7] for p in (ROOT/'assets/ships/final').glob('*.bin.gz')}
 assert actual==expected,(actual,expected)
 checks=0
@@ -15,8 +15,9 @@ for name in sorted(expected):
  def text():return raw().decode()
  assert r.read(4)==b'HMF1';s=json.loads(text());assert s['prefab']==name
  assert sum(p['kind']=='helm' for p in s['points'])==1
- assert sum(p['kind']=='ladder' for p in s['points'])==2
- assert sum(p['kind']=='mast' for p in s['points'])==1
+ paddling=s['name'] in ['dugout','kayak','tandem']
+ assert sum(p['kind']=='ladder' for p in s['points'])==(4 if s['name']=='tandem' else 2)
+ assert sum(p['kind']=='mast' for p in s['points'])==(0 if paddling else 1)
  assert len(s['waterMask'])>=40 and len(s['waterMask'])%2==0
  for left,right in zip(s['waterMask'][::2],s['waterMask'][1::2]):
   assert left[0]<right[0] and left[1]==right[1] and left[2]==right[2]
@@ -50,7 +51,8 @@ for name in sorted(expected):
   assert all(sum(v*v for v in vs[i+3:i+6])>.7 for i in range(0,len(vs),8)), 'Missing normals'
   nt=num();triangles+=nt//3;assert nt%3==0
   ts=struct.unpack('<'+'i'*nt,r.read(nt*4));assert min(ts)>=0 and max(ts)<n
- assert {'sail','hull','fixed','rudder'}<=groups
+ assert ({'hull','fixed','paddle'} if paddling else {'sail','hull','fixed','rudder'})<=groups
+ if paddling:assert 'sail' not in groups and 'rudder' not in groups
  assert not r.read(1),'Trailing bytes'
  if s['name'] in ['ottar','freighter']:
   directory=ROOT/'design/fleet-final'/s['name']
@@ -81,9 +83,10 @@ for name in sorted(expected):
     if i:assert abs(hs[i][j]-hs[i-1][j])/(x-xs[i-1])<=.361
     if j:assert abs(hs[i][j]-hs[i][j-1])/(y-ys[j-1])<=.361
   assert max(map(max,hs))-min(map(min,hs))>.1,'Cargo collision flattened into a floor'
- rope=json.loads((ROOT/'design/fleet-final'/s['name']/'rope-support.json').read_text())
- assert sum(p['kind']=='deck' and p['supported_samples']==241 for p in rope)==2,'Missing supported mooring coils'
- assert sum(p['kind']=='hanging' for p in rope)==2,'Missing belaying-pin hanks'
+ if not paddling:
+  rope=json.loads((ROOT/'design/fleet-final'/s['name']/'rope-support.json').read_text())
+  assert sum(p['kind']=='deck' and p['supported_samples']==241 for p in rope)==2,'Missing supported mooring coils'
+  assert sum(p['kind']=='hanging' for p in rope)==2,'Missing belaying-pin hanks'
  if s['name'] in ['falkusa','ceol','currach']:
   assert s['waterline']> .30,'Small boat draft was not lowered'
  if s['name']=='freighter':

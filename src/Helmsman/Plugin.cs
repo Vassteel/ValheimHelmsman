@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.34")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.35")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
@@ -73,7 +73,7 @@ public sealed class Plugin : BaseUnityPlugin
         Ships=gameObject.AddComponent<ShipDirectory>();
         gameObject.AddComponent<NetworkNavigation>();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.34 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.35 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()

@@ -145,7 +145,8 @@ internal static class ImportedShipMaterials
         foreach(var property in new[]{"_MoveableObject"})if(mat.HasProperty(property))mat.SetFloat(property,1);
         foreach(var property in new[]{"_AddSnow","_SwayDistance","_NoiseGlowEnabled"})if(mat.HasProperty(property))mat.SetFloat(property,0);
         Color tint=Color.white;
-        if(n.Contains("fish scales"))tint=new Color(.65f,.78f,.80f);
+        if(n.Contains("finewood dark inlay"))tint=new Color(.47f,.32f,.20f);
+        else if(n.Contains("fish scales"))tint=new Color(.65f,.78f,.80f);
         else if(n.Contains("tarred skin"))tint=new Color(.30f,.32f,.32f);
         else if(n.Contains("iron")&&!n.Contains("oxide"))tint=new Color(.30f,.31f,.30f);
         else if(n.Contains("red")||n.Contains("blue")||n.Contains("oxide")||n.Contains("ochre")&&!n.Contains("sail"))

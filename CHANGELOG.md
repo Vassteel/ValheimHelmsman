@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.35
+
+- Add Dugout, Finewood Kayak and Tandem Finewood Kayak, with seated player paddling and reachable boarding grips.
+- Give the dugout a cheap wood recipe and slower paddling than the kayaks.
+- Build all nine authored ship models on native Valheim components; remove the eight remaining source-model ships and both old canoe IDs without compatibility aliases.
+- Remove imported ship prefabs, optional ship styles, derived ship meshes and unused resource-stream data from release assets.
+
 ## 0.2.34
 
 - Reduce excessive heeling across imported ships with hull-sized sail leverage and stronger roll damping.

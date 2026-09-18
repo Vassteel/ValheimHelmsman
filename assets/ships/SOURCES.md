@@ -1,23 +1,23 @@
 # Maritime content sources
 
-Models: Marlthon, OdinShip 0.7.9 and OdinShipPlus 0.8.3. The user confirmed permission to reuse, retexture and redistribute these assets. Original plugin DLLs and licensing code are not included. Helmsman implements its own runtime behavior.
+## Authored ships
 
-Original prefab identifiers and recipe data were checked against the author's published descriptions:
+Helmsman supplies original geometry for Dugout, Finewood Kayak, Tandem Finewood Kayak, Currach, Ceol, Falkuša, Ottar, the large freighter and Snekkja. The models and paddles are built from the checked-in Blender scripts. Runtime materials, networking, buoyancy and effect components come from the installed Valheim game; game assets are not copied into the release. Player paddling is procedural skeletal animation against the game’s player rig.
+
+The eight retired ship types are removed without save aliases, as requested for the testing world. No OdinShip ship prefab, mesh, sail, animation controller or optional ship-style material is retained in the distributed asset bundle. Stream compaction removes unreferenced binary data as well as object entries.
+
+## Remaining harbor and decorative content
+
+The 27 roots in `content-roots.json` retain assets from Marlthon’s OdinShip 0.7.9 and OdinShipPlus 0.8.3. The user confirmed permission to reuse, retexture and redistribute these assets. Original plugin DLLs and licensing code are not included. Helmsman implements its own runtime behavior. Some visible geometry has already been replaced by Helmsman’s boatyard designs; retained hierarchy, shared textures, catch animals and other source data keep this attribution.
+
+The exact bundle contents and dependency checks are recorded in `helmsman-ships.audit.json`. The remaining replacement plan is `design/DECOR-REMODEL-PLAN.md` in the repository.
+
+Author pages:
 - https://thunderstore.io/c/valheim/p/Marlthon/OdinShip/
-- https://valheim.hexium.gg/mods/Marlthon/OdinShipPlus (author-published package description)
+- https://valheim.hexium.gg/mods/Marlthon/OdinShipPlus
 
-`content-roots.json` lists the imported player-facing models. Autonomous enemy ships, enemy crews, their weapons and naval combat ammunition are excluded for a later release. Development-only duplicate models are not added as extra recipes.
+## Birds
 
-Import audit: `helmsman-ships.audit.json`. Resource streams and mesh dependencies are preserved; original-mod MonoBehaviours are removed and cargo containers are rebound to Valheim's native Container. Old cargo records remain available during conversion.
+Birds use original procedural low-poly geometry and generated surface textures. No external bird model was imported. Concept drawings are design references, not game screenshots.
 
-Shipbuilding uses the original ingredient costs, through timed commissions at the puffin. New materials retain their original identifiers. The native longship keeps its vanilla recipe.
-
-Retextures: original generated albedo edits under `../shipwright/hulls`, bound to native Valheim shaders. All new behavioral code remains under validation; this asset import is not evidence of in-game or server acceptance.
-
-Visual variants: 38 original serialized sail, shield and hull materials are retained as choices. Default hulls use repainted atlases; optional variants preserve their pattern textures on native, matte shaders. Non-sailing single-seat and double canoes use native rowing gear.
-
-Birds: original procedural low-poly geometry and generated surface texture; no external bird model was imported. The approved concept drawings are design references, not screenshots of game models.
-
-## Boatyard geometry redesign
-
-`redesign/` contains Helmsman-authored shore structures, supplies and ship fittings plus derived ship-stem mesh changes. Imported ship bases, animated rigs, alternate styles and catch animals retain their source attribution. See `redesign/DESIGN.md` for exact coverage and validation limits.
+Build and asset checks do not replace in-game or server acceptance testing.

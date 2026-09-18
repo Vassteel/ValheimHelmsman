@@ -74,7 +74,35 @@ def main():
         for script in af.script_types:
             if script.local_serialized_file_index==0 and script.local_identifier_in_file not in keep:
                 script.local_identifier_in_file=0
-    # Resource streams stay intact: compressed mesh/audio/texture data can share a stream.
+    # Copy only referenced stream slices. Keeping the old .resS/.resource files
+    # wholesale would still distribute removed ship meshes, textures and audio.
+    from UnityPy.streams import EndianBinaryReader
+    streams={};slices={};rewritten={}
+    def compact(value):
+        if isinstance(value,dict):
+            keys=('path','offset','size') if all(k in value for k in ('path','offset','size')) else ('m_Source','m_Offset','m_Size')
+            if all(k in value for k in keys) and value[keys[2]]:
+                path,offset,size=(value[k] for k in keys);name=path.rsplit('/',1)[-1]
+                if name not in env.file.files:raise ValueError('External stream '+path)
+                old=env.file.files[name].bytes
+                if offset<0 or offset+size>len(old):raise ValueError('Invalid stream range')
+                key=(name,offset,size)
+                target=streams.setdefault(name,bytearray())
+                if key not in slices:
+                    target.extend(b'\0'*((-len(target))%16));slices[key]=len(target)
+                    target.extend(old[offset:offset+size])
+                value[keys[1]]=slices[key]
+            else:
+                for child in value.values():compact(child)
+        elif isinstance(value,(list,tuple)):
+            for child in value:compact(child)
+    for pid in sorted(keep):
+        if objects[pid].type.name not in ("Mesh","Texture2D","AudioClip"):continue
+        value=objects[pid].read_typetree();compact(value);objects[pid].save_typetree(value)
+    for name,old in list(env.file.files.items()):
+        if name.endswith(('.resS','.resource')):
+            replacement=EndianBinaryReader(bytes(streams.get(name,b'')))
+            replacement.flags=old.flags;env.file.files[name]=replacement
     args.destination.parent.mkdir(parents=True,exist_ok=True)
     args.destination.write_bytes(env.file.save(packer='lz4'))
     audit={'source_sha256':hashlib.sha256(args.source.read_bytes()).hexdigest(),
@@ -89,7 +117,7 @@ def main():
     imported={o.path_id:o for o in check.objects}
     for o in imported.values():
         missing=set(refs(o.read_typetree()))-imported.keys()
-        if missing:raise ValueError('Missing serialized dependencies: '+str(missing))
+        if missing:raise ValueError('Missing serialized dependencies: '+str(sorted(missing)[:10]))
         if o.type.name=='MonoScript' and o.read().m_AssemblyName.startswith('OdinShip'):
             raise ValueError('Unexpected original-mod script dependency')
     print(f'Imported {len(roots)} approved models, {len(keep)} objects; {args.destination.stat().st_size:,} bytes')

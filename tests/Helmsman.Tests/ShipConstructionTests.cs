@@ -7,9 +7,10 @@ internal static class ShipConstructionTests
     internal static void Run(Action<bool,string> check)
     {
         var roster=ShipConstruction.Blueprints;
-        check(roster.Count==17,"Original fleet plus Currach and the vanilla longship");
+        check(roster.Count==10,"Nine authored models and native longship");
         check(roster.Select(b=>b.Prefab).Distinct().Count()==roster.Count,"No ship registry collisions");
         check(roster.All(b=>!b.Source.Contains("Auto")),"Autonomous enemy ships remain excluded");
+        check(roster.Count(b=>!b.HasSail)==3,"Dugout, solo and tandem paddle craft");
         foreach(var b in roster)
         {
             check(ShipConstruction.ValidDuration(b.BuildSeconds),b.Name+" has a bounded non-instant duration");

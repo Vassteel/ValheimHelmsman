@@ -12,7 +12,7 @@ foreach(var path in Directory.GetFiles(Path.Combine(root,"assets/ships/final"),"
     var json=System.Text.Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
     var name=Path.GetFileName(path).Replace(".bin.gz","");
     var spec=FinalFleetModels.ReadSpecification(json,name);
-    if(spec.points.Length<6||spec.hullSolids.Length!=18||spec.colliders.Length==0||spec.sailPivot.Length!=3||spec.rudderPivot.Length!=3)throw new Exception("Lost geometry fields: "+name);
+    if(spec.points.Length<(spec.name is "dugout" or "kayak" ? 3 : 6)||spec.hullSolids.Length!=18||spec.colliders.Length==0||spec.sailPivot.Length!=3||spec.rudderPivot.Length!=3)throw new Exception("Lost geometry fields: "+name);
     if(spec.points.Any(p=>p.position.Length!=3||p.exit.Length!=3||p.facing.Length!=3))throw new Exception("Lost anchor fields: "+name);
     if(spec.name is "ottar" or "freighter")
         if(spec.cargoSolids.Length==0||spec.cargoHeight<=0)throw new Exception("Lost cargo fields: "+name);
@@ -28,5 +28,5 @@ foreach(var path in Directory.GetFiles(Path.Combine(root,"assets/ships/final"),"
     invalid=JObject.Parse(json);invalid["points"]=null;Reject(invalid.ToString(),name);
     count++;Console.WriteLine("PASS: production metadata loader: "+name);
 }
-if(count!=6)throw new Exception("Missing fleet assets");
-Console.WriteLine("PASS: all six specifications decoded with the installed game's Newtonsoft.Json; malformed specifications rejected.");
+if(count!=9)throw new Exception("Missing fleet assets");
+Console.WriteLine("PASS: all nine specifications decoded with the installed game's Newtonsoft.Json; malformed specifications rejected.");
