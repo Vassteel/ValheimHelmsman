@@ -1,0 +1,18 @@
+{
+  "name": "currach",
+  "standalone": true,
+  "length_m": 5.5,
+  "beam_m": 1.5,
+  "rowing_oars": 0,
+  "inventory": {
+    "columns": 3,
+    "rows": 2,
+    "slots": 6,
+    "status": "Integration target only; not implemented in-game"
+  },
+  "reference": "User-supplied images; original interpreted geometry",
+  "limitations": [
+    "No Unity integration, collision, sailing physics or seat interactions",
+    "Dimensions and rig are first-pass game-design choices"
+  ]
+}

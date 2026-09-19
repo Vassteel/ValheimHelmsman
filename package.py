@@ -7,11 +7,10 @@ version=manifest['version_number']
 files={
  'README.md':root/'packaging/README.md',
  'icon.png':root/'dist/ValheimHelmsman/icon.png',
+ 'LICENSE.txt':root/'LICENSE.txt',
  'BepInEx/plugins/ValheimHelmsman/ValheimHelmsman.dll':root/'dist/ValheimHelmsman/ValheimHelmsman.dll',
  'BepInEx/plugins/ValheimHelmsman/Helmsman.Core.dll':root/'dist/ValheimHelmsman/Helmsman.Core.dll',
 }
-files.update({name:root/name for name in ['CHANGELOG.md','COMPATIBILITY.md','TESTING.md','GUIDE.md']})
-files['MARITIME-CREDITS.md']=root/'assets/ships/SOURCES.md'
 public={key:manifest[key] for key in ('name','version_number','website_url','description','dependencies')}
 assert len(public['description'])<=250
 for filename,metadata in [(f'Local-ValheimHelmsman-{version}.zip',manifest),(f'ValheimHelmsman-{version}-thunderstore.zip',public)]:

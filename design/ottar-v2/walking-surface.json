@@ -1,0 +1,27 @@
+{
+  "status": "Prepared guide only; requires Unity integration and movement testing",
+  "coordinates": "Blender local metres: X bow, Y port, Z up",
+  "cargo_collision": "none",
+  "hold_walk_surface": {
+    "type": "BoxCollider",
+    "center": [
+      0,
+      0,
+      1.79
+    ],
+    "size": [
+      7.9,
+      3.5,
+      0.1
+    ],
+    "top": 1.84
+  },
+  "checks": [
+    "Walk continuously across fore deck, grated hold and aft deck",
+    "Verify collision stays with the moving ship",
+    "Keep mast and gunwale collisions separate",
+    "Verify swimming threshold and water masking inside loaded hull",
+    "Do not add individual cargo or lattice-hole colliders"
+  ],
+  "export_axes": "GLB local axes: X bow, Y up, Z starboard. Before Valheim integration align the bow to ship forward (+Z); then the walking box is centred at [0,1.79,0] with size [3.50,.10,7.90]. Verify the importer transform."
+}

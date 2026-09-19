@@ -1,0 +1,122 @@
+[
+  {
+    "id": "keel-cradle",
+    "prefab": "ShipConstruction",
+    "name": "Keel cradle",
+    "before": 21826,
+    "triangles": 10382,
+    "vertices": 21150,
+    "batches": 10,
+    "snaps": 0,
+    "dimensions_m": [
+      2.8027037382125854,
+      4.5,
+      1.4651435613632202
+    ]
+  },
+  {
+    "id": "roller-bed",
+    "prefab": "ShipConstruction1",
+    "name": "Launching rollers",
+    "before": 4580,
+    "triangles": 2924,
+    "vertices": 5572,
+    "batches": 17,
+    "snaps": 0,
+    "dimensions_m": [
+      2.880000114440918,
+      4.800000190734863,
+      0.6090001948177814
+    ]
+  },
+  {
+    "id": "framing-rack",
+    "prefab": "ShipConstruction2",
+    "name": "Ship framing gantry",
+    "before": 27916,
+    "triangles": 14420,
+    "vertices": 28736,
+    "batches": 17,
+    "snaps": 0,
+    "dimensions_m": [
+      4.0473926067352295,
+      2.4000000953674316,
+      3.204240083694458
+    ]
+  },
+  {
+    "id": "pier-crane",
+    "prefab": "PierCrane1",
+    "name": "Timber pier crane",
+    "before": 33304,
+    "triangles": 16952,
+    "vertices": 33848,
+    "batches": 23,
+    "snaps": 6,
+    "dimensions_m": [
+      3.0800000429153442,
+      4.499771356582642,
+      4.7499998807907104
+    ]
+  },
+  {
+    "id": "heavy-crane",
+    "prefab": "PierCrane2",
+    "name": "Braced pier crane",
+    "before": 37944,
+    "triangles": 19656,
+    "vertices": 39108,
+    "batches": 23,
+    "snaps": 6,
+    "dimensions_m": [
+      3.5999999046325684,
+      4.499771356582642,
+      5.149999976158142
+    ]
+  },
+  {
+    "id": "single-pulley",
+    "prefab": "PulleyCobia",
+    "name": "Single block",
+    "before": 3876,
+    "triangles": 2844,
+    "vertices": 5720,
+    "batches": 8,
+    "snaps": 0,
+    "dimensions_m": [
+      0.800000011920929,
+      0.5116961300373077,
+      1.3982359170913696
+    ]
+  },
+  {
+    "id": "double-pulley",
+    "prefab": "PulleyElephantSeal",
+    "name": "Double purchase",
+    "before": 14404,
+    "triangles": 9840,
+    "vertices": 19371,
+    "batches": 14,
+    "snaps": 0,
+    "dimensions_m": [
+      0.800000011920929,
+      0.566899985074997,
+      1.8955072164535522
+    ]
+  },
+  {
+    "id": "triple-pulley",
+    "prefab": "PulleyMarlin",
+    "name": "Heavy purchase",
+    "before": 17972,
+    "triangles": 11792,
+    "vertices": 23147,
+    "batches": 14,
+    "snaps": 0,
+    "dimensions_m": [
+      0.800000011920929,
+      0.6214999854564667,
+      1.8955072164535522
+    ]
+  }
+]

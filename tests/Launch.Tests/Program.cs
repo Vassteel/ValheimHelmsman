@@ -26,4 +26,17 @@ Check(Math.Abs(Physics.QueryHalf.x-3)<.001f&&Math.Abs(Physics.QueryHalf.z-8)<.00
 solid.enabled=false;Check(!Clear(),"Missing collision model never grants clearance");
 spareBox.enabled=true;spare.activeSelf=false;var unknown=root.AddComponent<MeshCollider>();unknown.convex=false;
 Check(!Clear()&&WaterChart.Fallback,"Unsupported concave geometry retains conservative checks");
+solid.enabled=true;unknown.enabled=false;Physics.Penetration=(a,b)=>1;
+var ramp=new GameObject();var rampPart=new GameObject();rampPart.transform.SetParent(ramp.transform);var rampCollider=rampPart.AddComponent<BoxCollider>();
+Physics.Nearby=new Collider[]{rampCollider};
+Check(ShipLaunchClearance.Clear(ship,new Vector3(100,35,200),Quaternion.identity,out _,ramp.transform,false),"Launch route ignores only its own cradle and supports");
+Check(!ShipLaunchClearance.Clear(ship,new Vector3(100,35,200),Quaternion.identity,out _,null,false),"Other slipway structures remain launch obstacles");
+Physics.Nearby=new Collider[]{obstacle};Physics.Penetration=(a,b)=>0;Heightmap.Ground=31;
+Check(ShipLaunchClearance.Clear(ship,new Vector3(100,35,200),Quaternion.identity,out _,ramp.transform,false)&&Math.Abs(Physics.PartPosition.y-35)<.001f,"Staged launch check retains height above dry shore");
+Check(!ShipLaunchClearance.Clear(ship,new Vector3(100,35,200),Quaternion.identity,out _),"Final launch still requires water below the hull");
 Console.WriteLine($"PASS: {passed} launch clearance checks using production code with physics doubles; actual Unity penetration remains an in-game check.");
+Heightmap.Ground=25;
+Check(ShipLaunchClearance.Clear(ship,new Vector3(100,29.4f,200),Quaternion.identity,out _,preserveHeight:true)&&Math.Abs(Physics.PartPosition.y-29.4f)<.001f,"Final launch collision uses the buoyant hull depth without resetting it to the surface");
+Heightmap.Ground=29.9f;
+Check(!ShipLaunchClearance.Clear(ship,new Vector3(100,29.4f,200),Quaternion.identity,out _,preserveHeight:true),"Preserving launch height never bypasses the water-depth check");
+Console.WriteLine("PASS: launch equilibrium height and water-depth checks.");

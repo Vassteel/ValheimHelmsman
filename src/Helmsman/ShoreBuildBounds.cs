@@ -11,7 +11,7 @@ public sealed class ShoreBuildBounds : MonoBehaviour
 
     internal static void ConfigureDock(GameObject prefab, string prefabName)
     {
-        if(prefabName!="FishingDock" && prefabName!="FishingDock_Extension")return;
+        if(prefabName!="FishingDock_Extension")return;
         var piece=prefab.GetComponent<Piece>();
         // Piers need to intersect shoreline terrain and adjacent building pieces.
         // Keep the ordinary station, access, biome and no-build-zone checks.

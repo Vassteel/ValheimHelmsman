@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings></PropertyGroup><ItemGroup>
+<ProjectReference Include="../../src/Helmsman.Core/Helmsman.Core.csproj" />
+<Compile Include="../../src/Helmsman/ConstructionOrder.cs" Link="ConstructionOrder.cs" />
+<Compile Include="../../src/Helmsman/SlipwayOrder.cs" Link="SlipwayOrder.cs" />
+<Compile Include="../../src/Helmsman/SlipwayOrderCodec.cs" Link="SlipwayOrderCodec.cs" />
+<Reference Include="Newtonsoft.Json"><HintPath>$(ValheimDir)/valheim_Data/Managed/Newtonsoft.Json.dll</HintPath></Reference>
+</ItemGroup></Project>

@@ -11,7 +11,7 @@ var chat=resolver.Resolve(new AssemblyNameReference("assembly_valheim",new Versi
 if(!chat.Fields.Any(f=>f.Name=="m_hideTimer" && f.FieldType.FullName=="System.Single"))throw new Exception("Chat visibility field changed");
 int members=0;foreach(var r in mod.GetMemberReferences())
 {
- if(!(r.DeclaringType.Namespace.StartsWith("UnityEngine")||r.DeclaringType.Namespace.StartsWith("Jotunn")||r.DeclaringType.Namespace==""))continue;
+ if(!(r.DeclaringType.Namespace.StartsWith("UnityEngine")||r.DeclaringType.Namespace.StartsWith("Jotunn")||r.DeclaringType.Namespace.StartsWith("MagicaCloth2")||r.DeclaringType.Namespace==""))continue;
  if(r is MethodReference m && m.Resolve()==null)throw new Exception("Unresolved "+r);
  if(r is FieldReference f && f.Resolve()==null)throw new Exception("Unresolved "+r);
  members++;
@@ -27,12 +27,15 @@ foreach(var file in Directory.GetFiles(Path.Combine(root,"assets/ships/final"),"
  var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Ships.final."+Path.GetFileName(file));
  if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(file)))throw new Exception("Stale final fleet asset "+file);
 }
-if(mod.Resources.Count(r=>r.Name.StartsWith("Helmsman.Ships.final."))!=9)throw new Exception("Missing final fleet resources");
-foreach(var pair in new[]{("Helmsman.Ships.bundle","assets/ships/helmsman-ships"),("Helmsman.Ships.boatyard","assets/ships/redesign/models.bin.gz")})
+foreach(var file in Directory.GetFiles(Path.Combine(root,"assets/workshop"),"*.bin.gz"))
 {
- var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name==pair.Item1);
- if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(Path.Combine(root,pair.Item2))))throw new Exception("Stale stripped content: "+pair.Item1);
+ var resource=(EmbeddedResource)mod.Resources.Single(r=>r.Name=="Helmsman.Workshop."+Path.GetFileName(file));
+ if(!resource.GetResourceData().SequenceEqual(File.ReadAllBytes(file)))throw new Exception("Stale workshop asset "+file);
 }
+if(mod.Resources.Count(r=>r.Name.StartsWith("Helmsman.Workshop."))!=23)throw new Exception("Missing workshop resources");
+if(mod.Resources.Count(r=>r.Name.StartsWith("Helmsman.Ships.final."))!=9)throw new Exception("Missing final fleet resources");
+if(mod.Resources.Any(r=>r.Name=="Helmsman.Ships.bundle"||r.Name=="Helmsman.Ships.boatyard"))throw new Exception("Retired imported resources remain embedded");
+if(mod.GetMemberReferences().OfType<MethodReference>().Any(m=>m.DeclaringType.FullName=="UnityEngine.AssetBundle"))throw new Exception("Retired bundle loader remains in runtime");
 if(mod.Resources.Any(r=>r.Name.StartsWith("Helmsman.Shipwright.hulls/")))throw new Exception("Retired ship textures still embedded");
 var hook=mod.Types.Single(t=>t.Name=="UseGullcallWhistle").Methods.Single(m=>m.Name=="Prefix");
 var target=resolver.Resolve(new AssemblyNameReference("assembly_valheim",new Version(0,0,0,0))).MainModule.Types.Single(t=>t.Name=="Humanoid").Methods.Single(m=>m.Name=="UseItem");
@@ -66,6 +69,9 @@ foreach(var patch in type.CustomAttributes.Where(a=>a.AttributeType.Name=="Harmo
 var api=chat.Module;
 foreach(var field in new[]{("Ship","m_speed","Ship/Speed"),("Ship","m_rudderValue","System.Single"),("Inventory","m_width","System.Int32")})
  if(!api.Types.Single(t=>t.Name==field.Item1).Fields.Any(f=>f.Name==field.Item2 && f.FieldType.FullName==field.Item3))throw new Exception("Missing reflected field: "+field.Item2);
+// Paid construction uses the game's own material support calculation.
+foreach(var method in new[]{("UpdateSupport","System.Void"),("HaveSupport","System.Boolean"),("GetSupport","System.Single"),("GetMinSupport","System.Single")})
+ if(!api.Types.Single(t=>t.Name=="WearNTear").Methods.Any(m=>m.Name==method.Item1&&m.Parameters.Count==0&&m.ReturnType.FullName==method.Item2))throw new Exception("Structural support API changed: "+method.Item1);
 // Runtime map/ward delegates must resolve before a report can be collected.
 foreach(var field in new[]{("Minimap","m_fogTexture","UnityEngine.Texture2D"),("Minimap","m_pins","System.Collections.Generic.List`1<Minimap/PinData>"),("PrivateArea","m_allAreas","System.Collections.Generic.List`1<PrivateArea>")})
  if(!api.Types.Single(t=>t.Name==field.Item1).Fields.Any(f=>f.Name==field.Item2 && f.FieldType.FullName==field.Item3))throw new Exception("Missing scouting field: "+field.Item2);
@@ -100,6 +106,10 @@ Console.WriteLine($"PASS: all {scopedKeys} cargo save keys and {scopedRpcs} RPC 
 var tick=api.Types.Single(t=>t.Name=="Ship").Methods.Single(m=>m.Name=="CustomFixedUpdate");
 int crewSites=tick.Body.Instructions.Count(i=>i.Operand is MethodReference m && m.Name=="get_Count" && m.DeclaringType is GenericInstanceType g && g.ElementType.FullName=="System.Collections.Generic.List`1" && g.GenericArguments.Single().Name=="Player");
 if(crewSites!=2)throw new Exception("Empty-crew physics pattern changed: "+crewSites);
+var snapSearch=api.Types.Single(t=>t.Name=="Player").Methods.Single(m=>m.Name=="FindClosestSnapPoints");
+if(snapSearch.Body.Instructions.Count(i=>i.OpCode==Mono.Cecil.Cil.OpCodes.Ldc_R4 && i.Operand is float r && r==10)!=1 || snapSearch.Parameters[0].ParameterType.FullName!="UnityEngine.Transform")
+    throw new Exception("Slipway native snap search pattern changed");
+Console.WriteLine("PASS: slipway snap search hook matches the installed game's single radius and ghost argument.");
 using var manifest=JsonDocument.Parse(File.ReadAllText(Path.Combine(root,"packaging/manifest.json")));
 var version=manifest.RootElement.GetProperty("version_number").GetString()!;
 using var core=ModuleDefinition.ReadModule(Path.Combine(root,"src/Helmsman.Core/bin/Release/netstandard2.1/Helmsman.Core.dll"));

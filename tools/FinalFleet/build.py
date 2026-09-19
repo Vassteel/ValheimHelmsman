@@ -277,6 +277,10 @@ def finish(kind):
  # Close the currach's rounded bow: the original skin stopped short of the
  # centreline, leaving a visible slot between port and starboard gunwales.
  if kind=='currach':
+  from keel_skin import geometry as keel_skin_geometry
+  seam_vertices,seam_faces=keel_skin_geometry(length)
+  skin=next(o.data.materials[0] for o in ship.objects if 'hull band' in o.name)
+  mesh('Currach keel skin closure',seam_vertices,seam_faces,skin)
   bands=[o for o in ship.objects if 'hull band' in o.name]
   for j in range(9):
    pair=[o for o in bands if o.name.endswith('%02d'%j)]
@@ -322,14 +326,7 @@ def finish(kind):
  bpy.ops.export_scene.gltf(filepath=str(dest/(kind+'.glb')),export_format='GLB',use_selection=True,export_apply=True)
  # Geometry is batched by material/animation group, never one draw call per rope or bale.
  materials=[];groups={};sheets=[]
- def group(ob):
-  n=ob.name.lower()
-  if n.startswith('carved merchant'):return 'decoration'
-  if n in ['steering oar / single carved oak','steering oar single carved oak','carved stern rudder','raised bent tiller']:return 'rudder'
-  if 'sail' in n and not any(k in n for k in ['yard','spare','roll','mast lacing']):return 'sail'
-  if n=='jib' or n.startswith(('lateen mainsail','jib bolt rope','jib stitched seam','red sailing cloth')):return 'sail'
-  if 'clinker strake' in n or 'hull band' in n:return 'hull'
-  return 'fixed'
+ from construction_groups import group
  for ob in ship.objects:
   if ob.type!='MESH':continue
   if 'sheet' in ob.name.lower():
@@ -407,4 +404,5 @@ def finish(kind):
  scene.render.filepath=str(dest/(kind+'-deck.png'));bpy.ops.render.render(write_still=True)
  print('FINISHED',kind,flush=True)
 
-for kind in sys.argv[1:] or SOURCES:finish(kind)
+if __name__=='__main__':
+ for kind in sys.argv[1:] or SOURCES:finish(kind)

@@ -1,0 +1,1106 @@
+[
+  {
+    "id": "slipway",
+    "name": "Shipwright slipway",
+    "dimensions_m": [
+      8.0,
+      22.149999618530273,
+      3.628999710083008
+    ],
+    "bounds_min": [
+      -4.0,
+      -12.0,
+      -0.009749936871230602
+    ],
+    "bounds_max": [
+      4.0,
+      10.149999618530273,
+      3.6192498207092285
+    ],
+    "triangles": 40160,
+    "original_geometry": true,
+    "snap_points": [
+      {
+        "name": "snap_support_-3_-10",
+        "blender_position": [
+          -3.0,
+          -10.0,
+          1.5
+        ],
+        "unity_position": [
+          -3.0,
+          1.5,
+          10.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_-10",
+        "blender_position": [
+          3.0,
+          -10.0,
+          1.5
+        ],
+        "unity_position": [
+          3.0,
+          1.5,
+          10.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_-10",
+        "blender_position": [
+          -4.0,
+          -10.0,
+          2.700000047683716
+        ],
+        "unity_position": [
+          -4.0,
+          2.700000047683716,
+          10.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_-10",
+        "blender_position": [
+          4.0,
+          -10.0,
+          2.700000047683716
+        ],
+        "unity_position": [
+          4.0,
+          2.700000047683716,
+          10.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_-8",
+        "blender_position": [
+          -3.0,
+          -8.0,
+          1.350000023841858
+        ],
+        "unity_position": [
+          -3.0,
+          1.350000023841858,
+          8.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_-8",
+        "blender_position": [
+          3.0,
+          -8.0,
+          1.350000023841858
+        ],
+        "unity_position": [
+          3.0,
+          1.350000023841858,
+          8.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_-8",
+        "blender_position": [
+          -4.0,
+          -8.0,
+          2.549999952316284
+        ],
+        "unity_position": [
+          -4.0,
+          2.549999952316284,
+          8.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_-8",
+        "blender_position": [
+          4.0,
+          -8.0,
+          2.549999952316284
+        ],
+        "unity_position": [
+          4.0,
+          2.549999952316284,
+          8.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_-6",
+        "blender_position": [
+          -3.0,
+          -6.0,
+          1.2000000476837158
+        ],
+        "unity_position": [
+          -3.0,
+          1.2000000476837158,
+          6.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_-6",
+        "blender_position": [
+          3.0,
+          -6.0,
+          1.2000000476837158
+        ],
+        "unity_position": [
+          3.0,
+          1.2000000476837158,
+          6.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_-6",
+        "blender_position": [
+          -4.0,
+          -6.0,
+          2.4000000953674316
+        ],
+        "unity_position": [
+          -4.0,
+          2.4000000953674316,
+          6.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_-6",
+        "blender_position": [
+          4.0,
+          -6.0,
+          2.4000000953674316
+        ],
+        "unity_position": [
+          4.0,
+          2.4000000953674316,
+          6.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_-4",
+        "blender_position": [
+          -3.0,
+          -4.0,
+          1.0499999523162842
+        ],
+        "unity_position": [
+          -3.0,
+          1.0499999523162842,
+          4.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_-4",
+        "blender_position": [
+          3.0,
+          -4.0,
+          1.0499999523162842
+        ],
+        "unity_position": [
+          3.0,
+          1.0499999523162842,
+          4.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_-4",
+        "blender_position": [
+          -4.0,
+          -4.0,
+          2.25
+        ],
+        "unity_position": [
+          -4.0,
+          2.25,
+          4.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_-4",
+        "blender_position": [
+          4.0,
+          -4.0,
+          2.25
+        ],
+        "unity_position": [
+          4.0,
+          2.25,
+          4.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_-2",
+        "blender_position": [
+          -3.0,
+          -2.0,
+          0.8999999761581421
+        ],
+        "unity_position": [
+          -3.0,
+          0.8999999761581421,
+          2.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_-2",
+        "blender_position": [
+          3.0,
+          -2.0,
+          0.8999999761581421
+        ],
+        "unity_position": [
+          3.0,
+          0.8999999761581421,
+          2.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_-2",
+        "blender_position": [
+          -4.0,
+          -2.0,
+          2.1000001430511475
+        ],
+        "unity_position": [
+          -4.0,
+          2.1000001430511475,
+          2.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_-2",
+        "blender_position": [
+          4.0,
+          -2.0,
+          2.1000001430511475
+        ],
+        "unity_position": [
+          4.0,
+          2.1000001430511475,
+          2.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_0",
+        "blender_position": [
+          -3.0,
+          0.0,
+          0.75
+        ],
+        "unity_position": [
+          -3.0,
+          0.75,
+          -0.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_0",
+        "blender_position": [
+          3.0,
+          0.0,
+          0.75
+        ],
+        "unity_position": [
+          3.0,
+          0.75,
+          -0.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_0",
+        "blender_position": [
+          -4.0,
+          0.0,
+          1.9500000476837158
+        ],
+        "unity_position": [
+          -4.0,
+          1.9500000476837158,
+          -0.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_0",
+        "blender_position": [
+          4.0,
+          0.0,
+          1.9500000476837158
+        ],
+        "unity_position": [
+          4.0,
+          1.9500000476837158,
+          -0.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_2",
+        "blender_position": [
+          -3.0,
+          2.0,
+          0.6000000238418579
+        ],
+        "unity_position": [
+          -3.0,
+          0.6000000238418579,
+          -2.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_2",
+        "blender_position": [
+          3.0,
+          2.0,
+          0.6000000238418579
+        ],
+        "unity_position": [
+          3.0,
+          0.6000000238418579,
+          -2.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_2",
+        "blender_position": [
+          -4.0,
+          2.0,
+          1.8000000715255737
+        ],
+        "unity_position": [
+          -4.0,
+          1.8000000715255737,
+          -2.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_2",
+        "blender_position": [
+          4.0,
+          2.0,
+          1.8000000715255737
+        ],
+        "unity_position": [
+          4.0,
+          1.8000000715255737,
+          -2.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_4",
+        "blender_position": [
+          -3.0,
+          4.0,
+          0.44999998807907104
+        ],
+        "unity_position": [
+          -3.0,
+          0.44999998807907104,
+          -4.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_4",
+        "blender_position": [
+          3.0,
+          4.0,
+          0.44999998807907104
+        ],
+        "unity_position": [
+          3.0,
+          0.44999998807907104,
+          -4.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_4",
+        "blender_position": [
+          -4.0,
+          4.0,
+          1.6500000953674316
+        ],
+        "unity_position": [
+          -4.0,
+          1.6500000953674316,
+          -4.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_4",
+        "blender_position": [
+          4.0,
+          4.0,
+          1.6500000953674316
+        ],
+        "unity_position": [
+          4.0,
+          1.6500000953674316,
+          -4.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_6",
+        "blender_position": [
+          -3.0,
+          6.0,
+          0.30000001192092896
+        ],
+        "unity_position": [
+          -3.0,
+          0.30000001192092896,
+          -6.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_6",
+        "blender_position": [
+          3.0,
+          6.0,
+          0.30000001192092896
+        ],
+        "unity_position": [
+          3.0,
+          0.30000001192092896,
+          -6.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_6",
+        "blender_position": [
+          -4.0,
+          6.0,
+          1.5
+        ],
+        "unity_position": [
+          -4.0,
+          1.5,
+          -6.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_6",
+        "blender_position": [
+          4.0,
+          6.0,
+          1.5
+        ],
+        "unity_position": [
+          4.0,
+          1.5,
+          -6.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_8",
+        "blender_position": [
+          -3.0,
+          8.0,
+          0.15000000596046448
+        ],
+        "unity_position": [
+          -3.0,
+          0.15000000596046448,
+          -8.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_8",
+        "blender_position": [
+          3.0,
+          8.0,
+          0.15000000596046448
+        ],
+        "unity_position": [
+          3.0,
+          0.15000000596046448,
+          -8.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_8",
+        "blender_position": [
+          -4.0,
+          8.0,
+          1.350000023841858
+        ],
+        "unity_position": [
+          -4.0,
+          1.350000023841858,
+          -8.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_8",
+        "blender_position": [
+          4.0,
+          8.0,
+          1.350000023841858
+        ],
+        "unity_position": [
+          4.0,
+          1.350000023841858,
+          -8.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_-3_10",
+        "blender_position": [
+          -3.0,
+          10.0,
+          0.0
+        ],
+        "unity_position": [
+          -3.0,
+          0.0,
+          -10.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_support_3_10",
+        "blender_position": [
+          3.0,
+          10.0,
+          0.0
+        ],
+        "unity_position": [
+          3.0,
+          0.0,
+          -10.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_-4_10",
+        "blender_position": [
+          -4.0,
+          10.0,
+          1.2000000476837158
+        ],
+        "unity_position": [
+          -4.0,
+          1.2000000476837158,
+          -10.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_side_4_10",
+        "blender_position": [
+          4.0,
+          10.0,
+          1.2000000476837158
+        ],
+        "unity_position": [
+          4.0,
+          1.2000000476837158,
+          -10.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_-4",
+        "blender_position": [
+          -4.0,
+          -12.0,
+          2.8500001430511475
+        ],
+        "unity_position": [
+          -4.0,
+          2.8500001430511475,
+          12.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_-2",
+        "blender_position": [
+          -2.0,
+          -12.0,
+          2.8500001430511475
+        ],
+        "unity_position": [
+          -2.0,
+          2.8500001430511475,
+          12.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_0",
+        "blender_position": [
+          0.0,
+          -12.0,
+          2.8500001430511475
+        ],
+        "unity_position": [
+          0.0,
+          2.8500001430511475,
+          12.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_2",
+        "blender_position": [
+          2.0,
+          -12.0,
+          2.8500001430511475
+        ],
+        "unity_position": [
+          2.0,
+          2.8500001430511475,
+          12.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_4",
+        "blender_position": [
+          4.0,
+          -12.0,
+          2.8500001430511475
+        ],
+        "unity_position": [
+          4.0,
+          2.8500001430511475,
+          12.0
+        ],
+        "purpose": "floor_dock_stair",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_support_-3",
+        "blender_position": [
+          -3.0,
+          -11.0,
+          1.774999976158142
+        ],
+        "unity_position": [
+          -3.0,
+          1.774999976158142,
+          11.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_support_-1",
+        "blender_position": [
+          -1.0,
+          -11.0,
+          1.774999976158142
+        ],
+        "unity_position": [
+          -1.0,
+          1.774999976158142,
+          11.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_support_1",
+        "blender_position": [
+          1.0,
+          -11.0,
+          1.774999976158142
+        ],
+        "unity_position": [
+          1.0,
+          1.774999976158142,
+          11.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      },
+      {
+        "name": "snap_head_support_3",
+        "blender_position": [
+          3.0,
+          -11.0,
+          1.774999976158142
+        ],
+        "unity_position": [
+          3.0,
+          1.774999976158142,
+          11.0
+        ],
+        "purpose": "support",
+        "runtime_tag": "snappoint"
+      }
+    ]
+  },
+  {
+    "id": "workbench",
+    "name": "Puffin's Construction Bench",
+    "dimensions_m": [
+      2.5,
+      1.3760000467300415,
+      1.1353651285171509
+    ],
+    "bounds_min": [
+      -1.25,
+      -0.8320000171661377,
+      0.010634860955178738
+    ],
+    "bounds_max": [
+      1.25,
+      0.5440000295639038,
+      1.1460000276565552
+    ],
+    "triangles": 15466,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "tool-rack",
+    "name": "Shipwright tools / construction speed",
+    "dimensions_m": [
+      1.2633121013641357,
+      0.8034353256225586,
+      1.9420064687728882
+    ],
+    "bounds_min": [
+      -0.6316560506820679,
+      -0.40428245067596436,
+      0.020159214735031128
+    ],
+    "bounds_max": [
+      0.6316560506820679,
+      0.39915287494659424,
+      1.9621657133102417
+    ],
+    "triangles": 3725,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "caulking-station",
+    "name": "Caulking station / hull durability",
+    "dimensions_m": [
+      1.3592023849487305,
+      0.8465749025344849,
+      1.4671310186386108
+    ],
+    "bounds_min": [
+      -0.6796011924743652,
+      -0.42328038811683655,
+      0.019417166709899902
+    ],
+    "bounds_max": [
+      0.6796011924743652,
+      0.4232944846153259,
+      1.4865481853485107
+    ],
+    "triangles": 10387,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "rigging-rack",
+    "name": "Rigging rack / ship speed",
+    "dimensions_m": [
+      1.5851777791976929,
+      0.8568528294563293,
+      1.9238022565841675
+    ],
+    "bounds_min": [
+      -0.7925888895988464,
+      -0.34274113178253174,
+      0.0
+    ],
+    "bounds_max": [
+      0.7925888895988464,
+      0.5141116976737976,
+      1.9238022565841675
+    ],
+    "triangles": 22653,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "paint-stand",
+    "name": "Paint stand / paint and decoration",
+    "dimensions_m": [
+      1.3359068632125854,
+      0.8916537761688232,
+      2.3482139110565186
+    ],
+    "bounds_min": [
+      -0.6635220050811768,
+      -0.42055314779281616,
+      0.01990562677383423
+    ],
+    "bounds_max": [
+      0.6723848581314087,
+      0.4711005985736847,
+      2.368119478225708
+    ],
+    "triangles": 8155,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "resin-wood",
+    "name": "Resin wood",
+    "dimensions_m": [
+      0.5717211961746216,
+      0.8799999952316284,
+      0.2281961590051651
+    ],
+    "bounds_min": [
+      -0.2880000174045563,
+      -0.4399999976158142,
+      0.006000000052154064
+    ],
+    "bounds_max": [
+      0.2837212085723877,
+      0.4399999976158142,
+      0.23419615626335144
+    ],
+    "triangles": 3176,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "caulked-wood",
+    "name": "Caulked wood",
+    "dimensions_m": [
+      0.5717211961746216,
+      0.8799999952316284,
+      0.2281961590051651
+    ],
+    "bounds_min": [
+      -0.2880000174045563,
+      -0.4399999976158142,
+      0.006000000052154064
+    ],
+    "bounds_max": [
+      0.2837212085723877,
+      0.4399999976158142,
+      0.23419615626335144
+    ],
+    "triangles": 3176,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "sail-canvas",
+    "name": "Sail canvas",
+    "dimensions_m": [
+      0.5540000200271606,
+      0.41200000047683716,
+      0.13142921030521393
+    ],
+    "bounds_min": [
+      -0.2770000100135803,
+      -0.20000000298023224,
+      0.0044999998062849045
+    ],
+    "bounds_max": [
+      0.2770000100135803,
+      0.21199999749660492,
+      0.13592921197414398
+    ],
+    "triangles": 2886,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "marine-rope",
+    "name": "Marine rope",
+    "dimensions_m": [
+      0.6235758066177368,
+      0.47061240673065186,
+      0.06323261559009552
+    ],
+    "bounds_min": [
+      -0.292584627866745,
+      -0.2906123995780945,
+      0.0024737194180488586
+    ],
+    "bounds_max": [
+      0.3309912085533142,
+      0.18000000715255737,
+      0.06570633500814438
+    ],
+    "triangles": 8300,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "wind-belt",
+    "name": "Wind belt",
+    "dimensions_m": [
+      0.5354993939399719,
+      0.5214993357658386,
+      0.08942803740501404
+    ],
+    "bounds_min": [
+      -0.23549936711788177,
+      -0.28599998354911804,
+      0.010499999858438969
+    ],
+    "bounds_max": [
+      0.30000001192092896,
+      0.23549936711788177,
+      0.09992803633213043
+    ],
+    "triangles": 2788,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "fish-oil",
+    "name": "Fish extract / carrying",
+    "dimensions_m": [
+      2.0,
+      2.0,
+      2.0
+    ],
+    "bounds_min": [
+      -1.0,
+      -1.1200000047683716,
+      -0.7799999713897705
+    ],
+    "bounds_max": [
+      1.0,
+      0.8799999952316284,
+      1.2200000286102295
+    ],
+    "triangles": 1393,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "wind-extract",
+    "name": "Fish extract / wind",
+    "dimensions_m": [
+      0.26194703578948975,
+      0.2619999945163727,
+      0.38600000739097595
+    ],
+    "bounds_min": [
+      -0.13099999725818634,
+      -0.13099999725818634,
+      0.0
+    ],
+    "bounds_max": [
+      0.1309470236301422,
+      0.13099999725818634,
+      0.38600000739097595
+    ],
+    "triangles": 1350,
+    "original_geometry": true,
+    "snap_points": []
+  },
+  {
+    "id": "dried-fish-basket",
+    "name": "Dried fish basket",
+    "dimensions_m": [
+      0.5887073874473572,
+      0.42399999499320984,
+      0.35851946473121643
+    ],
+    "bounds_min": [
+      -0.2943536937236786,
+      -0.21199999749660492,
+      0.004000000189989805
+    ],
+    "bounds_max": [
+      0.2943536937236786,
+      0.21199999749660492,
+      0.3625194728374481
+    ],
+    "triangles": 13144,
+    "original_geometry": true,
+    "snap_points": []
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "ceol",
+  "standalone": true,
+  "length_m": 6.4,
+  "beam_m": 1.8,
+  "rowing_oars": 0,
+  "inventory": {
+    "status": "Little Boat replacement capacity retained during integration"
+  },
+  "reference": "User-supplied images; original interpreted geometry",
+  "limitations": [
+    "No Unity integration, collision, sailing physics or seat interactions",
+    "Dimensions and rig are first-pass game-design choices"
+  ]
+}

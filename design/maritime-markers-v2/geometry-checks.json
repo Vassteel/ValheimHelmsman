@@ -1,0 +1,34 @@
+[
+  {
+    "model": "gullwatch-post",
+    "triangles": 2578,
+    "finite_geometry": true,
+    "bounds_match": true,
+    "no_empty_meshes": true,
+    "base_grounded": true
+  },
+  {
+    "model": "tide-serpent",
+    "triangles": 7616,
+    "finite_geometry": true,
+    "bounds_match": true,
+    "no_empty_meshes": true,
+    "base_grounded": true
+  },
+  {
+    "model": "wayfinder-marker",
+    "triangles": 2562,
+    "finite_geometry": true,
+    "bounds_match": true,
+    "no_empty_meshes": true,
+    "base_grounded": true
+  },
+  {
+    "model": "wreckward-marker",
+    "triangles": 2988,
+    "finite_geometry": true,
+    "bounds_match": true,
+    "no_empty_meshes": true,
+    "base_grounded": true
+  }
+]

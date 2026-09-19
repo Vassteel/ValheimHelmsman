@@ -1,0 +1,30 @@
+[
+  {
+    "model": "fish-oil-press",
+    "triangles": 40116,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "net-rack",
+    "triangles": 36998,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "fish-dryer",
+    "triangles": 36584,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "eel-rack",
+    "triangles": 14112,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  }
+]

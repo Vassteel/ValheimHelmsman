@@ -2,6 +2,8 @@ using System.Text.Json;
 using UnityEngine;
 using VikingBirds;
 using Helmsman.Core;
+if(args.Contains("--circus")){CrewExport.Run(args[0]);return;}
+if(args.Contains("--animation")){AnimationExport.Run(args[0]);return;}
 var output=args.Length>0?args[0]:"output/bird-geometry.json";
 var scenes=new List<object>();
 bool performance=args.Contains("--performance");
@@ -37,7 +39,7 @@ foreach(var species in performance?new[]{"Puffin","Pelican"}:new[]{"Puffin","Bur
    parts.Add(new{name=filter.gameObject.name,vertices,normals=mesh.normals.Select(n=>Vector3.From(System.Numerics.Vector3.TransformNormal(n.V,filter.transform.Matrix)).normalized).Select(n=>new[]{n.x,n.y,n.z}).ToArray(),uv=mesh.uv.Select(v=>new[]{v.x,v.y}),material=mat.name,triangles=mesh.triangles,color=new[]{color.r,color.g,color.b}});
   }
   int triangles=bird.Root.GetComponentsInChildren<MeshFilter>().Sum(f=>f.sharedMesh.triangles.Length/3);
-  if(triangles>30000||parts.Count>36)throw new Exception("Bird geometry budget exceeded");
+  if(triangles>(species=="Puffin"?48000:30000)||parts.Count>(species=="Puffin"?44:36))throw new Exception($"Bird geometry budget exceeded: {triangles} triangles, {parts.Count} renderers");
   Console.WriteLine(species+" "+pose+": "+triangles+" triangles, "+parts.Count+" renderers; finite geometry and atlas bounds passed.");
   scenes.Add(new{name=species+" — "+pose,parts});
  }

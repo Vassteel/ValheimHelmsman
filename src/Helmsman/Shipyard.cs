@@ -8,21 +8,6 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[Serializable]
-internal sealed class ConstructionOrder
-{
-    public string blueprint="", recipe="", name="";
-    public long started,creator;
-    public float duration;
-    // Missing on older saved orders, which were always paid.
-    public bool freeBuild;
-    public Vector3 position;
-    public float heading;
-    internal bool Valid=>ShipConstruction.Find(blueprint)!=null && ShipConstruction.ValidDuration(duration) && started>=0 &&
-        Finite(position.x) && Finite(position.y) && Finite(position.z) && Finite(heading) && name!=null && name.Length<=48 && recipe==ShipConstruction.Find(blueprint)!.Recipe;
-    private static bool Finite(float n)=>!float.IsInfinity(n)&&!float.IsNaN(n);
-}
-
 public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
 {
     private static readonly int OrderKey="helmsman_build_order_v1".GetStableHashCode();
@@ -31,13 +16,13 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     private ZNetView view=null!;
     private WearNTear wear=null!;
     private VikingBirds.PerchedBird? bird;
-    private PuffinBenchWalk? stroll;
-    private float idleOffset,workBlend;
-    private PuffinWorkPose workPose;
+    private PuffinWorker? worker;
     private readonly ShipBuildGhost buildGhost=new();
     private bool ghostFailed;
     private float nextTick;
     private string status="";
+    internal string Identity=>Ready?view.GetZDO().m_uid.ToString():"";
+    internal string NpcStatus=>worker?.Status??Status;
     internal bool Ready=>view&&view.IsValid();
     internal static void Configure(ConfigFile config)
     {
@@ -62,9 +47,26 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     {
         get
         {
-            var o=Order;if(o==null)return Busy?"Saved order needs inspection; its materials are retained.":"Choose a nearby ship to paint or decorate.";
+            var o=Order;if(o==null)return Busy?"Saved order needs inspection; its materials are retained.":"Build ships with the hammer; a paint stand unlocks decoration.";
             double left=Math.Max(0,o.duration-Elapsed(o));
             return left>0?o.name+" — "+FormatDuration(left)+" remaining":status.Length>0?status:"Construction finished; checking launch area.";
+        }
+    }
+    private float nextConstructionStatus;
+    private string constructionStatus="";
+    internal string ConstructionStatus
+    {
+        get
+        {
+            if(Time.time<nextConstructionStatus)return constructionStatus;
+            nextConstructionStatus=Time.time+1;
+            var lines=new List<string>();
+            var structure=GetComponent<Structures.StructureConstruction>();
+            if(structure&&structure.Busy){lines.Add(structure.Status);var need=structure.RemainingMaterials();if(need.Length>0)lines.Add("Total outstanding: "+need);}
+            foreach(var slip in UnityEngine.Object.FindObjectsByType<Slipway>(FindObjectsSortMode.None))
+            {var report=slip.StatusFor(Identity);if(report.Length>0)lines.Add(report);}
+            constructionStatus=lines.Count>0?string.Join("\n\n",lines):"No active construction. Select a ship with the hammer or import a structure.";
+            return constructionStatus;
         }
     }
     internal static float Duration(ShipBlueprint blueprint)=>durations[blueprint.Id].Value;
@@ -94,11 +96,9 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
             if(!collider.isTrigger && collider.Raycast(ray,out var hit,10) && hit.distance<closest)
             {closest=hit.distance;perch=transform.InverseTransformPoint(hit.point);}
         bird.Root.transform.localPosition=perch;
-        stroll=new PuffinBenchWalk(bird.Root.transform);idleOffset=UnityEngine.Random.Range(0f,23f);
+        worker=new PuffinWorker(this,bird);
         bird.Probes(transform);
-        var trigger=bird.Root.AddComponent<SphereCollider>();trigger.center=new Vector3(0,.6f,0);trigger.radius=.35f;
-        var interaction=bird.Root.AddComponent<BirdInteraction>();interaction.Label=GetHoverName;interaction.Hint=GetHoverText;
-        interaction.Use=user=>Interact(user,false,false);
+        bird.Root.AddComponent<PuffinHover>().Owner=this;
     }
     private void Update()
     {
@@ -109,21 +109,7 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
             try{buildGhost.Update(order,order==null?0:(float)(Elapsed(order)/order.duration));}
             catch(Exception error){ghostFailed=true;Plugin.Instance.Error(error);}
 
-        if(bird!=null)
-        {
-            bool nearby=Player.m_localPlayer&&(Player.m_localPlayer.transform.position-bird.Root.transform.position).sqrMagnitude<9;
-            bool sleeping=order==null&&EnvMan.instance&&!EnvMan.IsDaylight()&&!nearby;
-            bool working=order!=null && Elapsed(order)<order.duration && (stroll==null||stroll.AtHome);
-            if(working)workPose=PuffinPerformance.Sample(ShipConstruction.Find(order!.blueprint)!.HasSail,Elapsed(order));
-            workBlend=Mathf.MoveTowards(workBlend,working?1:0,Time.deltaTime*4);
-            var pose=workPose;float blend=workBlend;
-            bird.SetTool(blend>.5f?pose.Tool:0);
-            bird.Pose(pose.Pitch*blend,pose.HeadYaw*blend,pose.Roll*blend,pose.BodyPitch*blend,pose.Crouch*blend,pose.Wing*blend);
-            if(blend<.01f&&!sleeping)bird.Idle(Time.time+idleOffset);
-            stroll?.Tick(bird,order==null&&!Busy&&!sleeping&&blend<.01f,Time.deltaTime);
-            if(blend>0)bird.Stage(new Vector3(pose.X,pose.Hop,pose.Z)*blend,pose.Yaw*blend,pose.Hop*.3f*blend);
-            bird.Rest(sleeping&&(stroll==null||stroll.AtHome),Time.time+idleOffset,Time.deltaTime);
-        }
+        worker?.Tick(Time.deltaTime);
         if(order==null || !view.IsOwner() || Time.time<nextTick || Elapsed(order)<order.duration)return;
         nextTick=Time.time+2;
         try{Launch(order);}catch(Exception error){status="Launch paused; the saved order is retained.";Plugin.Instance.Error(error);}
@@ -173,9 +159,9 @@ public sealed class Shipyard : MonoBehaviour,Interactable,Hoverable
     }
     public string GetHoverName()=>"Puffin shipwright";
     public float GetHoverOffset()=>0;
-    public string GetHoverText()=>Localization.instance.Localize("Puffin shipwright\n[<color=yellow><b>$KEY_Use</b></color>] Paint and decoration\n")+Status;
+    public string GetHoverText()=>Localization.instance.Localize("Puffin shipwright\n[<color=yellow><b>$KEY_Use</b></color>] Workshop\n[<color=yellow><b>$KEY_AltPlace + $KEY_Use</b></color>] Supplies\n")+ConstructionStatus;
     public bool Interact(Humanoid user,bool hold,bool alt)
-    {if(hold||!(user is Player p)||p!=Player.m_localPlayer||!Near(p))return false;Plugin.Instance.UI.OpenShipyard(this);return true;}
+    {if(hold||!(user is Player p)||p!=Player.m_localPlayer||!Near(p))return false;if(alt)return GetComponent<Container>().Interact(user,false,false);Plugin.Instance.UI.OpenShipyard(this);return true;}
     public bool UseItem(Humanoid user,ItemDrop.ItemData item)=>false;
-    private void OnDestroy(){if(wear)wear.m_onDestroyed-=ReturnMaterials;bird?.Dispose();buildGhost.Dispose();}
+    private void OnDestroy(){if(wear)wear.m_onDestroyed-=ReturnMaterials;worker?.Dispose();bird?.Dispose();buildGhost.Dispose();}
 }

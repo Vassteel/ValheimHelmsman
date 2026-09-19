@@ -139,6 +139,7 @@ GuardedStepsTests.Run(Check);
 ShipConstructionTests.Run(Check);
 PaddleStrokeTests.Run(Check);
 CommissionCostTests.Run(Check);
+ConstructionFundingTests.Run(Check);
 PuffinPerformanceTests.Run(Check);
         ShipwrightRulesTests.Run(Check);
 Console.WriteLine($"{passed} checks passed.");

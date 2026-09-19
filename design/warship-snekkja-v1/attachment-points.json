@@ -1,0 +1,379 @@
+{
+  "status": "Visual alignment guides only",
+  "axes": "X bow, Y port, Z up; metres",
+  "points": [
+    {
+      "id": "row_00_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        -5.4,
+        -0.5002106289705881,
+        0.7815833293423212
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_00_port",
+      "kind": "rowing seat guide",
+      "position": [
+        -5.4,
+        0.5002106289705881,
+        0.7815833293423212
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_01_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        -4.5,
+        -0.5653842508652572,
+        0.7445212815115361
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_01_port",
+      "kind": "rowing seat guide",
+      "position": [
+        -4.5,
+        0.5653842508652572,
+        0.7445212815115361
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_02_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        -3.6000000000000005,
+        -0.6122331278982974,
+        0.7241399169071252
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_02_port",
+      "kind": "rowing seat guide",
+      "position": [
+        -3.6000000000000005,
+        0.6122331278982974,
+        0.7241399169071252
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_03_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        -2.7,
+        -0.6436807330606356,
+        0.7144739580838951
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_03_port",
+      "kind": "rowing seat guide",
+      "position": [
+        -2.7,
+        0.6436807330606356,
+        0.7144739580838951
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_04_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        -1.8000000000000003,
+        -0.6621920699150379,
+        0.7108837448066954
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_04_port",
+      "kind": "rowing seat guide",
+      "position": [
+        -1.8000000000000003,
+        0.6621920699150379,
+        0.7108837448066954
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_05_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        -0.9000000000000004,
+        -0.6704546135185929,
+        0.7100552340504185
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_05_port",
+      "kind": "rowing seat guide",
+      "position": [
+        -0.9000000000000004,
+        0.6704546135185929,
+        0.7100552340504185
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_06_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        0.0,
+        -0.6720585268503799,
+        0.7100000000000001
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_06_port",
+      "kind": "rowing seat guide",
+      "position": [
+        0.0,
+        0.6720585268503799,
+        0.7100000000000001
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_07_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        0.8999999999999995,
+        -0.6704546135185929,
+        0.7100552340504185
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_07_port",
+      "kind": "rowing seat guide",
+      "position": [
+        0.8999999999999995,
+        0.6704546135185929,
+        0.7100552340504185
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_08_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        1.7999999999999998,
+        -0.6621920699150379,
+        0.7108837448066954
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_08_port",
+      "kind": "rowing seat guide",
+      "position": [
+        1.7999999999999998,
+        0.6621920699150379,
+        0.7108837448066954
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_09_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        2.6999999999999993,
+        -0.6436807330606356,
+        0.7144739580838951
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_09_port",
+      "kind": "rowing seat guide",
+      "position": [
+        2.6999999999999993,
+        0.6436807330606356,
+        0.7144739580838951
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_10_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        3.5999999999999996,
+        -0.6122331278982974,
+        0.7241399169071252
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_10_port",
+      "kind": "rowing seat guide",
+      "position": [
+        3.5999999999999996,
+        0.6122331278982974,
+        0.7241399169071252
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_11_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        4.5,
+        -0.5653842508652572,
+        0.7445212815115361
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_11_port",
+      "kind": "rowing seat guide",
+      "position": [
+        4.5,
+        0.5653842508652572,
+        0.7445212815115361
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_12_starboard",
+      "kind": "rowing seat guide",
+      "position": [
+        5.4,
+        -0.5002106289705881,
+        0.7815833293423212
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "row_12_port",
+      "kind": "rowing seat guide",
+      "position": [
+        5.4,
+        0.5002106289705881,
+        0.7815833293423212
+      ],
+      "facing": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "helm",
+      "kind": "helm guide",
+      "position": [
+        -6.6,
+        -0.23,
+        0.9
+      ]
+    }
+  ]
+}

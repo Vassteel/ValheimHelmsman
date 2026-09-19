@@ -28,4 +28,8 @@ Reset(22);lease.Run(Pay);Player.m_localPlayer.transform.position=new(100,0,0);Ca
 Reset(22);lease.Run(Pay);Time.unscaledTime=11;Call("Update");Check(charges==0,"Timed-out authority request takes no materials");
 Reset();PrivateArea.Allowed=false;Check(lease.Run(Pay).Contains("accessible")&&charges==0,"Ward restriction blocks local payment");
 Reset();Call("Request",22L,10L);Check(view.Data.Owner==42,"Remote request cannot impersonate another player");
+Reset();Player.m_localPlayer.transform.position=new(100,0,0);lease.AccessRange=p=>p.Id==10;
+Check(lease.Run(Pay)=="Paid once"&&charges==1,"Authorized base-zone policy replaces local radius");
+Reset();lease.AccessRange=p=>false;Check(lease.Run(Pay).Contains("accessible")&&charges==0,"Different base zone cannot bypass workshop access");
+Reset(22);lease.AccessRange=p=>true;lease.Run(Pay);lease.AccessRange=p=>false;Call("Update");Check(charges==0,"Leaving the base zone cancels pending payment");
 Console.WriteLine($"PASS: {count} production workshop authority and single-payment checks.");

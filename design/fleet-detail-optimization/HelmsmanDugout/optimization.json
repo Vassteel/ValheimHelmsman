@@ -1,0 +1,37 @@
+{
+  "before": 10744,
+  "after": 9446,
+  "parts": [
+    {
+      "group": "fixed",
+      "material": 1,
+      "before": 3324,
+      "after": 2244,
+      "reduced_components": 3,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 0,
+      "before": 432,
+      "after": 256,
+      "reduced_components": 4,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 2,
+      "before": 96,
+      "after": 54,
+      "reduced_components": 3,
+      "preserved_components": 0
+    }
+  ],
+  "protected": [
+    "hull",
+    "sail",
+    "rudder",
+    "mast",
+    "paddle"
+  ]
+}

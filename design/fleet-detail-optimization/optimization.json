@@ -1,0 +1,1418 @@
+[
+  {
+    "asset": "BigCargoShip.bin.gz",
+    "before": 69898,
+    "after": 63128,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 8,
+        "before": 6588,
+        "after": 6048,
+        "reduced_components": 15,
+        "preserved_components": 80
+      },
+      {
+        "group": "deck",
+        "material": 9,
+        "before": 138,
+        "after": 138,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 10,
+        "before": 138,
+        "after": 138,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 11,
+        "before": 380,
+        "after": 380,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 12,
+        "before": 138,
+        "after": 138,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 10,
+        "before": 534,
+        "after": 534,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 8,
+        "before": 776,
+        "after": 656,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 27,
+        "before": 8068,
+        "after": 7036,
+        "reduced_components": 20,
+        "preserved_components": 49
+      },
+      {
+        "group": "rigging",
+        "material": 28,
+        "before": 194,
+        "after": 176,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 0,
+        "before": 36,
+        "after": 20,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 29,
+        "before": 288,
+        "after": 288,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 1,
+        "before": 72,
+        "after": 40,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 108,
+        "after": 76,
+        "reduced_components": 2,
+        "preserved_components": 1
+      },
+      {
+        "group": "fixed",
+        "material": 3,
+        "before": 108,
+        "after": 76,
+        "reduced_components": 2,
+        "preserved_components": 1
+      },
+      {
+        "group": "fixed",
+        "material": 4,
+        "before": 108,
+        "after": 76,
+        "reduced_components": 2,
+        "preserved_components": 1
+      },
+      {
+        "group": "fixed",
+        "material": 5,
+        "before": 108,
+        "after": 92,
+        "reduced_components": 1,
+        "preserved_components": 2
+      },
+      {
+        "group": "fixed",
+        "material": 30,
+        "before": 932,
+        "after": 932,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 9,
+        "before": 240,
+        "after": 240,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 11,
+        "before": 240,
+        "after": 240,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 12,
+        "before": 206,
+        "after": 206,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 31,
+        "before": 1320,
+        "after": 1320,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 32,
+        "before": 206,
+        "after": 206,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 13,
+        "before": 36,
+        "after": 16,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 27,
+        "before": 72,
+        "after": 54,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 32,
+        "before": 1580,
+        "after": 726,
+        "reduced_components": 20,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 8,
+        "before": 344,
+        "after": 344,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 0,
+        "before": 114,
+        "after": 114,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 1,
+        "before": 114,
+        "after": 114,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 2,
+        "before": 114,
+        "after": 114,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 3,
+        "before": 114,
+        "after": 114,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 4,
+        "before": 114,
+        "after": 114,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 5,
+        "before": 56,
+        "after": 56,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 6,
+        "before": 56,
+        "after": 56,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 29,
+        "before": 96,
+        "after": 96,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 33,
+        "before": 880,
+        "after": 780,
+        "reduced_components": 5,
+        "preserved_components": 20
+      },
+      {
+        "group": "cargo",
+        "material": 34,
+        "before": 3818,
+        "after": 2862,
+        "reduced_components": 29,
+        "preserved_components": 14
+      },
+      {
+        "group": "cargo",
+        "material": 35,
+        "before": 3724,
+        "after": 3022,
+        "reduced_components": 37,
+        "preserved_components": 41
+      },
+      {
+        "group": "cargo",
+        "material": 36,
+        "before": 1182,
+        "after": 792,
+        "reduced_components": 15,
+        "preserved_components": 9
+      },
+      {
+        "group": "cargo",
+        "material": 37,
+        "before": 1166,
+        "after": 854,
+        "reduced_components": 12,
+        "preserved_components": 12
+      },
+      {
+        "group": "cargo",
+        "material": 38,
+        "before": 62,
+        "after": 62,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 8,
+        "before": 326,
+        "after": 326,
+        "reduced_components": 0,
+        "preserved_components": 4
+      },
+      {
+        "group": "rigging",
+        "material": 32,
+        "before": 38,
+        "after": 38,
+        "reduced_components": 0,
+        "preserved_components": 5
+      },
+      {
+        "group": "decoration",
+        "material": 8,
+        "before": 3864,
+        "after": 2316,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 27,
+        "before": 2308,
+        "after": 2308,
+        "reduced_components": 0,
+        "preserved_components": 6
+      },
+      {
+        "group": "fixed",
+        "material": 27,
+        "before": 236,
+        "after": 236,
+        "reduced_components": 0,
+        "preserved_components": 6
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "HelmsmanCurrach.bin.gz",
+    "before": 29108,
+    "after": 27244,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 1,
+        "before": 2732,
+        "after": 2448,
+        "reduced_components": 12,
+        "preserved_components": 48
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 1466,
+        "after": 1466,
+        "reduced_components": 0,
+        "preserved_components": 14
+      },
+      {
+        "group": "fixed",
+        "material": 0,
+        "before": 208,
+        "after": 168,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 3,
+        "before": 52,
+        "after": 52,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 4,
+        "before": 108,
+        "after": 48,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 3,
+        "before": 108,
+        "after": 48,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 2,
+        "before": 108,
+        "after": 48,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 5,
+        "before": 28,
+        "after": 28,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 9,
+        "before": 72,
+        "after": 44,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 10,
+        "before": 288,
+        "after": 132,
+        "reduced_components": 6,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 11,
+        "before": 292,
+        "after": 138,
+        "reduced_components": 6,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 12,
+        "before": 288,
+        "after": 132,
+        "reduced_components": 6,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 13,
+        "before": 264,
+        "after": 236,
+        "reduced_components": 1,
+        "preserved_components": 1
+      },
+      {
+        "group": "cargo",
+        "material": 14,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 15,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 16,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 17,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 18,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 19,
+        "before": 36,
+        "after": 16,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 20,
+        "before": 36,
+        "after": 16,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 21,
+        "before": 158,
+        "after": 70,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 22,
+        "before": 60,
+        "after": 26,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 1,
+        "before": 72,
+        "after": 72,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 23,
+        "before": 440,
+        "after": 200,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 13,
+        "before": 88,
+        "after": 52,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 21,
+        "before": 64,
+        "after": 36,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 1,
+        "before": 170,
+        "after": 170,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 7,
+        "before": 5006,
+        "after": 4834,
+        "reduced_components": 2,
+        "preserved_components": 34
+      },
+      {
+        "group": "rigging",
+        "material": 21,
+        "before": 80,
+        "after": 80,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 7,
+        "before": 2340,
+        "after": 2340,
+        "reduced_components": 0,
+        "preserved_components": 6
+      },
+      {
+        "group": "fixed",
+        "material": 7,
+        "before": 204,
+        "after": 204,
+        "reduced_components": 0,
+        "preserved_components": 3
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "HelmsmanDugout.bin.gz",
+    "before": 10744,
+    "after": 9446,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 1,
+        "before": 3324,
+        "after": 2244,
+        "reduced_components": 3,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 0,
+        "before": 432,
+        "after": 256,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 96,
+        "after": 54,
+        "reduced_components": 3,
+        "preserved_components": 0
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "HelmsmanFinewoodKayak.bin.gz",
+    "before": 21440,
+    "after": 15710,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 1,
+        "before": 3182,
+        "after": 1928,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 2832,
+        "after": 1696,
+        "reduced_components": 3,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 3,
+        "before": 2832,
+        "after": 1696,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 4,
+        "before": 2832,
+        "after": 1696,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 5,
+        "before": 1416,
+        "after": 848,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 0,
+        "before": 1048,
+        "after": 604,
+        "reduced_components": 20,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 6,
+        "before": 302,
+        "after": 288,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 7,
+        "before": 96,
+        "after": 54,
+        "reduced_components": 3,
+        "preserved_components": 0
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "HelmsmanTandemKayak.bin.gz",
+    "before": 22472,
+    "after": 16514,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 1,
+        "before": 3456,
+        "after": 2090,
+        "reduced_components": 6,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 2974,
+        "after": 1780,
+        "reduced_components": 3,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 3,
+        "before": 2974,
+        "after": 1782,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 4,
+        "before": 2974,
+        "after": 1780,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 5,
+        "before": 1486,
+        "after": 890,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 0,
+        "before": 1306,
+        "after": 960,
+        "reduced_components": 7,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 6,
+        "before": 242,
+        "after": 242,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 7,
+        "before": 160,
+        "after": 90,
+        "reduced_components": 5,
+        "preserved_components": 0
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "HerculeShip.bin.gz",
+    "before": 32262,
+    "after": 30396,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 1998,
+        "after": 1618,
+        "reduced_components": 20,
+        "preserved_components": 15
+      },
+      {
+        "group": "fixed",
+        "material": 3,
+        "before": 258,
+        "after": 204,
+        "reduced_components": 2,
+        "preserved_components": 2
+      },
+      {
+        "group": "deck",
+        "material": 4,
+        "before": 154,
+        "after": 132,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 5,
+        "before": 138,
+        "after": 114,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 6,
+        "before": 138,
+        "after": 116,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 7,
+        "before": 138,
+        "after": 116,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 13,
+        "before": 48,
+        "after": 48,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 14,
+        "before": 144,
+        "after": 64,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 15,
+        "before": 144,
+        "after": 64,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 3,
+        "before": 144,
+        "after": 64,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 16,
+        "before": 298,
+        "after": 298,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 17,
+        "before": 144,
+        "after": 64,
+        "reduced_components": 4,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 18,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 19,
+        "before": 72,
+        "after": 32,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 20,
+        "before": 604,
+        "after": 296,
+        "reduced_components": 4,
+        "preserved_components": 3
+      },
+      {
+        "group": "cargo",
+        "material": 21,
+        "before": 120,
+        "after": 52,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 2,
+        "before": 144,
+        "after": 144,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 6,
+        "before": 34,
+        "after": 34,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 20,
+        "before": 166,
+        "after": 166,
+        "reduced_components": 0,
+        "preserved_components": 2
+      },
+      {
+        "group": "rigging",
+        "material": 10,
+        "before": 4878,
+        "after": 4878,
+        "reduced_components": 0,
+        "preserved_components": 36
+      },
+      {
+        "group": "rigging",
+        "material": 2,
+        "before": 312,
+        "after": 312,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 20,
+        "before": 54,
+        "after": 54,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 10,
+        "before": 342,
+        "after": 342,
+        "reduced_components": 0,
+        "preserved_components": 6
+      },
+      {
+        "group": "cargo",
+        "material": 22,
+        "before": 1056,
+        "after": 552,
+        "reduced_components": 12,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 23,
+        "before": 152,
+        "after": 90,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 13,
+        "before": 1000,
+        "after": 1000,
+        "reduced_components": 0,
+        "preserved_components": 18
+      },
+      {
+        "group": "fixed",
+        "material": 21,
+        "before": 138,
+        "after": 138,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 4,
+        "before": 36,
+        "after": 36,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 5,
+        "before": 36,
+        "after": 36,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 6,
+        "before": 36,
+        "after": 36,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 7,
+        "before": 36,
+        "after": 36,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 10,
+        "before": 2308,
+        "after": 2308,
+        "reduced_components": 0,
+        "preserved_components": 6
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "LittleBoat.bin.gz",
+    "before": 27326,
+    "after": 25730,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 7,
+        "before": 2388,
+        "after": 1604,
+        "reduced_components": 29,
+        "preserved_components": 7
+      },
+      {
+        "group": "deck",
+        "material": 8,
+        "before": 204,
+        "after": 180,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 9,
+        "before": 180,
+        "after": 158,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 10,
+        "before": 180,
+        "after": 158,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 11,
+        "before": 158,
+        "after": 158,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 22,
+        "before": 126,
+        "after": 72,
+        "reduced_components": 2,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 108,
+        "after": 64,
+        "reduced_components": 1,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 23,
+        "before": 58,
+        "after": 58,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 7,
+        "before": 220,
+        "after": 220,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 24,
+        "before": 6486,
+        "after": 5840,
+        "reduced_components": 6,
+        "preserved_components": 30
+      },
+      {
+        "group": "rigging",
+        "material": 23,
+        "before": 80,
+        "after": 80,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 24,
+        "before": 3034,
+        "after": 3034,
+        "reduced_components": 0,
+        "preserved_components": 6
+      },
+      {
+        "group": "fixed",
+        "material": 24,
+        "before": 310,
+        "after": 310,
+        "reduced_components": 0,
+        "preserved_components": 6
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  },
+  {
+    "asset": "WarShip.bin.gz",
+    "before": 43312,
+    "after": 41258,
+    "parts": [
+      {
+        "group": "fixed",
+        "material": 8,
+        "before": 2142,
+        "after": 1510,
+        "reduced_components": 23,
+        "preserved_components": 10
+      },
+      {
+        "group": "deck",
+        "material": 9,
+        "before": 344,
+        "after": 344,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 10,
+        "before": 344,
+        "after": 344,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 11,
+        "before": 344,
+        "after": 344,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 12,
+        "before": 362,
+        "after": 362,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 8,
+        "before": 448,
+        "after": 448,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 6,
+        "before": 760,
+        "after": 340,
+        "reduced_components": 10,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 13,
+        "before": 1630,
+        "after": 1140,
+        "reduced_components": 14,
+        "preserved_components": 12
+      },
+      {
+        "group": "cargo",
+        "material": 14,
+        "before": 898,
+        "after": 898,
+        "reduced_components": 0,
+        "preserved_components": 25
+      },
+      {
+        "group": "cargo",
+        "material": 7,
+        "before": 96,
+        "after": 96,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "cargo",
+        "material": 15,
+        "before": 608,
+        "after": 272,
+        "reduced_components": 8,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 13,
+        "before": 144,
+        "after": 144,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 30,
+        "before": 5698,
+        "after": 5522,
+        "reduced_components": 2,
+        "preserved_components": 42
+      },
+      {
+        "group": "fixed",
+        "material": 12,
+        "before": 68,
+        "after": 68,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 9,
+        "before": 68,
+        "after": 68,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 10,
+        "before": 68,
+        "after": 68,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 11,
+        "before": 68,
+        "after": 68,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 2,
+        "before": 68,
+        "after": 68,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "fixed",
+        "material": 14,
+        "before": 138,
+        "after": 138,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 8,
+        "before": 246,
+        "after": 246,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "rigging",
+        "material": 14,
+        "before": 160,
+        "after": 160,
+        "reduced_components": 0,
+        "preserved_components": 0
+      },
+      {
+        "group": "deck",
+        "material": 30,
+        "before": 2308,
+        "after": 2308,
+        "reduced_components": 0,
+        "preserved_components": 6
+      },
+      {
+        "group": "fixed",
+        "material": 30,
+        "before": 236,
+        "after": 236,
+        "reduced_components": 0,
+        "preserved_components": 6
+      }
+    ],
+    "protected": [
+      "hull",
+      "sail",
+      "rudder",
+      "mast",
+      "paddle"
+    ]
+  }
+]

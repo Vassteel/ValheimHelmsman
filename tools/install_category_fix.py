@@ -14,7 +14,7 @@ def atomic(path,data):
  finally:
   if os.path.exists(temp):os.unlink(temp)
 closed()
-manifest=root/'packaging/manifest.json';version=json.loads(manifest.read_text())['version_number'];assert version=='0.2.35'
+manifest=root/'packaging/manifest.json';version=json.loads(manifest.read_text())['version_number'];assert version=='0.2.40'
 sources=[root/'dist/ValheimHelmsman/ValheimHelmsman.dll',root/'dist/ValheimHelmsman/Helmsman.Core.dll',manifest]
 places=[Path('/home/deck/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins/ValheimHelmsman'),Path('/home/deck/.var/app/io.github.ebkr.r2modman/config/r2modmanPlus-local/Valheim/profiles/Mods/BepInEx/plugins/local-ValheimHelmsman')]
 for folder in places:
@@ -29,6 +29,13 @@ try:
    if old is not None:(backup/(str(i)+'-'+source.name)).write_bytes(old)
    data=source.read_bytes();changes.append((dest,old));atomic(dest,data);assert dest.read_bytes()==data
    files.append({'mod':'Helmsman','version':version,'path':str(dest),'sha256':hashlib.sha256(data).hexdigest(),'changed':old!=data})
+ # POI construction now lives in Helmsman. Retire only the standalone DLL,
+ # with a backup outside BepInEx so it cannot load alongside the merged tool.
+ for i,folder in enumerate(places):
+  for dest in folder.parent.rglob('PoiTotem.dll'):
+   closed();old=dest.read_bytes();(backup/(str(i)+'-standalone-PoiTotem.dll')).write_bytes(old)
+   changes.append((dest,old));dest.unlink()
+   files.append({'mod':'Helmsman','path':str(dest),'removed_standalone_poi':True})
 except BaseException:
  for path,old in reversed(changes):
   if old is None:path.unlink(missing_ok=True)

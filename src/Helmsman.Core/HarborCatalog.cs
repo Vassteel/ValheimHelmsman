@@ -16,30 +16,22 @@ public sealed class HarborEntry
 public static class HarborCatalog
 {
     public static readonly IReadOnlyList<HarborEntry> Pieces=Array.AsReadOnly(new[]{
-        new HarborEntry("ShipConstruction","Ship construction","FineWood:20,IronNails:10,ElderBark:10"),
-        new HarborEntry("ShipConstruction1","Ship construction I","FineWood:20,IronNails:10,ElderBark:10"),
-        new HarborEntry("ShipConstruction2","Ship construction II","FineWood:20,IronNails:10,ElderBark:10"),
-        new HarborEntry("PierCrane1","Pier crane I","Chain:4,Wood:40,RoundLog:20,IronNails:20"),
-        new HarborEntry("PierCrane2","Pier crane II","Iron:4,Wood:40,RoundLog:20,IronNails:20"),
-        new HarborEntry("PulleyCobia","Cobia pulley","Wood:10,LeatherScraps:4"),
-        new HarborEntry("PulleyElephantSeal","Elephant seal pulley","Wood:10,LeatherScraps:4"),
-        new HarborEntry("PulleyMarlin","Blue marlin pulley","Wood:10,LeatherScraps:4"),
-        new HarborEntry("Enguias","Eels","Wood:4,FishRaw:2"),
-        new HarborEntry("Peixes","Fish dryer","Wood:4,FishRaw:2"),
-        new HarborEntry("RedePesca","Fishing net","Wood:3,LeatherScraps:10"),
-        new HarborEntry("Totem1","Totem I","RoundLog:2,Wood:2"),
-        new HarborEntry("Totem2","Totem II","RoundLog:2"),
-        new HarborEntry("Totem3","Totem III","RoundLog:2"),
-        new HarborEntry("Totem4","Totem IV","Wood:8,TrophySkeleton:1"),
-        new HarborEntry("OilPress","Oil extractor","Wood:20,Iron:2,IronNails:10"),
-        new HarborEntry("FishingDock","Fishing dock","BronzeNails:20,Wood:20,RoundLog:4,Coins:250"),
-        new HarborEntry("FishingDock_Extension","Dock extension","BronzeNails:20,Wood:20,RoundLog:4")
+        new HarborEntry("ShipConstruction","Keel cradle","FineWood:20,IronNails:10,ElderBark:10"),
+        new HarborEntry("ShipConstruction1","Launching rollers","FineWood:20,IronNails:10,ElderBark:10"),
+        new HarborEntry("ShipConstruction2","Ship framing gantry","FineWood:20,IronNails:10,ElderBark:10"),
+        new HarborEntry("PierCrane1","Timber pier crane","Chain:4,Wood:40,RoundLog:20,IronNails:20"),
+        new HarborEntry("PierCrane2","Braced pier crane","Iron:4,Wood:40,RoundLog:20,IronNails:20"),
+        new HarborEntry("PulleyCobia","Single block","Wood:10,LeatherScraps:4"),
+        new HarborEntry("PulleyElephantSeal","Double purchase","Wood:10,LeatherScraps:4"),
+        new HarborEntry("PulleyMarlin","Heavy purchase","Wood:10,LeatherScraps:4"),
+        new HarborEntry("FishingDock","Pelican fishing station","BronzeNails:20,Wood:20,RoundLog:4,Coins:250")
     });
     public static readonly IReadOnlyList<HarborEntry> Items=Array.AsReadOnly(new[]{
-        new HarborEntry("ResinWood","Resin wood","RoundLog:10,Resin:10",10),
-        new HarborEntry("CaulkedWood","Caulked wood","FineWood:10,Resin:10,Coal:10",10),
-        new HarborEntry("ClothShip","Sail canvas","DeerHide:5"),
-        new HarborEntry("ShipRope","Marine rope","LeatherScraps:5"),
+        // Retain existing inventory and paid-order refunds; crafting is deferred.
+        new HarborEntry("ResinWood","Resin wood",amount:10),
+        new HarborEntry("CaulkedWood","Caulked wood",amount:10),
+        new HarborEntry("ClothShip","Sail canvas"),
+        new HarborEntry("ShipRope","Marine rope"),
         new HarborEntry("WindBelt","Wind belt","Ruby:1,AmberPearl:4,DeerHide:5,Blueberries:2"),
         new HarborEntry("FishExtract","Fish extract"),
         new HarborEntry("FishExtract2","Fish extract"),

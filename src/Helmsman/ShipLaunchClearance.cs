@@ -8,12 +8,12 @@ namespace Helmsman;
 internal static class ShipLaunchClearance
 {
     private static int Mask=>LayerMask.GetMask("Default","static_solid","Default_small","piece","terrain","vehicle");
-    internal static bool Clear(Ship ship,Vector3 position,Quaternion rotation,out string reason)
+    internal static bool Clear(Ship ship,Vector3 position,Quaternion rotation,out string reason,Transform? ignore=null,bool atSea=true,bool preserveHeight=false)
     {
-        position=WaterChart.AtSea(position);
+        if(atSea&&!preserveHeight)position=WaterChart.AtSea(position);
         if(!ZoneSystem.instance || !ZoneSystem.instance.IsZoneLoaded(position) || !Heightmap.GetHeight(position,out var ground))
         {reason="Launch water is not loaded yet.";return false;}
-        if(WaterChart.Sea-ground<.25f)
+        if(atSea&&WaterChart.Sea-ground<.25f)
         {reason="Move the launch point into the water.";return false;}
         var root=ship.transform;
         var inverse=Quaternion.Inverse(root.rotation);
@@ -43,7 +43,7 @@ internal static class ShipLaunchClearance
         var nearby=Physics.OverlapBox(position+rotation*bounds.center,bounds.extents,rotation,Mask,QueryTriggerInteraction.Ignore);
         foreach(var obstacle in nearby)
         {
-            if(!obstacle || obstacle.transform.IsChildOf(root) || obstacle.GetComponentInParent<Character>())continue;
+            if(!obstacle || obstacle.transform.IsChildOf(root) || (ignore&&obstacle.transform.IsChildOf(ignore)) || obstacle.GetComponentInParent<Character>())continue;
             foreach(var part in parts)
             {
                 var partPosition=position+rotation*(inverse*(part.transform.position-root.position));

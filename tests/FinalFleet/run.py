@@ -52,6 +52,7 @@ for name in sorted(expected):
   nt=num();triangles+=nt//3;assert nt%3==0
   ts=struct.unpack('<'+'i'*nt,r.read(nt*4));assert min(ts)>=0 and max(ts)<n
  assert ({'hull','fixed','paddle'} if paddling else {'sail','hull','fixed','rudder'})<=groups
+ if not paddling:assert {'deck','mast','rigging'}<=groups,'Construction stages were merged into fixed meshes'
  if paddling:assert 'sail' not in groups and 'rudder' not in groups
  assert not r.read(1),'Trailing bytes'
  if s['name'] in ['ottar','freighter']:
@@ -95,3 +96,6 @@ for name in sorted(expected):
  assert 0<s['sailPivot'][1]<=s['airHeight']<25
  checks+=1;print(f'PASS: {name}: {triangles:,} triangles, {parts} material batches; sail, helm, boarding and collision resources valid.')
 print(f'PASS: all {checks} final fleet assets, closed keel sections and merchant hold coverage.')
+
+from check_keel import check as check_currach_keel
+check_currach_keel(ROOT/"assets/ships/final/HelmsmanCurrach.bin.gz")

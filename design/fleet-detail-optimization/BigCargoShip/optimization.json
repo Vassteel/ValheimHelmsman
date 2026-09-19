@@ -1,0 +1,373 @@
+{
+  "before": 69898,
+  "after": 63128,
+  "parts": [
+    {
+      "group": "fixed",
+      "material": 8,
+      "before": 6588,
+      "after": 6048,
+      "reduced_components": 15,
+      "preserved_components": 80
+    },
+    {
+      "group": "deck",
+      "material": 9,
+      "before": 138,
+      "after": 138,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 10,
+      "before": 138,
+      "after": 138,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 11,
+      "before": 380,
+      "after": 380,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 12,
+      "before": 138,
+      "after": 138,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 10,
+      "before": 534,
+      "after": 534,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 8,
+      "before": 776,
+      "after": 656,
+      "reduced_components": 2,
+      "preserved_components": 0
+    },
+    {
+      "group": "rigging",
+      "material": 27,
+      "before": 8068,
+      "after": 7036,
+      "reduced_components": 20,
+      "preserved_components": 49
+    },
+    {
+      "group": "rigging",
+      "material": 28,
+      "before": 194,
+      "after": 176,
+      "reduced_components": 1,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 0,
+      "before": 36,
+      "after": 20,
+      "reduced_components": 1,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 29,
+      "before": 288,
+      "after": 288,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 1,
+      "before": 72,
+      "after": 40,
+      "reduced_components": 2,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 2,
+      "before": 108,
+      "after": 76,
+      "reduced_components": 2,
+      "preserved_components": 1
+    },
+    {
+      "group": "fixed",
+      "material": 3,
+      "before": 108,
+      "after": 76,
+      "reduced_components": 2,
+      "preserved_components": 1
+    },
+    {
+      "group": "fixed",
+      "material": 4,
+      "before": 108,
+      "after": 76,
+      "reduced_components": 2,
+      "preserved_components": 1
+    },
+    {
+      "group": "fixed",
+      "material": 5,
+      "before": 108,
+      "after": 92,
+      "reduced_components": 1,
+      "preserved_components": 2
+    },
+    {
+      "group": "fixed",
+      "material": 30,
+      "before": 932,
+      "after": 932,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 9,
+      "before": 240,
+      "after": 240,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 11,
+      "before": 240,
+      "after": 240,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 12,
+      "before": 206,
+      "after": 206,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 31,
+      "before": 1320,
+      "after": 1320,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 32,
+      "before": 206,
+      "after": 206,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 13,
+      "before": 36,
+      "after": 16,
+      "reduced_components": 1,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 27,
+      "before": 72,
+      "after": 54,
+      "reduced_components": 1,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 32,
+      "before": 1580,
+      "after": 726,
+      "reduced_components": 20,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 8,
+      "before": 344,
+      "after": 344,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 0,
+      "before": 114,
+      "after": 114,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 1,
+      "before": 114,
+      "after": 114,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 2,
+      "before": 114,
+      "after": 114,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 3,
+      "before": 114,
+      "after": 114,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 4,
+      "before": 114,
+      "after": 114,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 5,
+      "before": 56,
+      "after": 56,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 6,
+      "before": 56,
+      "after": 56,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 29,
+      "before": 96,
+      "after": 96,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 33,
+      "before": 880,
+      "after": 780,
+      "reduced_components": 5,
+      "preserved_components": 20
+    },
+    {
+      "group": "cargo",
+      "material": 34,
+      "before": 3818,
+      "after": 2862,
+      "reduced_components": 29,
+      "preserved_components": 14
+    },
+    {
+      "group": "cargo",
+      "material": 35,
+      "before": 3724,
+      "after": 3022,
+      "reduced_components": 37,
+      "preserved_components": 41
+    },
+    {
+      "group": "cargo",
+      "material": 36,
+      "before": 1182,
+      "after": 792,
+      "reduced_components": 15,
+      "preserved_components": 9
+    },
+    {
+      "group": "cargo",
+      "material": 37,
+      "before": 1166,
+      "after": 854,
+      "reduced_components": 12,
+      "preserved_components": 12
+    },
+    {
+      "group": "cargo",
+      "material": 38,
+      "before": 62,
+      "after": 62,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "rigging",
+      "material": 8,
+      "before": 326,
+      "after": 326,
+      "reduced_components": 0,
+      "preserved_components": 4
+    },
+    {
+      "group": "rigging",
+      "material": 32,
+      "before": 38,
+      "after": 38,
+      "reduced_components": 0,
+      "preserved_components": 5
+    },
+    {
+      "group": "decoration",
+      "material": 8,
+      "before": 3864,
+      "after": 2316,
+      "reduced_components": 2,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 27,
+      "before": 2308,
+      "after": 2308,
+      "reduced_components": 0,
+      "preserved_components": 6
+    },
+    {
+      "group": "fixed",
+      "material": 27,
+      "before": 236,
+      "after": 236,
+      "reduced_components": 0,
+      "preserved_components": 6
+    }
+  ],
+  "protected": [
+    "hull",
+    "sail",
+    "rudder",
+    "mast",
+    "paddle"
+  ]
+}

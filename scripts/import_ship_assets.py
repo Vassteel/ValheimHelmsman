@@ -19,14 +19,14 @@ def main():
     roots={p.read().m_Name:(path,p.path_id) for path,p in env.container.items()
            if path.endswith('.prefab') and p.read().m_Name in APPROVED}
     if set(roots)!=set(APPROVED):raise ValueError('Missing selected models: '+str(set(APPROVED)-set(roots)))
-    native_container=next(pid for pid,s in scripts.items() if s.m_ClassName=='Container' and s.m_AssemblyName.startswith('assembly_valheim'))
-    native_container_object=next(o for o in objects.values() if o.type.name=='MonoBehaviour' and o.read_typetree()['m_Script']['m_PathID']==native_container)
     stripped=[];cargo={};blocked=set();converted=[]
     for o in objects.values():
         if o.type.name!='MonoBehaviour':continue
         d=o.read_typetree();script=scripts.get(d['m_Script']['m_PathID'])
         if script and script.m_AssemblyName.startswith('OdinShip'):
             if script.m_ClassName=='ShipContainer':
+                native_container=next(pid for pid,s in scripts.items() if s.m_ClassName=='Container' and s.m_AssemblyName.startswith('assembly_valheim'))
+                native_container_object=next(o for o in objects.values() if o.type.name=='MonoBehaviour' and o.read_typetree()['m_Script']['m_PathID']==native_container)
                 # Only inherited Container fields are serialized. Rebind to the game's class;
                 # Helmsman scopes its save keys/RPC names for multiple holds on one ship.
                 cargo[str(d['m_GameObject']['m_PathID'])]=dict(d)

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using HarmonyLib;
 using Helmsman.Core;
 using UnityEngine;
@@ -38,6 +39,14 @@ internal static class PaddlePlayerInstall
     }
 }
 
+// Magica schedules cape simulation before MonoBehaviour.LateUpdate. Supply the
+// final skeletal pose before it reads the skinning anchors and body colliders.
+[HarmonyPatch(typeof(MagicaCloth2.ClothManager),"OnBeforeLateUpdate")]
+internal static class PaddleBeforeCloth
+{
+    private static void Prefix()=>PaddlePlayerPose.BeforeCloth();
+}
+
 // Apply after the vanilla seated Animator. Restore the captured local pose before
 // the next animation evaluation, so offsets never accumulate or leak on dismount.
 [DefaultExecutionOrder(10000)]
@@ -48,6 +57,11 @@ public sealed class PaddlePlayerPose : MonoBehaviour
     private Quaternion[] rotations=Array.Empty<Quaternion>();private Vector3[] positions=Array.Empty<Vector3>();
     private bool applied,failed;private GameObject? paddle;private PaddleCraftRig? craft;
     private float blend;private double lastTime;
+    private int poseFrame=-1;private bool resetCloth;
+    private static readonly HashSet<PaddlePlayerPose> players=new();
+    internal static void BeforeCloth(){foreach(var pose in players)if(pose&&pose.isActiveAndEnabled)pose.ApplyPose();}
+    private void OnEnable(){players.Add(this);}
+
     private static readonly HumanBodyBones[] ids={HumanBodyBones.Hips,HumanBodyBones.Spine,HumanBodyBones.Chest,
         HumanBodyBones.LeftUpperArm,HumanBodyBones.LeftLowerArm,HumanBodyBones.LeftHand,
         HumanBodyBones.RightUpperArm,HumanBodyBones.RightLowerArm,HumanBodyBones.RightHand,
@@ -67,13 +81,16 @@ public sealed class PaddlePlayerPose : MonoBehaviour
         bones=bones.Concat(descendants.Where(t=>t.name.Contains("Hand")&&new[]{"Index","Middle","Ring","Pinky","Thumb"}.Any(f=>t.name.Contains(f))&&!t.name.EndsWith("_end",StringComparison.Ordinal))).Distinct().ToArray();
         rotations=new Quaternion[bones.Length];positions=new Vector3[bones.Length];return true;
     }
-    private void LateUpdate()
+    private void LateUpdate()=>ApplyPose(); // Fallback if cloth quality disables its update.
+    private void ApplyPose()
     {
+        if(poseFrame==Time.frameCount)return;
+        poseFrame=Time.frameCount;
         if(!view||!view.IsValid()||!ZNetScene.instance)return;
         if(view.IsOwner()&&(!player.IsAttached()||player.IsDead()))
         {
             if(view.GetZDO().GetZDOID("helmsman_paddle_ship")!=ZDOID.None)view.GetZDO().Set("helmsman_paddle_ship",ZDOID.None);
-            Release();return;
+            TandemPaddling.Clear(view.GetZDO());Release();return;
         }
         var id=view.GetZDO().GetZDOID("helmsman_paddle_ship");
         var instance=id!=ZDOID.None?ZNetScene.instance.FindInstance(id):null;
@@ -85,24 +102,27 @@ public sealed class PaddlePlayerPose : MonoBehaviour
         if((transform.position-anchor).sqrMagnitude>4||player.IsDead()){Release();return;}
         if(craft!=next)
         {
-            Release();craft=next;
+            Release();craft=next;resetCloth=true;
             paddle=Instantiate(craft.PaddleTemplate,craft.transform);paddle.name="Player paddle";paddle.SetActive(true);
         }
         if(!BindBones()){if(paddle)paddle.SetActive(false);return;}
         if(!paddle)return;
         paddle.SetActive(true);
-        var ship=craft.GetComponent<Ship>();var speed=ship.GetSpeedSetting();bool rowing=speed==Ship.Speed.Slow||speed==Ship.Speed.Back;
+        var ship=craft.GetComponent<Ship>();var speed=ship.GetSpeedSetting();
+        bool front=TandemPaddling.Front(seat);int input=front?TandemPaddling.Input(view.GetZDO()):0;
+        bool rowing=front?input!=0:speed==Ship.Speed.Slow||speed==Ship.Speed.Back;
         blend=Mathf.MoveTowards(blend,rowing?1:0,Time.deltaTime*3);
         double time=ZNet.instance?ZNet.instance.GetTime().Ticks/(double)TimeSpan.TicksPerSecond:Time.time;
         if(rowing)lastTime=time;
-        var stroke=PaddleStroke.Sample(lastTime,craft.DoubleBlade,speed==Ship.Speed.Back);
+        var stroke=PaddleStroke.Sample(lastTime,craft.DoubleBlade,front?input<0:speed==Ship.Speed.Back);
         var root=craft.transform;
         var moving=new Vector3((float)stroke.X,(float)stroke.Y,(float)stroke.Z);
         var axis=Vector3.Lerp(Vector3.right,new Vector3((float)stroke.AxisX,(float)stroke.AxisY,(float)stroke.AxisZ),blend).normalized;
         Vector3 center=anchor+root.TransformDirection(Vector3.Lerp(new Vector3(0,.40f,.32f),moving,blend));
         Vector3 shaft=root.TransformDirection(axis);
-        // HMF paddle lies on local X; rotate it as one rigid object between both grips.
-        paddle.transform.position=center;paddle.transform.rotation=root.rotation*Quaternion.FromToRotation(Vector3.right,axis);
+        // HMF shaft lies on local X. Roll the blade 90 degrees so its broad
+        // face meets the stroke instead of slicing through the water edge-first.
+        paddle.transform.position=center;paddle.transform.rotation=root.rotation*Quaternion.FromToRotation(Vector3.right,axis)*Quaternion.AngleAxis(90,Vector3.right);
         for(int i=0;i<bones.Length;i++){rotations[i]=bones[i].localRotation;positions[i]=bones[i].localPosition;}
         applied=true;
         bones[0].position=anchor+root.up*.12f;bones[0].rotation=root.rotation;
@@ -110,15 +130,17 @@ public sealed class PaddlePlayerPose : MonoBehaviour
         bones[1].rotation=torso;bones[2].rotation=torso;
         // Keep the rigid shaft inside the reach of the actual animated shoulders,
         // including different avatar proportions. Hands never slide off the paddle.
+        var left=Grip(bones[5],shaft,root.forward,root.up,true);
+        var right=Grip(bones[8],shaft,root.forward,root.up,false);
         for(int pass=0;pass<8;pass++)
         {
-            center=FitGrip(center,shaft,-.31f,bones[3],bones[4],bones[5]);
-            center=FitGrip(center,shaft,.31f,bones[6],bones[7],bones[8]);
+            center=FitGrip(center,shaft,-.31f,bones[3],bones[4],bones[5],left.Offset);
+            center=FitGrip(center,shaft,.31f,bones[6],bones[7],bones[8],right.Offset);
         }
         paddle.transform.position=center;
         // Targets remain on the shaft, with elbow poles outside the torso.
-        Solve(bones[3],bones[4],bones[5],center-shaft*.31f,anchor-root.right*.8f+root.up*.45f);
-        Solve(bones[6],bones[7],bones[8],center+shaft*.31f,anchor+root.right*.8f+root.up*.45f);
+        Solve(bones[3],bones[4],bones[5],center-shaft*.31f-left.Offset,anchor-root.right*.8f+root.up*.45f);
+        Solve(bones[6],bones[7],bones[8],center+shaft*.31f-right.Offset,anchor+root.right*.8f+root.up*.45f);
         Solve(bones[9],bones[10],bones[11],anchor+root.TransformDirection(new Vector3(-.18f,-.055f,.77f)),anchor+root.TransformDirection(new Vector3(-.25f,.26f,.43f)));
         Solve(bones[12],bones[13],bones[14],anchor+root.TransformDirection(new Vector3(.18f,-.055f,.77f)),anchor+root.TransformDirection(new Vector3(.25f,.26f,.43f)));
         foreach(int index in new[]{11,14})
@@ -126,26 +148,58 @@ public sealed class PaddlePlayerPose : MonoBehaviour
             var toe=bones[index].Cast<Transform>().FirstOrDefault(t=>t.name.Contains("ToeBase"));
             if(toe)bones[index].rotation=Quaternion.FromToRotation(toe.position-bones[index].position,root.forward)*bones[index].rotation;
         }
-        // Orient each palm around the shaft using its rig's original hand-to-finger axis.
-        AlignHand(bones[5],shaft,root.forward);AlignHand(bones[8],shaft,root.forward);
-        foreach(var finger in bones.Skip(ids.Length))
-        {
-            if(finger.name.Contains("Thumb"))continue;
-            float curl=finger.name.EndsWith("1",StringComparison.Ordinal)?30:55;
-            finger.rotation=Quaternion.AngleAxis(curl,shaft)*finger.rotation;
-        }
+        bones[5].rotation=left.Rotation;bones[8].rotation=right.Rotation;
+        CurlFingers(bones[5],shaft,root.forward,center-shaft*.31f);
+        CurlFingers(bones[8],shaft,root.forward,center+shaft*.31f);
+        if(resetCloth){ResetCape();resetCloth=false;}
     }
-    private static Vector3 FitGrip(Vector3 center,Vector3 shaft,float grip,Transform shoulder,Transform elbow,Transform hand)
+    private static Vector3 FitGrip(Vector3 center,Vector3 shaft,float grip,Transform shoulder,Transform elbow,Transform hand,Vector3 palmOffset)
     {
         float reach=Vector3.Distance(shoulder.position,elbow.position)+Vector3.Distance(elbow.position,hand.position)-.003f;
-        Vector3 delta=center+shaft*grip-shoulder.position;
+        Vector3 delta=center+shaft*grip-palmOffset-shoulder.position;
         return delta.magnitude>reach?center-delta.normalized*(delta.magnitude-reach):center;
     }
-    private static void AlignHand(Transform hand,Vector3 shaft,Vector3 forward)
+    private static (Quaternion Rotation,Vector3 Offset) Grip(Transform hand,Vector3 shaft,Vector3 forward,Vector3 up,bool left)
     {
-        var finger=hand.Cast<Transform>().FirstOrDefault(t=>t.name.IndexOf("Middle",StringComparison.OrdinalIgnoreCase)>=0);
-        if(finger&&(finger.position-hand.position).sqrMagnitude>.00001f)
-            hand.rotation=Quaternion.FromToRotation((finger.position-hand.position).normalized,Vector3.Cross(shaft,forward).normalized)*hand.rotation;
+        var fingers=hand.Cast<Transform>().ToArray();
+        var middle=fingers.FirstOrDefault(t=>t.name.Contains("Middle"));
+        var index=fingers.FirstOrDefault(t=>t.name.Contains("Index"));
+        var pinky=fingers.FirstOrDefault(t=>t.name.Contains("Pinky"));
+        if(!middle||!index||!pinky)return (hand.rotation,forward*.08f-up*.02f);
+        Vector3 along=middle.localPosition.normalized;
+        Vector3 across=(index.localPosition-pinky.localPosition).normalized;
+        Vector3 curlForward=Vector3.ProjectOnPlane(forward,shaft).normalized;
+        Vector3 thumbSide=left?shaft:-shaft;
+        var localBasis=Quaternion.LookRotation(along,Vector3.Cross(across,along));
+        var worldBasis=Quaternion.LookRotation(curlForward,Vector3.Cross(thumbSide,curlForward));
+        float palmLength=hand.TransformVector(middle.localPosition).magnitude*.72f;
+        // The wrist is behind/above the shaft; the shaft rests inside the palm.
+        return (worldBasis*Quaternion.Inverse(localBasis),curlForward*palmLength-up*.02f);
+    }
+    private static void CurlFingers(Transform hand,Vector3 shaft,Vector3 forward,Vector3 grip)
+    {
+        Vector3 start=Vector3.ProjectOnPlane(forward,shaft).normalized;
+        foreach(var finger in hand.Cast<Transform>().Where(t=>new[]{"Index","Middle","Ring","Pinky","Thumb"}.Any(f=>t.name.Contains(f))))
+        {
+            var joint=finger;
+            for(int segment=0;segment<3&&joint&&joint.childCount>0;segment++)
+            {
+                var end=joint.GetChild(0);
+                Vector3 direction=finger.name.Contains("Thumb")?grip-joint.position:
+                    Quaternion.AngleAxis(segment==0?65:segment==1?120:165,shaft)*start;
+                if(direction.sqrMagnitude>.000001f)
+                    joint.rotation=Quaternion.FromToRotation(end.position-joint.position,direction)*joint.rotation;
+                joint=end;
+            }
+        }
+    }
+    private void ResetCape()
+    {
+        // A single reset at each seat transition, never a reset every stroke.
+        foreach(var cape in GetComponentsInChildren<MagicaCloth2.MagicaCloth>())
+            if(cape.isActiveAndEnabled)cape.ResetCloth(false);
+        foreach(var cape in GetComponentsInChildren<Cloth>())
+            if(cape.enabled){cape.enabled=false;cape.enabled=true;}
     }
     private static void Solve(Transform upper,Transform lower,Transform end,Vector3 target,Vector3 pole)
     {
@@ -163,7 +217,7 @@ public sealed class PaddlePlayerPose : MonoBehaviour
     {
         if(!applied)return;for(int i=0;i<bones.Length;i++)if(bones[i]){bones[i].localRotation=rotations[i];bones[i].localPosition=positions[i];}applied=false;
     }
-    private void Release(){Restore();if(paddle)Destroy(paddle);paddle=null;craft=null;blend=0;}
-    private void OnDisable(){Release();}
-    private void OnDestroy(){Release();}
+    private void Release(){Restore();if(craft)ResetCape();if(paddle)Destroy(paddle);paddle=null;craft=null;blend=0;}
+    private void OnDisable(){players.Remove(this);Release();}
+    private void OnDestroy(){players.Remove(this);Release();}
 }

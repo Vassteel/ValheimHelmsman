@@ -37,10 +37,10 @@ internal static class NativeFleetFactory
         if(FinalFleetModels.PaddleCraft(model))
         {
             bool log=model=="HelmsmanDugout";
-            ship.m_backwardForce=log?.075f:.16f;
-            ship.m_dampingForward=log?.018f:.009f;
-            ship.m_dampingSideway=.24f;ship.m_angularDamping=.28f;
-            ship.m_stearForce=log?.12f:.17f;ship.m_stearVelForceFactor=.12f;
+            ship.m_backwardForce=log?.075f:.65f;
+            ship.m_dampingForward=log?.018f:.0045f;
+            ship.m_dampingSideway=.24f;ship.m_angularDamping=log?.28f:.16f;
+            ship.m_stearForce=log?.12f:.80f;ship.m_stearVelForceFactor=log?.12f:.40f;
             ship.m_hasSail=false;ship.m_sailForceFactor=0;
         }
         return prefab;

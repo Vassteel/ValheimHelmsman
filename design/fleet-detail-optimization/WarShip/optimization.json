@@ -1,0 +1,197 @@
+{
+  "before": 43312,
+  "after": 41258,
+  "parts": [
+    {
+      "group": "fixed",
+      "material": 8,
+      "before": 2142,
+      "after": 1510,
+      "reduced_components": 23,
+      "preserved_components": 10
+    },
+    {
+      "group": "deck",
+      "material": 9,
+      "before": 344,
+      "after": 344,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 10,
+      "before": 344,
+      "after": 344,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 11,
+      "before": 344,
+      "after": 344,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 12,
+      "before": 362,
+      "after": 362,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 8,
+      "before": 448,
+      "after": 448,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 6,
+      "before": 760,
+      "after": 340,
+      "reduced_components": 10,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 13,
+      "before": 1630,
+      "after": 1140,
+      "reduced_components": 14,
+      "preserved_components": 12
+    },
+    {
+      "group": "cargo",
+      "material": 14,
+      "before": 898,
+      "after": 898,
+      "reduced_components": 0,
+      "preserved_components": 25
+    },
+    {
+      "group": "cargo",
+      "material": 7,
+      "before": 96,
+      "after": 96,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "cargo",
+      "material": 15,
+      "before": 608,
+      "after": 272,
+      "reduced_components": 8,
+      "preserved_components": 0
+    },
+    {
+      "group": "rigging",
+      "material": 13,
+      "before": 144,
+      "after": 144,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "rigging",
+      "material": 30,
+      "before": 5698,
+      "after": 5522,
+      "reduced_components": 2,
+      "preserved_components": 42
+    },
+    {
+      "group": "fixed",
+      "material": 12,
+      "before": 68,
+      "after": 68,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 9,
+      "before": 68,
+      "after": 68,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 10,
+      "before": 68,
+      "after": 68,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 11,
+      "before": 68,
+      "after": 68,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 2,
+      "before": 68,
+      "after": 68,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 14,
+      "before": 138,
+      "after": 138,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "rigging",
+      "material": 8,
+      "before": 246,
+      "after": 246,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "rigging",
+      "material": 14,
+      "before": 160,
+      "after": 160,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "deck",
+      "material": 30,
+      "before": 2308,
+      "after": 2308,
+      "reduced_components": 0,
+      "preserved_components": 6
+    },
+    {
+      "group": "fixed",
+      "material": 30,
+      "before": 236,
+      "after": 236,
+      "reduced_components": 0,
+      "preserved_components": 6
+    }
+  ],
+  "protected": [
+    "hull",
+    "sail",
+    "rudder",
+    "mast",
+    "paddle"
+  ]
+}

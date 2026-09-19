@@ -1,0 +1,77 @@
+{
+  "before": 22472,
+  "after": 16514,
+  "parts": [
+    {
+      "group": "fixed",
+      "material": 1,
+      "before": 3456,
+      "after": 2090,
+      "reduced_components": 6,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 2,
+      "before": 2974,
+      "after": 1780,
+      "reduced_components": 3,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 3,
+      "before": 2974,
+      "after": 1782,
+      "reduced_components": 4,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 4,
+      "before": 2974,
+      "after": 1780,
+      "reduced_components": 4,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 5,
+      "before": 1486,
+      "after": 890,
+      "reduced_components": 2,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 0,
+      "before": 1306,
+      "after": 960,
+      "reduced_components": 7,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 6,
+      "before": 242,
+      "after": 242,
+      "reduced_components": 0,
+      "preserved_components": 0
+    },
+    {
+      "group": "fixed",
+      "material": 7,
+      "before": 160,
+      "after": 90,
+      "reduced_components": 5,
+      "preserved_components": 0
+    }
+  ],
+  "protected": [
+    "hull",
+    "sail",
+    "rudder",
+    "mast",
+    "paddle"
+  ]
+}

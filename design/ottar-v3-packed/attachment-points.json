@@ -1,0 +1,95 @@
+{
+  "status": "Visual guides only; game interaction and animation alignment pending",
+  "coordinates": "Blender local metres: X bow, Y port, Z up",
+  "points": [
+    {
+      "id": "helm_seat",
+      "kind": "seated helm",
+      "position": [
+        -5.72,
+        -0.24,
+        2.5183999999999997
+      ],
+      "facing_blender": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "passenger_seat_1",
+      "kind": "passenger seat",
+      "position": [
+        -4.46,
+        -0.94,
+        2.3798
+      ],
+      "facing_blender": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "passenger_seat_2",
+      "kind": "passenger seat",
+      "position": [
+        -4.46,
+        0.94,
+        2.3798
+      ],
+      "facing_blender": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "passenger_seat_3",
+      "kind": "passenger seat",
+      "position": [
+        4.62,
+        -0.88,
+        2.3974
+      ],
+      "facing_blender": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "passenger_seat_4",
+      "kind": "passenger seat",
+      "position": [
+        4.62,
+        0.88,
+        2.3974
+      ],
+      "facing_blender": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "mast_holdfast",
+      "kind": "standing holdfast",
+      "position": [
+        0.76,
+        0,
+        1.88
+      ],
+      "hand_target": [
+        0.35,
+        0,
+        2.97
+      ],
+      "facing_blender": [
+        -1,
+        0,
+        0
+      ]
+    }
+  ]
+}

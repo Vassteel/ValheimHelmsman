@@ -1,0 +1,169 @@
+[
+  {
+    "asset": "BigCargoShip.bin.gz",
+    "source": "assets/ships/final/BigCargoShip.bin.gz",
+    "before": 256920,
+    "triangles": 69898,
+    "vertices_before": 492992,
+    "vertices": 170770,
+    "target": 45000,
+    "protected_groups": [
+      "hull",
+      "rudder",
+      "sail"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "HelmsmanCurrach.bin.gz",
+    "source": "assets/ships/final/HelmsmanCurrach.bin.gz",
+    "before": 97898,
+    "triangles": 28592,
+    "vertices_before": 193818,
+    "vertices": 70430,
+    "target": 20000,
+    "protected_groups": [
+      "hull",
+      "rudder",
+      "sail"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "HelmsmanDugout.bin.gz",
+    "source": "assets/ships/final/HelmsmanDugout.bin.gz",
+    "before": 10744,
+    "triangles": 10744,
+    "vertices_before": 20775,
+    "vertices": 20775,
+    "target": 20000,
+    "protected_groups": [
+      "hull",
+      "paddle"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "HelmsmanFinewoodKayak.bin.gz",
+    "source": "assets/ships/final/HelmsmanFinewoodKayak.bin.gz",
+    "before": 25356,
+    "triangles": 21440,
+    "vertices_before": 50448,
+    "vertices": 57174,
+    "target": 20000,
+    "protected_groups": [
+      "hull",
+      "paddle"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "HelmsmanTandemKayak.bin.gz",
+    "source": "assets/ships/final/HelmsmanTandemKayak.bin.gz",
+    "before": 31360,
+    "triangles": 22472,
+    "vertices_before": 62428,
+    "vertices": 60203,
+    "target": 20000,
+    "protected_groups": [
+      "hull",
+      "paddle"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "HerculeShip.bin.gz",
+    "source": "assets/ships/final/HerculeShip.bin.gz",
+    "before": 101390,
+    "triangles": 32262,
+    "vertices_before": 200539,
+    "vertices": 78978,
+    "target": 20000,
+    "protected_groups": [
+      "hull",
+      "rudder",
+      "sail"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "LittleBoat.bin.gz",
+    "source": "assets/ships/final/LittleBoat.bin.gz",
+    "before": 77514,
+    "triangles": 27326,
+    "vertices_before": 153365,
+    "vertices": 67274,
+    "target": 20000,
+    "protected_groups": [
+      "hull",
+      "rudder",
+      "sail"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "MercantShip.bin.gz",
+    "source": "assets/ships/final/MercantShip.bin.gz",
+    "before": 281432,
+    "triangles": 80814,
+    "vertices_before": 531933,
+    "vertices": 193893,
+    "target": 45000,
+    "protected_groups": [
+      "hull",
+      "rudder",
+      "sail"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "WarShip.bin.gz",
+    "source": "assets/ships/final/WarShip.bin.gz",
+    "before": 126598,
+    "triangles": 43312,
+    "vertices_before": 248321,
+    "vertices": 99782,
+    "target": 30000,
+    "protected_groups": [
+      "hull",
+      "rudder",
+      "sail"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "fishing-dock.bin.gz",
+    "source": "assets/workshop/fishing-dock.bin.gz",
+    "before": 45982,
+    "triangles": 19978,
+    "vertices_before": 137946,
+    "vertices": 59896,
+    "target": 20000,
+    "protected_groups": [],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "slipway.bin.gz",
+    "source": "assets/workshop/slipway.bin.gz",
+    "before": 40160,
+    "triangles": 19988,
+    "vertices_before": 120480,
+    "vertices": 59868,
+    "target": 20000,
+    "protected_groups": [
+      "haul"
+    ],
+    "metadata_unchanged": true
+  },
+  {
+    "asset": "rigging-rack.bin.gz",
+    "source": "assets/workshop/rigging-rack.bin.gz",
+    "before": 22653,
+    "triangles": 19989,
+    "vertices_before": 67959,
+    "vertices": 59399,
+    "target": 20000,
+    "protected_groups": [],
+    "metadata_unchanged": true
+  }
+]

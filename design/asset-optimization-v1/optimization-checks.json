@@ -1,0 +1,74 @@
+[
+  {
+    "asset": "BigCargoShip.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "HelmsmanCurrach.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "HelmsmanDugout.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "HelmsmanFinewoodKayak.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "HelmsmanTandemKayak.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "HerculeShip.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "LittleBoat.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "MercantShip.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "WarShip.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "fishing-dock.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "slipway.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  },
+  {
+    "asset": "rigging-rack.bin.gz",
+    "metadata_unchanged": true,
+    "animated_topology_unchanged": true,
+    "lost_components": []
+  }
+]

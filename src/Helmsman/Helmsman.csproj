@@ -11,18 +11,18 @@
     <Reference><ExternallyResolved>true</ExternallyResolved></Reference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <EmbeddedResource Include="../../assets/workshop/*.bin.gz" LogicalName="Helmsman.Workshop.%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../assets/ships/final/*.bin.gz" LogicalName="Helmsman.Ships.final.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="../../assets/ships/redesign/models.bin.gz" LogicalName="Helmsman.Ships.boatyard" />
     <EmbeddedResource Include="../../assets/birds/detail.png" LogicalName="VikingBirds.detail.png" />
     <EmbeddedResource Include="../../assets/birds/surface.png" LogicalName="VikingBirds.surface.png" />
     <EmbeddedResource Include="../../assets/ships/customization.json" LogicalName="Helmsman.Ships.customization.json" />
-    <EmbeddedResource Include="../../assets/ships/helmsman-ships" LogicalName="Helmsman.Ships.bundle" />
     <EmbeddedResource Include="../../assets/shipwright/*.png" LogicalName="Helmsman.Shipwright.%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../assets/gullcall/model.bin" LogicalName="Helmsman.Gullcall.model.bin" />
     <EmbeddedResource Include="../../assets/gullcall/model.json" LogicalName="Helmsman.Gullcall.model.json" />
     <EmbeddedResource Include="../../assets/gullcall/icon.png" LogicalName="Helmsman.Gullcall.icon.png" />
     <ProjectReference Include="../Helmsman.Core/Helmsman.Core.csproj" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/assembly_*.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/valheim_Data/Managed/MagicaClothV2.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/Splatform.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/UnityEngine*.dll" Private="false" />
     <Reference Include="$(ValheimDir)/valheim_Data/Managed/Newtonsoft.Json.dll" Private="false" />

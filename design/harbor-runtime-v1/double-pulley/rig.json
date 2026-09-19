@@ -1,0 +1,72 @@
+{
+  "key": "double-pulley",
+  "prefab": "PulleyElephantSeal",
+  "name": "Double purchase",
+  "lift": 0.18,
+  "rigs": [
+    {
+      "tag": "wheel0",
+      "kind": "wheel",
+      "pivot": [
+        0,
+        -0.1675,
+        0.44
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "lift": 0,
+      "ratio": 6.25
+    },
+    {
+      "tag": "wheel1",
+      "kind": "wheel",
+      "pivot": [
+        0,
+        -0.22,
+        -0.4
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "lift": 1,
+      "ratio": 7.267441860465116
+    },
+    {
+      "tag": "load",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 1,
+      "ratio": 1
+    },
+    {
+      "tag": "free-tail",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": -4,
+      "ratio": 1
+    }
+  ]
+}

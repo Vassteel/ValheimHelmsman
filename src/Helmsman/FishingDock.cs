@@ -41,7 +41,7 @@ public sealed class FishingDock : MonoBehaviour
         var trigger=bird.Root.AddComponent<SphereCollider>();trigger.center=new Vector3(0,.7f,0);trigger.radius=.35f;
         var interaction=bird.Root.AddComponent<BirdInteraction>();interaction.Label=()=>"Pelican fisherman";
         interaction.Hint=()=>Localization.instance.Localize("Pelican fisherman\n[<color=yellow><b>$KEY_Use</b></color>] Catch report");
-        interaction.Use=user=>{Plugin.Message(!EnvMan.IsDaylight()?"Fishing resumes at dawn.":CanFish(out _)?"Fishing. Next catch in "+Shipyard.FormatDuration(Math.Max(0,seconds.Value-view.GetZDO().GetFloat(Progress)))+".":"Waiting for space in the dock chest.");return true;};
+        interaction.Use=user=>{Plugin.Message(!EnvMan.IsDaylight()?"Fishing resumes at dawn.":CanFish(out _)?"Fishing. Next catch in "+Shipyard.FormatDuration(Math.Max(0,seconds.Value-view.GetZDO().GetFloat(Progress)))+".":"Waiting for space in the station chest.");return true;};
     }
     private bool CanFish(out ItemDrop? item)
     {

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Helmsman;
 
-[BepInPlugin(Guid, "Valheim Helmsman", "0.2.35")]
+[BepInPlugin(Guid, "Valheim Helmsman", "0.2.40")]
 [BepInDependency(Jotunn.Main.ModGuid)]
 [BepInDependency("local.valheim.quartermaster", BepInDependency.DependencyFlags.SoftDependency)]
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
@@ -56,6 +56,7 @@ public sealed class Plugin : BaseUnityPlugin
         ClearNavigationRocks=Config.Bind("Navigation","ClearRocksAndCollectStone",false,"Optional attended-autopilot rock clearing. Break natural stone rocks blocking the hull and collect their stone into ship cargo. Changes the world permanently; excess stone stays in the world if cargo is full.");
         FishPassThrough=Config.Bind("Navigation","FishPassThrough",true,"Ignore fish-hull collisions while the gull controls this boat. Fish stay alive. Normal collisions resume when autopilot ends.");
         Shipyard.Configure(Config);
+        ShipyardAudio.Configure(Config);
         FishingDock.Configure(Config);
         harmony = new Harmony(Guid);
         try { harmony.PatchAll(typeof(Plugin).Assembly); }
@@ -70,10 +71,11 @@ public sealed class Plugin : BaseUnityPlugin
         gameObject.AddComponent<IslandScouting>();
         gameObject.AddComponent<ScoutGullPresentation>();
         UI = gameObject.AddComponent<HelmsmanUI>();
+        Structures.StructureImports.Initialize(this,Config);
         Ships=gameObject.AddComponent<ShipDirectory>();
         gameObject.AddComponent<NetworkNavigation>();
         PrefabManager.OnVanillaPrefabsAvailable += RegisterDock;
-        Logger.LogInfo("Helmsman 0.2.35 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
+        Logger.LogInfo("Helmsman 0.2.40 loaded. Peer-owned voyages and server-coordinated ship calls; no voyage resumes automatically on load.");
     }
 
     private void RegisterDock()
@@ -150,6 +152,8 @@ public sealed class Plugin : BaseUnityPlugin
         GullcallAssets.Release();
         ShipwrightAssets.Release();
         ShipMenuPreviews.Release();
+        WorkshopModels.Release();
+        ShipyardAudio.Release();
         BoatyardModels.Release();
         FinalFleetModels.Release();
         ImportedShipMaterials.Release();

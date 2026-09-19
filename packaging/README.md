@@ -38,8 +38,12 @@ A gull captain sails your ships, a puffin builds and refits them, and a pelican 
 - **Shift + Use at the mast or helm:** Name your ship.
 - **Take the helm:** Cancel autopilot.
 
+## 🤝 Mod Compatibility
+
+Compatibility with other mods that add ships can be added upon request. Contact me on [Discord](https://discord.gg/mbkPcvu9ax) or [Steam](https://steamcommunity.com/id/Vassteel/).
+
 **Testing:** Functional in local play. Recent additions and multiplayer/server behaviour still need testing. Use matching versions on server and clients.
 
-[Guide](https://github.com/Vassteel/ValheimHelmsman/blob/master/GUIDE.md) · [GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/abN7R2tWyK)
+[Guide](https://github.com/Vassteel/ValheimHelmsman/blob/master/GUIDE.md) · [GitHub](https://github.com/Vassteel/ValheimHelmsman) · [Discord](https://discord.gg/mbkPcvu9ax)
 
 Code, artwork and documentation developed with generative AI.

@@ -1,0 +1,18 @@
+{
+  "name": "BigCargoShip heavy freighter study",
+  "revision": 1,
+  "standalone": true,
+  "length_m": 19.2,
+  "beam_m": 6.3,
+  "hull_rail_height_midships_m": 2.86,
+  "timber_logs": 15,
+  "ore_bins": 6,
+  "boarding_ladders": 2,
+  "passenger_seats": 4,
+  "textures": "Original embedded 128px colour maps",
+  "limitations": [
+    "Original game-oriented concept, not an exact historical reconstruction",
+    "No game integration, collisions, flotation or movement validation",
+    "Cargo tackle is static; working animation not implemented"
+  ]
+}

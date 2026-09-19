@@ -11,7 +11,7 @@ public sealed class ImportedSailAnimation : MonoBehaviour
 {
     public bool FixedMast,MeshFurl,ConfiguredScale;
     public Vector3 RestScale;
-    public float FurlAmount=1;
+    public float FurlAmount=.1f;
     private Transform? sail;
     private Vector3 fullScale;
     internal void Tick(Ship ship,float delta)

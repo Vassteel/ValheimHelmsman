@@ -1,0 +1,88 @@
+{
+  "key": "pier-crane",
+  "prefab": "PierCrane1",
+  "name": "Timber pier crane",
+  "lift": 0.55,
+  "rigs": [
+    {
+      "tag": "wheel0",
+      "kind": "wheel",
+      "pivot": [
+        0,
+        -2.7474999999999996,
+        3.24
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "lift": 0,
+      "ratio": 5.555555555555555
+    },
+    {
+      "tag": "wheel1",
+      "kind": "wheel",
+      "pivot": [
+        0,
+        -2.8,
+        1.94
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "lift": 1,
+      "ratio": 6.459948320413437
+    },
+    {
+      "tag": "load",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 1,
+      "ratio": 1
+    },
+    {
+      "tag": "free-tail",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 0,
+      "ratio": 1
+    },
+    {
+      "tag": "winch",
+      "kind": "wheel",
+      "pivot": [
+        0.62,
+        -0.47,
+        1.02
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "lift": 0,
+      "ratio": -12.820512820512821
+    }
+  ]
+}

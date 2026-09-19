@@ -1,0 +1,58 @@
+[
+  {
+    "model": "keel-cradle",
+    "triangles": 21826,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "roller-bed",
+    "triangles": 4580,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "framing-rack",
+    "triangles": 27916,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "pier-crane",
+    "triangles": 33304,
+    "snap_markers": 6,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "heavy-crane",
+    "triangles": 37944,
+    "snap_markers": 6,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "single-pulley",
+    "triangles": 3876,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "double-pulley",
+    "triangles": 14404,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  },
+  {
+    "model": "triple-pulley",
+    "triangles": 17972,
+    "snap_markers": 0,
+    "finite_geometry": true,
+    "bounds_match": true
+  }
+]

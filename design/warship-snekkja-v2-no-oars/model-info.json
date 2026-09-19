@@ -1,0 +1,21 @@
+{
+  "name": "WarShip snekkja study",
+  "revision": 2,
+  "standalone": true,
+  "reference": "Skuldelev 5 and Helge Ask, Viking Ship Museum",
+  "archaeological_target_length_m": 17.3,
+  "archaeological_target_beam_m": 2.47,
+  "archaeological_target_depth_midships_m": 1.16,
+  "historical_rowing_pairs": 13,
+  "rowing_oars": 0,
+  "steering_oars": 1,
+  "shields_displayed": 26,
+  "projected_sail_area_m2": 45.9155,
+  "textures": "Original 128px maps; embedded",
+  "interpretation": "Original hull lines, rig, equipment placement and colour arrangement; not an exact archaeological reconstruction",
+  "limitations": [
+    "No game integration or player movement tests",
+    "Rowing oars intentionally omitted for Valheim; benches retained as passenger-seat guides",
+    "Exact paint scheme is not established for the excavated ship"
+  ]
+}

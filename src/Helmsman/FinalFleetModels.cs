@@ -35,14 +35,15 @@ internal static partial class FinalFleetModels
         using var zip=new GZipStream(stream,CompressionMode.Decompress);using var r=new BinaryReader(zip);
         if(Encoding.ASCII.GetString(r.ReadBytes(4))!="HMF1")throw new InvalidDataException("Unknown final fleet format");
         var model=new Model{Spec=ReadSpecification(Text(r,1000000),name)};
-        int nm=Count(r,128);var materials=new Material[nm];
+        int nm=Count(r,128);var materials=new Material[nm];var labels=new string[nm];
+        bool smallCraft=SmallCraftFinish.Applies(name);
         for(int i=0;i<nm;i++)
         {
             string label=Text(r);var png=Bytes(r,1024*1024);var color=new Color(Number(r),Number(r),Number(r),Number(r));
             // Read the packed study image to keep HMF compatibility; use the running
             // game's corresponding wood/cloth texture and shader for the playable ship.
-            var mat=ImportedShipMaterials.FleetMaterial(label,color);owned.Add(mat);
-            materials[i]=mat;
+            var mat=ImportedShipMaterials.FleetMaterial(label,color,smallCraft);owned.Add(mat);
+            materials[i]=mat;labels[i]=label;
         }
         int parts=Count(r,256);
         for(int p=0;p<parts;p++)
@@ -53,6 +54,7 @@ internal static partial class FinalFleetModels
             int nt=Count(r,6000000);if(nt%3!=0)throw new InvalidDataException("Invalid final ship triangles");var triangles=new int[nt];
             for(int i=0;i<nt;i++){triangles[i]=r.ReadInt32();if(triangles[i]<0||triangles[i]>=n)throw new InvalidDataException("Invalid final ship index");}
             var mesh=new Mesh{name="Helmsman "+name+" "+group,indexFormat=n>65535?IndexFormat.UInt32:IndexFormat.UInt16};owned.Add(mesh);
+            if(smallCraft)SmallCraftFinish.Map(group,labels[material],vertices,uv);
             mesh.vertices=vertices;mesh.normals=normals;mesh.uv=uv;mesh.triangles=triangles;mesh.RecalculateTangents();mesh.RecalculateBounds();
             model.Parts.Add(new Part{Group=group,Mesh=mesh,Material=materials[material]});
         }

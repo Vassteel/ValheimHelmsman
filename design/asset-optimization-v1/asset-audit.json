@@ -1,0 +1,492 @@
+[
+  {
+    "name": "Big cargo ship",
+    "category": "Fleet",
+    "before": 256920,
+    "triangles": 69898,
+    "vertices": 170770,
+    "batches": 71,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/BigCargoShip.bin.gz"
+  },
+  {
+    "name": "Currach",
+    "category": "Fleet",
+    "before": 97898,
+    "triangles": 28592,
+    "vertices": 70430,
+    "batches": 38,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/HelmsmanCurrach.bin.gz"
+  },
+  {
+    "name": "Dugout",
+    "category": "Fleet",
+    "before": 10744,
+    "triangles": 10744,
+    "vertices": 20775,
+    "batches": 6,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/HelmsmanDugout.bin.gz"
+  },
+  {
+    "name": "Finewood kayak",
+    "category": "Fleet",
+    "before": 25356,
+    "triangles": 21440,
+    "vertices": 57174,
+    "batches": 11,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/HelmsmanFinewoodKayak.bin.gz"
+  },
+  {
+    "name": "Tandem finewood kayak",
+    "category": "Fleet",
+    "before": 31360,
+    "triangles": 22472,
+    "vertices": 60203,
+    "batches": 11,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/HelmsmanTandemKayak.bin.gz"
+  },
+  {
+    "name": "Falkuša",
+    "category": "Fleet",
+    "before": 101390,
+    "triangles": 32262,
+    "vertices": 78978,
+    "batches": 40,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/HerculeShip.bin.gz"
+  },
+  {
+    "name": "Ceol",
+    "category": "Fleet",
+    "before": 77514,
+    "triangles": 27326,
+    "vertices": 67274,
+    "batches": 31,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/LittleBoat.bin.gz"
+  },
+  {
+    "name": "Ottar",
+    "category": "Fleet",
+    "before": 281432,
+    "triangles": 80814,
+    "vertices": 193893,
+    "batches": 67,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/MercantShip.bin.gz"
+  },
+  {
+    "name": "Snekkja",
+    "category": "Fleet",
+    "before": 126598,
+    "triangles": 43312,
+    "vertices": 99782,
+    "batches": 48,
+    "status": "Integrated; local test pending",
+    "source": "assets/ships/final/WarShip.bin.gz"
+  },
+  {
+    "name": "Caulked wood",
+    "category": "Workshop and supplies",
+    "before": 3176,
+    "triangles": 3176,
+    "vertices": 9528,
+    "batches": 7,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/caulked-wood.bin.gz"
+  },
+  {
+    "name": "Caulking station / hull durability",
+    "category": "Workshop and supplies",
+    "before": 10148,
+    "triangles": 10148,
+    "vertices": 30444,
+    "batches": 7,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/caulking-station.bin.gz"
+  },
+  {
+    "name": "Dried fish basket",
+    "category": "Workshop and supplies",
+    "before": 13144,
+    "triangles": 13144,
+    "vertices": 39432,
+    "batches": 5,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/dried-fish-basket.bin.gz"
+  },
+  {
+    "name": "Fish extract / carrying",
+    "category": "Workshop and supplies",
+    "before": 1393,
+    "triangles": 1393,
+    "vertices": 4179,
+    "batches": 5,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/fish-oil.bin.gz"
+  },
+  {
+    "name": "Pelican workstation",
+    "category": "Workshop and supplies",
+    "before": 45982,
+    "triangles": 19978,
+    "vertices": 59896,
+    "batches": 23,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/fishing-dock.bin.gz"
+  },
+  {
+    "name": "Double purchase",
+    "category": "Harbor equipment",
+    "before": 14404,
+    "triangles": 9840,
+    "vertices": 19371,
+    "batches": 14,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-double-pulley.bin.gz"
+  },
+  {
+    "name": "Ship framing gantry",
+    "category": "Harbor equipment",
+    "before": 27916,
+    "triangles": 14420,
+    "vertices": 28736,
+    "batches": 17,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-framing-rack.bin.gz"
+  },
+  {
+    "name": "Braced pier crane",
+    "category": "Harbor equipment",
+    "before": 37944,
+    "triangles": 19656,
+    "vertices": 39108,
+    "batches": 23,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-heavy-crane.bin.gz"
+  },
+  {
+    "name": "Keel cradle",
+    "category": "Harbor equipment",
+    "before": 21826,
+    "triangles": 10382,
+    "vertices": 21150,
+    "batches": 10,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-keel-cradle.bin.gz"
+  },
+  {
+    "name": "Timber pier crane",
+    "category": "Harbor equipment",
+    "before": 33304,
+    "triangles": 16952,
+    "vertices": 33848,
+    "batches": 23,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-pier-crane.bin.gz"
+  },
+  {
+    "name": "Launching rollers",
+    "category": "Harbor equipment",
+    "before": 4580,
+    "triangles": 2924,
+    "vertices": 5572,
+    "batches": 17,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-roller-bed.bin.gz"
+  },
+  {
+    "name": "Single block",
+    "category": "Harbor equipment",
+    "before": 3876,
+    "triangles": 2844,
+    "vertices": 5720,
+    "batches": 8,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-single-pulley.bin.gz"
+  },
+  {
+    "name": "Heavy purchase",
+    "category": "Harbor equipment",
+    "before": 17972,
+    "triangles": 11792,
+    "vertices": 23147,
+    "batches": 14,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/harbor-triple-pulley.bin.gz"
+  },
+  {
+    "name": "Marine rope",
+    "category": "Workshop and supplies",
+    "before": 8300,
+    "triangles": 8300,
+    "vertices": 24900,
+    "batches": 2,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/marine-rope.bin.gz"
+  },
+  {
+    "name": "Paint stand / paint and decoration",
+    "category": "Workshop and supplies",
+    "before": 7812,
+    "triangles": 7812,
+    "vertices": 23436,
+    "batches": 10,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/paint-stand.bin.gz"
+  },
+  {
+    "name": "Resin wood",
+    "category": "Workshop and supplies",
+    "before": 3176,
+    "triangles": 3176,
+    "vertices": 9528,
+    "batches": 6,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/resin-wood.bin.gz"
+  },
+  {
+    "name": "Rigging rack / ship speed",
+    "category": "Workshop and supplies",
+    "before": 22408,
+    "triangles": 19992,
+    "vertices": 59254,
+    "batches": 11,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/rigging-rack.bin.gz"
+  },
+  {
+    "name": "Sail canvas",
+    "category": "Workshop and supplies",
+    "before": 2886,
+    "triangles": 2886,
+    "vertices": 8658,
+    "batches": 5,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/sail-canvas.bin.gz"
+  },
+  {
+    "name": "Shipwright slipway",
+    "category": "Workshop and supplies",
+    "before": 40160,
+    "triangles": 19988,
+    "vertices": 59868,
+    "batches": 14,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/slipway.bin.gz"
+  },
+  {
+    "name": "Shipwright tools / construction speed",
+    "category": "Workshop and supplies",
+    "before": 2542,
+    "triangles": 2542,
+    "vertices": 7626,
+    "batches": 7,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/tool-rack.bin.gz"
+  },
+  {
+    "name": "Wind belt",
+    "category": "Workshop and supplies",
+    "before": 2788,
+    "triangles": 2788,
+    "vertices": 8364,
+    "batches": 6,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/wind-belt.bin.gz"
+  },
+  {
+    "name": "Fish extract / wind",
+    "category": "Workshop and supplies",
+    "before": 1350,
+    "triangles": 1350,
+    "vertices": 4050,
+    "batches": 5,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/wind-extract.bin.gz"
+  },
+  {
+    "name": "Puffin's Construction Bench",
+    "category": "Workshop and supplies",
+    "before": 14822,
+    "triangles": 14822,
+    "vertices": 44466,
+    "batches": 12,
+    "status": "Integrated; local test pending",
+    "source": "assets/workshop/workbench.bin.gz"
+  },
+  {
+    "name": "Puffin",
+    "category": "Birds",
+    "before": 40276,
+    "triangles": 26630,
+    "vertices": 23360,
+    "batches": 34,
+    "status": "Integrated; all generated parts counted",
+    "source": "src/Helmsman/Art/PerchedBird.cs"
+  },
+  {
+    "name": "Burrowing owl",
+    "category": "Birds",
+    "before": 15872,
+    "triangles": 15872,
+    "vertices": 10750,
+    "batches": 27,
+    "status": "Integrated; all generated parts counted",
+    "source": "src/Helmsman/Art/PerchedBird.cs"
+  },
+  {
+    "name": "Pelican",
+    "category": "Birds",
+    "before": 18806,
+    "triangles": 18806,
+    "vertices": 12800,
+    "batches": 30,
+    "status": "Integrated; all generated parts counted",
+    "source": "src/Helmsman/Art/PerchedBird.cs"
+  },
+  {
+    "name": "Scout gull with helmet (perched)",
+    "category": "Birds",
+    "before": 13712,
+    "triangles": 13712,
+    "vertices": 8161,
+    "batches": 17,
+    "status": "Native base refined at runtime; perched instance counted",
+    "source": "tools/GullPreview/Program.cs"
+  },
+  {
+    "name": "Gullcall whistle",
+    "category": "Supplies",
+    "before": 906,
+    "triangles": 906,
+    "vertices": "",
+    "batches": "",
+    "status": "Unchanged; already inexpensive",
+    "source": "assets/gullcall/model.json"
+  },
+  {
+    "name": "Enguias",
+    "category": "Remaining imported hierarchy",
+    "before": 432,
+    "triangles": 432,
+    "vertices": "",
+    "batches": 3,
+    "status": "Current visible replacement; original hierarchy still retained",
+    "source": "assets/ships/redesign/models.bin.gz"
+  },
+  {
+    "name": "Peixes",
+    "category": "Remaining imported hierarchy",
+    "before": 177,
+    "triangles": 177,
+    "vertices": "",
+    "batches": 3,
+    "status": "Current visible replacement; original hierarchy still retained",
+    "source": "assets/ships/redesign/models.bin.gz"
+  },
+  {
+    "name": "RedePesca",
+    "category": "Remaining imported hierarchy",
+    "before": 276,
+    "triangles": 276,
+    "vertices": "",
+    "batches": 2,
+    "status": "Current visible replacement; original hierarchy still retained",
+    "source": "assets/ships/redesign/models.bin.gz"
+  },
+  {
+    "name": "OilPress",
+    "category": "Remaining imported hierarchy",
+    "before": 2884,
+    "triangles": 2884,
+    "vertices": "",
+    "batches": 3,
+    "status": "Current visible replacement; original hierarchy still retained",
+    "source": "assets/ships/redesign/models.bin.gz"
+  },
+  {
+    "name": "Fish oil screw press",
+    "category": "Fishing studies",
+    "before": 40116,
+    "triangles": 21296,
+    "vertices": "",
+    "batches": "",
+    "status": "Review only; not shipped",
+    "source": "design/fishing-equipment-v3/fish-oil-press/fish-oil-press.blend"
+  },
+  {
+    "name": "Fishing net rack",
+    "category": "Fishing studies",
+    "before": 36998,
+    "triangles": 19706,
+    "vertices": "",
+    "batches": "",
+    "status": "Review only; not shipped",
+    "source": "design/fishing-equipment-v3/net-rack/net-rack.blend"
+  },
+  {
+    "name": "Fish drying rack",
+    "category": "Fishing studies",
+    "before": 36584,
+    "triangles": 21236,
+    "vertices": "",
+    "batches": "",
+    "status": "Review only; not shipped",
+    "source": "design/fishing-equipment-v3/fish-dryer/fish-dryer.blend"
+  },
+  {
+    "name": "Eel drying rack",
+    "category": "Fishing studies",
+    "before": 14112,
+    "triangles": 14112,
+    "vertices": "",
+    "batches": "",
+    "status": "Review only; not shipped",
+    "source": "design/fishing-equipment-v3/eel-rack/eel-rack.blend"
+  },
+  {
+    "name": "Gullwatch post",
+    "category": "Shelved markers",
+    "before": 2578,
+    "triangles": 2578,
+    "vertices": "",
+    "batches": "",
+    "status": "Shelved; not shipped",
+    "source": "design/maritime-markers-v2/gullwatch-post/gullwatch-post.blend"
+  },
+  {
+    "name": "Tide serpent",
+    "category": "Shelved markers",
+    "before": 7616,
+    "triangles": 7616,
+    "vertices": "",
+    "batches": "",
+    "status": "Shelved; not shipped",
+    "source": "design/maritime-markers-v2/tide-serpent/tide-serpent.blend"
+  },
+  {
+    "name": "Wayfinder marker",
+    "category": "Shelved markers",
+    "before": 2562,
+    "triangles": 2562,
+    "vertices": "",
+    "batches": "",
+    "status": "Shelved; not shipped",
+    "source": "design/maritime-markers-v2/wayfinder-marker/wayfinder-marker.blend"
+  },
+  {
+    "name": "Wreckward marker",
+    "category": "Shelved markers",
+    "before": 2988,
+    "triangles": 2988,
+    "vertices": "",
+    "batches": "",
+    "status": "Shelved; not shipped",
+    "source": "design/maritime-markers-v2/wreckward-marker/wreckward-marker.blend"
+  }
+]

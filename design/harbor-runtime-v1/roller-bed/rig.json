@@ -1,0 +1,120 @@
+{
+  "key": "roller-bed",
+  "prefab": "ShipConstruction1",
+  "name": "Launching rollers",
+  "lift": 0,
+  "rigs": [
+    {
+      "tag": "load",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 1,
+      "ratio": 1
+    },
+    {
+      "tag": "free-tail",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 0,
+      "ratio": 1
+    },
+    {
+      "tag": "roller0",
+      "kind": "roller",
+      "pivot": [
+        0,
+        -2,
+        0.43
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "lift": 0,
+      "ratio": 5.0
+    },
+    {
+      "tag": "roller1",
+      "kind": "roller",
+      "pivot": [
+        0,
+        -1,
+        0.43
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "lift": 0,
+      "ratio": 5.0
+    },
+    {
+      "tag": "roller2",
+      "kind": "roller",
+      "pivot": [
+        0,
+        0,
+        0.43
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "lift": 0,
+      "ratio": 5.0
+    },
+    {
+      "tag": "roller3",
+      "kind": "roller",
+      "pivot": [
+        0,
+        1,
+        0.43
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "lift": 0,
+      "ratio": 5.0
+    },
+    {
+      "tag": "roller4",
+      "kind": "roller",
+      "pivot": [
+        0,
+        2,
+        0.43
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "lift": 0,
+      "ratio": 5.0
+    }
+  ]
+}

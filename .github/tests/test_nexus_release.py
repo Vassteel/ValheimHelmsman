@@ -46,6 +46,13 @@ class NexusTests(unittest.TestCase):
         self.assertTrue(output.with_suffix('.zip.sha256').exists())
         self.assertTrue(output.with_suffix('.zip.receipt.json').exists())
 
+    def test_license_is_retained_when_configured(self):
+        self.config['include_files'] = ['LICENSE.txt']
+        result = self.prepare(self.source())
+        with zipfile.ZipFile(result) as archive:
+            self.assertEqual(set(archive.namelist()), {self.dll, 'LICENSE.txt'})
+            self.assertEqual(archive.read('LICENSE.txt'), b'license')
+
     def test_two_dlls_and_required_asset(self):
         self.config['dlls'].append('Core.dll')
         asset = 'BepInEx/plugins/Example/assets/model.bin'

@@ -1,0 +1,40 @@
+{
+  "key": "keel-cradle",
+  "prefab": "ShipConstruction",
+  "name": "Keel cradle",
+  "lift": 0,
+  "rigs": [
+    {
+      "tag": "load",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 1,
+      "ratio": 1
+    },
+    {
+      "tag": "free-tail",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 0,
+      "ratio": 1
+    }
+  ]
+}

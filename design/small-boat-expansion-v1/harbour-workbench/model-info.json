@@ -1,0 +1,43 @@
+{
+  "name": "Harbour Workbench",
+  "standalone": true,
+  "footprint_m": [
+    3,
+    2
+  ],
+  "roles": [
+    {
+      "bird": "Puffin",
+      "role": "Ship orders, upgrades and styles",
+      "perch": [
+        -1.16,
+        0.64,
+        1.31
+      ]
+    },
+    {
+      "bird": "Gull",
+      "role": "Dock designation, routes and scouting",
+      "perch": [
+        0.02,
+        0.84,
+        2.18
+      ]
+    },
+    {
+      "bird": "Pelican",
+      "role": "Fishing and catch storage",
+      "perch": [
+        1.12,
+        0.63,
+        1.56
+      ]
+    }
+  ],
+  "bird_behaviour": "Station-bound; planned perching and bounded nearby idle movement",
+  "water_targets": "Separate configured launch berth and fishing location",
+  "limitations": [
+    "Static concept birds, not rigged or animated",
+    "No functional game menus, inventory, fishing or migration implemented"
+  ]
+}

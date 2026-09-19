@@ -17,9 +17,7 @@ internal static partial class ImportedHulls
         var effects=new HashSet<string>(StringComparer.Ordinal);
         foreach(var entry in HarborCatalog.Items)
         {
-            var prefab=Clone(entry.Prefab,entry.Prefab);
-            ImportedShipMaterials.Apply(prefab,entry.Prefab);
-            BoatyardModels.Apply(prefab,entry.Prefab);
+            var prefab=WorkshopSupplies.Create(entry);
             string description=entry.Prefab switch {
                 "ResinWood"=>"Resin-treated timber for shipbuilding.",
                 "CaulkedWood"=>"Sealed timber for larger vessels.",
@@ -34,10 +32,10 @@ internal static partial class ImportedHulls
             if(entry.Recipe.Length>0)
             {config.CraftingStation="piece_workbench";config.MinStationLevel=1;config.Requirements=Costs(entry.Recipe);}
             BoatyardModels.RefreshIcon(prefab);
-            var item=new CustomItem(prefab,true,config);
+            var item=new CustomItem(prefab,false,config);
             foreach(var effect in new[]{item.ItemDrop.m_itemData.m_shared.m_equipStatusEffect,item.ItemDrop.m_itemData.m_shared.m_consumeStatusEffect})
                 if(effect && effects.Add(effect.name))
-                {effect.m_name=entry.Name;effect.m_tooltip=description;ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(effect,true));}
+                {effect.m_name=entry.Name;effect.m_tooltip=description;effect.m_icon=prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons[0];ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(effect,true));}
             if(!ItemManager.Instance.AddItem(item))throw new InvalidOperationException("Cannot register maritime item "+entry.Prefab);
         }
     }
@@ -45,30 +43,14 @@ internal static partial class ImportedHulls
     {
         foreach(var entry in HarborCatalog.Pieces)
         {
-            var prefab=Clone(entry.Prefab,entry.Prefab);
-            ImportedShipMaterials.Apply(prefab,entry.Prefab);
-            BoatyardModels.Apply(prefab,entry.Prefab);
+            string? model=NativeHarbor.Model(entry.Prefab);
+            var prefab=model!=null?NativeHarbor.Create(entry.Prefab,model):entry.Prefab=="FishingDock"?NativeFishingDock.Create():throw new InvalidOperationException("No native harbor model for "+entry.Prefab);
             ShoreBuildBounds.ConfigureDock(prefab,entry.Prefab);
-            if(entry.Prefab=="FishingDock")
-            {
-                var worker=prefab.transform.Find("FisherMan");
-                if(worker)worker.gameObject.SetActive(false);
-                var fishing=prefab.AddComponent<FishingDock>();fishing.WorkerAnchor=worker?worker:prefab.transform;
-                fishing.Chest=prefab.transform.Find("Container").GetComponent<Container>();
-                fishing.Chest.m_rootObjectOverride=prefab.GetComponent<ZNetView>();
-            }
-            if(entry.Prefab=="OilPress")
-            {
-                var press=prefab.AddComponent<FishOilPress>();
-                press.Output=prefab.transform.Find("output");
-                press.Working=prefab.transform.Find("_fermenting").gameObject;
-                prefab.AddComponent<WorkstationLease>();
-            }
             BoatyardModels.RefreshIcon(prefab);
             prefab.GetComponent<Piece>().m_usage=Piece.UsageTagFlags.Decor|
-                (entry.Prefab=="FishingDock"||entry.Prefab=="OilPress"?Piece.UsageTagFlags.Crafting:0);
-            PieceManager.Instance.AddPiece(new CustomPiece(prefab,true,new PieceConfig {
-                Name=entry.Name,Description=entry.Prefab=="FishingDock"?"Daylight fishing with the pelican. Catches enter the dock chest.":entry.Prefab=="OilPress"?"Ten fish become one bottle of fish oil after ten minutes.":"Harbor decoration.",PieceTable="Hammer",Category="Helmsman",CraftingStation="piece_workbench",Requirements=Costs(entry.Recipe)
+                (entry.Prefab=="FishingDock"?Piece.UsageTagFlags.Crafting:0);
+            PieceManager.Instance.AddPiece(new CustomPiece(prefab,false,new PieceConfig {
+                Name=entry.Name,Description=entry.Prefab=="FishingDock"?"Daylight fishing with the pelican. Catches enter the station chest.":model!=null?(model=="keel-cradle"?"A padded timber cradle for supporting a hull.":"Operate the harbor machinery to run its working cycle."):"Harbor decoration.",PieceTable="Hammer",Category="Helmsman",CraftingStation="piece_workbench",Requirements=Costs(entry.Recipe)
             }));
         }
     }

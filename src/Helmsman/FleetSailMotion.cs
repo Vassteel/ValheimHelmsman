@@ -18,6 +18,23 @@ public sealed class FleetSailMotion : MonoBehaviour
     private float nextTick;
     private float halfWidth=1;
     private float bottom;
+    private bool frozenPreview;
+    internal void FreezePreview()
+    {
+        if(frozenPreview)return;frozenPreview=true;
+        enabled=false;
+        var rig=GetComponent<FinalShipPresentation>();if(rig)rig.enabled=false;
+        int index=0;
+        foreach(var filter in Sail.GetComponentsInChildren<MeshFilter>(true))
+        {
+            var source=index<AuthoredMeshes.Length?AuthoredMeshes[index++]:filter.sharedMesh;
+            if(!source)continue;
+            var mesh=Instantiate(source);var vertices=source.vertices;
+            for(int i=0;i<vertices.Length;i++)vertices[i]=Vector3.Lerp(FleetSailShape.Anchor(Kind,vertices[i],Top),vertices[i],.1f);
+            mesh.vertices=vertices;mesh.RecalculateNormals();mesh.RecalculateBounds();filter.sharedMesh=mesh;
+            cloth.Add(new Cloth{Mesh=mesh});
+        }
+    }
     private void Start()
     {
         if(ZNet.instance&&ZNet.instance.IsDedicated())return;

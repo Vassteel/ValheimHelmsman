@@ -1,0 +1,20 @@
+{
+  "status": "Guide only; walking on visual cargo requires game integration and foot-contact testing",
+  "cargo_collision": "none",
+  "coordinates": "Blender local metres",
+  "hold_walk_surface": {
+    "type": "BoxCollider",
+    "center": [
+      0,
+      0,
+      1.83
+    ],
+    "size": [
+      7.9,
+      3.4,
+      0.1
+    ],
+    "top": 1.88
+  },
+  "review_note": "Use one smooth support rather than individual barrel/bag colliders. Review visible feet against uneven cargo and keep helm, passenger-seat approaches and mast holdfast accessible."
+}

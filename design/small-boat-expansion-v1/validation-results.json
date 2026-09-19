@@ -1,0 +1,26 @@
+[
+  {
+    "asset": "falkusa",
+    "mesh_objects": 238,
+    "embedded_images": 22,
+    "passed": true
+  },
+  {
+    "asset": "ceol",
+    "mesh_objects": 127,
+    "embedded_images": 25,
+    "passed": true
+  },
+  {
+    "asset": "currach",
+    "mesh_objects": 182,
+    "embedded_images": 24,
+    "passed": true
+  },
+  {
+    "asset": "harbour-workbench",
+    "mesh_objects": 132,
+    "embedded_images": 18,
+    "passed": true
+  }
+]

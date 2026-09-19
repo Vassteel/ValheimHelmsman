@@ -225,7 +225,8 @@ public sealed partial class HelmsmanUI : MonoBehaviour
             float spacing=onboard ? (hadCargoTab ? 344 : 680) : 136;
             var button=Button(rect,tabs[i],24+i*spacing,-101,onboard ? (hadCargoTab ? 328 : 672) : 128,()=>SwitchTab(index));
             if(!onboard){var label=button.GetComponentInChildren<TMP_Text>();label.enableAutoSizing=true;label.fontSizeMin=13;label.fontSizeMax=18;}
-            if((onboard ? (tab==4 ? 1 : 0) : tab)==i)button.GetComponent<Image>().color=MenuTheme.SelectedTab;
+            NativeMenuTheme.Button(button,true);
+            if((onboard ? (tab==4 ? 1 : 0) : tab)==i)NativeMenuTheme.ActiveTab(button);
         }
         body=MenuTheme.Rect("Contents",rect,24,-155,672,382);
         if(tab==4 && onboard)BuildCargo();else if(tab==4)BuildScouting();else if(tab==3 && !onboard)BuildSummon();else if(onboard || tab==2)BuildDestinations();else if(tab==0)BuildBerth();else BuildDeparture();

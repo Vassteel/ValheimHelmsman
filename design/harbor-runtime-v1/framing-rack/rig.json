@@ -1,0 +1,72 @@
+{
+  "key": "framing-rack",
+  "prefab": "ShipConstruction2",
+  "name": "Ship framing gantry",
+  "lift": 0.45,
+  "rigs": [
+    {
+      "tag": "wheel0",
+      "kind": "wheel",
+      "pivot": [
+        0,
+        -0.14750000000000002,
+        2.56
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "lift": 0,
+      "ratio": 7.142857142857142
+    },
+    {
+      "tag": "wheel1",
+      "kind": "wheel",
+      "pivot": [
+        0,
+        -0.2,
+        1.57
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "lift": 1,
+      "ratio": 8.305647840531561
+    },
+    {
+      "tag": "load",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 1,
+      "ratio": 1
+    },
+    {
+      "tag": "free-tail",
+      "kind": "lift",
+      "pivot": [
+        0,
+        0,
+        0
+      ],
+      "axis": [
+        0,
+        0,
+        1
+      ],
+      "lift": 0,
+      "ratio": 1
+    }
+  ]
+}

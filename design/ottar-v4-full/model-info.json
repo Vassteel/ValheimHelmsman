@@ -1,0 +1,27 @@
+{
+  "name": "Ottar",
+  "status": "Standalone visual study. Not imported, registered, packaged or installed in Helmsman.",
+  "basis": "Skuldelev 1 / Ottar; interpreted hull lines, framing, rigging pose and cargo",
+  "units": "metres; Blender X forward, Y port, Z up",
+  "nominal_hull_length": 15.84,
+  "nominal_beam": 4.8,
+  "revision": 4,
+  "cargo_barrels": 14,
+  "cargo_hide_bales": 12,
+  "cargo_sacks": 18,
+  "cargo_rolled_bundles": 6,
+  "cargo_timber_bundles": 2,
+  "grating_panels": 0,
+  "helm_benches": 1,
+  "passenger_seats": 4,
+  "mast_holdfasts": 1,
+  "boarding_ladders": 2,
+  "mesh_objects": 871,
+  "vertices": 62713,
+  "triangles_before_bevel": 114978,
+  "limitations": [
+    "Not an exact archaeological reconstruction",
+    "Walking and attachment guides prepared; no Unity collision, seated animations or functional interactions",
+    "GLB uses base material colours; Blender has procedural grain bump"
+  ]
+}

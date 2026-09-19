@@ -1,0 +1,15 @@
+{
+  "name": "falkusa",
+  "standalone": true,
+  "length_m": 9.0,
+  "beam_m": 2.7,
+  "rowing_oars": 0,
+  "inventory": {
+    "status": "Fishing inventory capacity to be chosen during integration"
+  },
+  "reference": "User-supplied images; original interpreted geometry",
+  "limitations": [
+    "No Unity integration, collision, sailing physics or seat interactions",
+    "Dimensions and rig are first-pass game-design choices"
+  ]
+}

@@ -6,16 +6,16 @@ using UnityEngine.UI;
 
 namespace Helmsman;
 
-/// <summary>Quartermaster's ChestUi palette, typography and control treatment.</summary>
+/// <summary>Vanilla inventory artwork and control treatment shared with Quartermaster.</summary>
 internal sealed class MenuTheme
 {
     internal static readonly Color Gold=new Color(.92f,.73f,.38f);
-    internal static readonly Color Muted=new Color(.73f,.77f,.79f);
-    internal static readonly Color Background=new Color(.055f,.07f,.075f,.995f);
-    internal static readonly Color ButtonColor=new Color(.16f,.18f,.19f);
-    internal static readonly Color InputColor=new Color(.11f,.14f,.16f);
+    internal static readonly Color Muted=new Color(.85f,.80f,.70f);
+    internal static readonly Color Background=new Color(.19f,.13f,.08f,.99f);
+    internal static readonly Color ButtonColor=new Color(.30f,.23f,.16f);
+    internal static readonly Color InputColor=new Color(.12f,.09f,.06f);
     internal static readonly Color SelectedTab=new Color(.28f,.23f,.13f);
-    internal static readonly Color EnabledToggle=new Color(.12f,.23f,.22f);
+    internal static readonly Color EnabledToggle=new Color(.30f,.27f,.16f);
     private readonly TMP_FontAsset font;
     internal MenuTheme(TMP_FontAsset font){this.font=font;}
 
@@ -23,6 +23,7 @@ internal sealed class MenuTheme
     {
         // Same source as Quartermaster: use the game's inventory action font.
         var gui=InventoryGui.instance;
+        NativeMenuTheme.Capture(gui);
         if(gui && gui.m_stackAllButton)
         {
             var label=gui.m_stackAllButton.GetComponentInChildren<TMP_Text>(true);
@@ -45,11 +46,7 @@ internal sealed class MenuTheme
     internal static Image Panel(RectTransform rect,Color color,bool border=false)
     {
         var image=rect.gameObject.AddComponent<Image>();image.color=color;
-        if(border)
-        {
-            var outline=rect.gameObject.AddComponent<Outline>();
-            outline.effectColor=Gold;outline.effectDistance=new Vector2(2,-2);
-        }
+        if(border)NativeMenuTheme.Panel(image);
         return image;
     }
     internal TMP_Text Text(Transform parent,string text,float x,float y,float width,float height,float size,Color color)
@@ -57,7 +54,7 @@ internal sealed class MenuTheme
         var label=Rect("Label",parent,x,y,width,height).gameObject.AddComponent<TextMeshProUGUI>();
         label.font=font;label.text=text;label.fontSize=size;label.color=color;label.raycastTarget=false;
         label.alignment=TextAlignmentOptions.MidlineLeft;label.textWrappingMode=TextWrappingModes.Normal;
-        label.richText=false;return label;
+        label.richText=false;NativeMenuTheme.Text(label,size>=22);return label;
     }
     internal Button Button(Transform parent,string label,float x,float y,float width,Action action)
     {
@@ -68,7 +65,7 @@ internal sealed class MenuTheme
         colors.selectedColor=new Color(1.8f,1.6f,1.1f);button.colors=colors;
         var text=Text(rect,label,9,0,width-18,38,18,Color.white);
         text.alignment=TextAlignmentOptions.Center;text.enableAutoSizing=true;text.fontSizeMin=14;text.fontSizeMax=18;
-        button.onClick.AddListener(()=>action());return button;
+        NativeMenuTheme.Button(button);button.onClick.AddListener(()=>action());return button;
     }
     internal TMP_InputField Input(Transform parent,string value,float x,float y,float width,Action<string> changed)
     {
@@ -80,7 +77,7 @@ internal sealed class MenuTheme
         field.characterLimit=48;field.contentType=TMP_InputField.ContentType.Standard;
         field.lineType=TMP_InputField.LineType.SingleLine;field.text=value;
         field.navigation=new Navigation{mode=Navigation.Mode.None};
-        field.onValueChanged.AddListener(v=>changed(v));return field;
+        NativeMenuTheme.Input(field);field.onValueChanged.AddListener(v=>changed(v));return field;
     }
     internal Slider Slider(Transform parent,string title,float y,float min,float max,float value,string unit,Action<float> changed)
     {
@@ -99,8 +96,18 @@ internal sealed class MenuTheme
         slider.onValueChanged.AddListener(v=>{label.text=title+": "+v.ToString("0.0")+unit;changed(v);});
         // A clear target across the full track makes pointer dragging easier.
         var hit=rect.gameObject.AddComponent<Image>();hit.color=Color.clear;
-        return slider;
+        NativeSlider(slider);return slider;
     }
+    private static void NativeSlider(Slider slider)
+    {
+        var gui=InventoryGui.instance;var source=gui&&gui.m_splitDialog?gui.m_splitDialog.GetComponentInChildren<Slider>(true):null;
+        if(!source)return;
+        NativeMenuTheme.Control(slider,source);
+        if(source.fillRect&&slider.fillRect)NativeMenuTheme.Image(slider.fillRect.GetComponent<Image>(),source.fillRect.GetComponent<Image>());
+        var track=slider.transform.Find("Track")?.GetComponent<Image>();
+        var nativeTrack=source.transform.Find("Background")?.GetComponent<Image>();if(track&&nativeTrack)NativeMenuTheme.Image(track,nativeTrack);
+    }
+
 }
 
 // ZInput handles controller activation once; pointer activation remains native.

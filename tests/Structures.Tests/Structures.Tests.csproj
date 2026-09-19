@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+<ItemGroup><Compile Include="../../src/Helmsman/Structures/Blueprint.cs" Link="Blueprint.cs" /><Compile Include="../../src/Helmsman/Structures/ImportPaths.cs" Link="ImportPaths.cs" /><Compile Include="../../src/Helmsman/Structures/PrefabPolicy.cs" Link="PrefabPolicy.cs" /><Compile Include="../../src/Helmsman/Structures/PlacementUndo.cs" Link="PlacementUndo.cs" /><Compile Include="../../src/Helmsman/Structures/PlacementInput.cs" Link="PlacementInput.cs" /></ItemGroup>
+</Project>

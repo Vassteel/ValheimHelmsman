@@ -27,7 +27,8 @@ public sealed class WorkstationLease : MonoBehaviour
         view.Register<bool>("HelmsmanWorkReply",Reply);
         initialized=true;
     }
-    private bool Near(Player player)=>player&&!player.IsDead()&&(player.transform.position-transform.position).sqrMagnitude<64;
+    internal Func<Player,bool>? AccessRange;
+    private bool Near(Player player)=>player&&!player.IsDead()&&(AccessRange!=null?AccessRange(player):(player.transform.position-transform.position).sqrMagnitude<64);
     internal string Run(Func<string> action)
     {
         if(!initialized||!Near(Player.m_localPlayer)||!PrivateArea.CheckAccess(transform.position,0,false,true))return "Stand beside an accessible workshop.";

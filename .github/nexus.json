@@ -6,5 +6,8 @@
   ],
   "game": "valheim",
   "page_id": 3815,
-  "file_id": null
+  "file_id": null,
+  "include_files": [
+    "LICENSE.txt"
+  ]
 }

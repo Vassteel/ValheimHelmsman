@@ -18,6 +18,6 @@ foreach(var station in new[]{bench,(CraftingStation)null})
  var normal=all.ToList();hook.Invoke(null,new object[]{new Player{Station=station},normal});
  Check(normal.SequenceEqual(all),"Workbench and hand-crafting lists remain unchanged");
 }
-var discovered=relevant.Take(2).ToList();hook.Invoke(null,new object[]{new Player{Station=table},discovered});
-Check(discovered.Count==2,"Filtering does not grant undiscovered recipes");
+var known=relevant.Take(2).ToArray();var discovered=known.ToList();hook.Invoke(null,new object[]{new Player{Station=table},discovered});
+Check(discovered.SequenceEqual(known),"Filtering does not grant undiscovered recipes");
 Console.WriteLine($"PASS: {checks} carpenter recipe checks: station flags, all-recipes mode, unrelated recipes, other stations and discovery.");

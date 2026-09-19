@@ -13,7 +13,7 @@ internal static class BuildMenuCategory
 {
     internal const string Token = "$helmsman_build_category";
     private static readonly HashSet<string> Prefabs = new(
-        HarborCatalog.Pieces.Select(p => p.Prefab).Concat(ShipConstruction.Blueprints.Select(b => b.Prefab)).Concat(new[] { Plugin.DockPrefab, ImportedHulls.TablePrefab }),
+        HarborCatalog.Pieces.Select(p => p.Prefab).Concat(ShipConstruction.Blueprints.Select(b => b.Prefab)).Concat(new[] { Plugin.DockPrefab, ImportedHulls.TablePrefab, "HelmsmanSlipway", "HelmsmanToolRack", "HelmsmanCaulkingStation", "HelmsmanRiggingRack", "HelmsmanPaintStand" }),
         StringComparer.Ordinal);
     internal static bool Contains(Piece piece) => piece && Prefabs.Contains(Utils.GetPrefabName(piece.gameObject));
 }

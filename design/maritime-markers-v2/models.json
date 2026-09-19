@@ -1,0 +1,90 @@
+[
+  {
+    "id": "gullwatch-post",
+    "name": "Gullwatch post",
+    "replaces": "Totem1",
+    "triangles": 2578,
+    "dimensions_m": [
+      0.6000000238418579,
+      0.6377198696136475,
+      2.134999990463257
+    ],
+    "bounds_min": [
+      -0.30000001192092896,
+      -0.38271990418434143,
+      0.0
+    ],
+    "bounds_max": [
+      0.30000001192092896,
+      0.2549999952316284,
+      2.134999990463257
+    ],
+    "original_geometry": true
+  },
+  {
+    "id": "tide-serpent",
+    "name": "Tide serpent",
+    "replaces": "Totem2",
+    "triangles": 7616,
+    "dimensions_m": [
+      0.7552387714385986,
+      0.9529999494552612,
+      2.177000045776367
+    ],
+    "bounds_min": [
+      -0.3776193857192993,
+      -0.574999988079071,
+      0.0
+    ],
+    "bounds_max": [
+      0.3776193857192993,
+      0.3779999911785126,
+      2.177000045776367
+    ],
+    "original_geometry": true
+  },
+  {
+    "id": "wayfinder-marker",
+    "name": "Wayfinder marker",
+    "replaces": "Totem3",
+    "triangles": 2562,
+    "dimensions_m": [
+      0.9399999976158142,
+      0.44999998807907104,
+      1.9200000762939453
+    ],
+    "bounds_min": [
+      -0.4699999988079071,
+      -0.22499999403953552,
+      0.0
+    ],
+    "bounds_max": [
+      0.4699999988079071,
+      0.22499999403953552,
+      1.9200000762939453
+    ],
+    "original_geometry": true
+  },
+  {
+    "id": "wreckward-marker",
+    "name": "Wreckward marker",
+    "replaces": "Totem4",
+    "triangles": 2988,
+    "dimensions_m": [
+      0.6800000071525574,
+      0.5299999713897705,
+      2.0719523429870605
+    ],
+    "bounds_min": [
+      -0.3400000035762787,
+      -0.3050000071525574,
+      0.0
+    ],
+    "bounds_max": [
+      0.3400000035762787,
+      0.22499999403953552,
+      2.0719523429870605
+    ],
+    "original_geometry": true
+  }
+]

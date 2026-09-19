@@ -28,7 +28,7 @@ def digest(data):
 
 
 def prepare(source, destination, config, version):
-    """Copy only configured runtime files; never execute or extract release code."""
+    """Copy configured runtime files and notices; never execute release code."""
     name = config['name']
     prefix = f'BepInEx/plugins/{name}/'
     dlls = {prefix + dll for dll in config['dlls']}
@@ -57,7 +57,7 @@ def prepare(source, destination, config, version):
             raise ValueError('Runtime-only archive filename must match the mod and release version.')
         if {n for n in names if n.lower().endswith('.dll')} != dlls:
             raise ValueError('Archive has missing or unexpected DLLs.')
-        runtime = dlls | set(config.get('runtime_files', []))
+        runtime = dlls | set(config.get('runtime_files', [])) | set(config.get('include_files', []))
         if not runtime.issubset(names):
             raise ValueError('A configured runtime file is missing.')
         content = {n: archive.read(n) for n in sorted(runtime)}
@@ -161,7 +161,7 @@ def from_release(args, config):
     source.parent.mkdir(exist_ok=True)
     source.write_bytes(data)
     with zipfile.ZipFile(source) as archive:
-        allowed = {f'BepInEx/plugins/{config["name"]}/{d}' for d in config['dlls']} | set(config.get('runtime_files', []))
+        allowed = {f'BepInEx/plugins/{config["name"]}/{d}' for d in config['dlls']} | set(config.get('runtime_files', [])) | set(config.get('include_files', []))
         if set(archive.namelist()) != allowed:
             raise ValueError('Release asset must contain runtime files only. Prepare it with the package command first.')
     result = prepare(source, Path('nexus-dist'), config, version)

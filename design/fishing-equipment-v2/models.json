@@ -1,0 +1,90 @@
+[
+  {
+    "id": "fish-oil-press",
+    "name": "Fish oil screw press",
+    "replaces": "OilPress",
+    "triangles": 40116,
+    "dimensions_m": [
+      2.679356336593628,
+      1.426621437072754,
+      2.1449999809265137
+    ],
+    "bounds_min": [
+      -1.4161815643310547,
+      -0.8166213631629944,
+      0.0
+    ],
+    "bounds_max": [
+      1.2631747722625732,
+      0.6100000143051147,
+      2.1449999809265137
+    ],
+    "original_geometry": true
+  },
+  {
+    "id": "net-rack",
+    "name": "Fishing net rack",
+    "replaces": "RedePesca",
+    "triangles": 36998,
+    "dimensions_m": [
+      2.259999990463257,
+      1.087499976158142,
+      1.8656377792358398
+    ],
+    "bounds_min": [
+      -1.1299999952316284,
+      -0.6675000190734863,
+      0.0
+    ],
+    "bounds_max": [
+      1.1299999952316284,
+      0.41999998688697815,
+      1.8656377792358398
+    ],
+    "original_geometry": true
+  },
+  {
+    "id": "fish-dryer",
+    "name": "Fish drying rack",
+    "replaces": "Peixes",
+    "triangles": 36584,
+    "dimensions_m": [
+      2.1600000858306885,
+      0.8399999737739563,
+      1.7346603870391846
+    ],
+    "bounds_min": [
+      -1.0800000429153442,
+      -0.41999998688697815,
+      0.0
+    ],
+    "bounds_max": [
+      1.0800000429153442,
+      0.41999998688697815,
+      1.7346603870391846
+    ],
+    "original_geometry": true
+  },
+  {
+    "id": "eel-rack",
+    "name": "Eel drying rack",
+    "replaces": "Enguias",
+    "triangles": 14112,
+    "dimensions_m": [
+      1.600000023841858,
+      0.8399999737739563,
+      1.735107183456421
+    ],
+    "bounds_min": [
+      -0.800000011920929,
+      -0.41999998688697815,
+      0.0
+    ],
+    "bounds_max": [
+      0.800000011920929,
+      0.41999998688697815,
+      1.735107183456421
+    ],
+    "original_geometry": true
+  }
+]

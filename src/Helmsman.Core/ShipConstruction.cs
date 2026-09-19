@@ -9,6 +9,7 @@ public sealed class ShipBlueprint
     public readonly string Id, Name, Source, Recipe;
     public readonly int BuildSeconds;
     public readonly bool HasSail;
+    public bool UsesSlipway => Id is "hercule" or "merchant" or "longship" or "big_cargo" or "warship";
     public string Prefab => Source;
     public ShipBlueprint(string id, string name, string source, string recipe, int seconds, bool sails = true)
     { Id=id; Name=name; Source=source; Recipe=recipe; BuildSeconds=seconds; HasSail=sails; }
@@ -25,13 +26,28 @@ public static class ShipConstruction
         new ShipBlueprint("tandem_kayak", "Tandem Finewood Kayak", "HelmsmanTandemKayak", "FineWood:16,Wood:16,Resin:10", 180, false),
         new ShipBlueprint("little_boat", "Ceol", "LittleBoat", "LeatherScraps:8,Wood:40", 240),
         new ShipBlueprint("currach", "Currach", "HelmsmanCurrach", "DeerHide:10,Wood:25,Resin:10", 180),
-        new ShipBlueprint("hercule", "Falkuša fishing boat", "HerculeShip", "ClothShip:2,ResinWood:30,BronzeNails:100,ShipRope:2", 360),
-        new ShipBlueprint("merchant", "Ottar", "MercantShip", "ClothShip:4,ResinWood:40,IronNails:100,ShipRope:2", 480),
+        new ShipBlueprint("hercule", "Falkuša fishing boat", "HerculeShip", "DeerHide:10,RoundLog:30,Resin:30,BronzeNails:100,LeatherScraps:10", 360),
+        new ShipBlueprint("merchant", "Ottar", "MercantShip", "DeerHide:20,RoundLog:40,Resin:40,IronNails:100,LeatherScraps:10", 480),
         new ShipBlueprint("longship", "Longship", "VikingShip", ShipwrightRules.Hull.Recipe, 720),
-        new ShipBlueprint("big_cargo", "Big cargo ship", "BigCargoShip", "ClothShip:4,CaulkedWood:50,IronNails:150,ShipRope:4", 900),
-        new ShipBlueprint("warship", "Snekkja", "WarShip", "ClothShip:4,CaulkedWood:50,IronNails:120,ShipRope:2", 1080),
+        new ShipBlueprint("big_cargo", "Big cargo ship", "BigCargoShip", "DeerHide:20,FineWood:50,Resin:50,Coal:50,IronNails:150,LeatherScraps:20", 900),
+        new ShipBlueprint("warship", "Snekkja", "WarShip", "DeerHide:20,FineWood:50,Resin:50,Coal:50,IronNails:120,LeatherScraps:10", 1080),
     });
     public static ShipBlueprint? Find(string id) => Blueprints.FirstOrDefault(b=>b.Id==id);
+    // Accept only known historical costs so paid orders can finish or refund exactly
+    // what was charged before the temporary switch to vanilla materials.
+    public static bool ValidRecipe(string id, string recipe)
+    {
+        var plan=Find(id);
+        if(plan==null)return false;
+        if(recipe==plan.Recipe)return true;
+        return id switch {
+            "hercule" => recipe=="ClothShip:2,ResinWood:30,BronzeNails:100,ShipRope:2",
+            "merchant" => recipe=="ClothShip:4,ResinWood:40,IronNails:100,ShipRope:2",
+            "big_cargo" => recipe=="ClothShip:4,CaulkedWood:50,IronNails:150,ShipRope:4",
+            "warship" => recipe=="ClothShip:4,CaulkedWood:50,IronNails:120,ShipRope:2",
+            _ => false
+        };
+    }
     public static bool ValidDuration(double seconds) => !double.IsNaN(seconds) && !double.IsInfinity(seconds) && seconds>=30 && seconds<=86400;
     public static double Elapsed(long started, long now, double duration)
     {

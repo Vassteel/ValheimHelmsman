@@ -29,7 +29,8 @@ internal static class ImportedShipMaterials
         var building=From("piece_workbench").Concat(From("piece_chest_wood")).ToArray();
         // Current ships can use cloth sails outside the legacy m_sailObject and
         // hull shaders other than Custom/Piece. Resolve actual renderer materials.
-        wood=materials.FirstOrDefault(m=>m.name.IndexOf("ship_wood",StringComparison.OrdinalIgnoreCase)>=0)
+        wood=materials.Concat(From("Karve")).FirstOrDefault(m=>string.Equals(m.name.Replace(" (Instance)",""),"ship_wood",StringComparison.OrdinalIgnoreCase))
+            ??materials.FirstOrDefault(m=>m.name.IndexOf("ship_wood",StringComparison.OrdinalIgnoreCase)>=0)
             ??materials.FirstOrDefault(m=>m.shader.name=="Custom/Piece")
             ??materials.Concat(building).FirstOrDefault(m=>WorldSurface(m.shader.name));
         cloth=From("Karve").FirstOrDefault(m=>m.name.StartsWith("sail_white",StringComparison.OrdinalIgnoreCase))
@@ -78,7 +79,7 @@ internal static class ImportedShipMaterials
                     else
                     {
                         material=new Material(fabric?cloth!:wood!);
-                        var texture=Replacement(source,original.name,fabric)??original.mainTexture;
+                        var texture=(fabric?ShipwrightAssets.Texture("Sea flax","sails"):null)??original.mainTexture;
                         if(texture)material.mainTexture=texture;
                         material.mainTextureScale=original.mainTextureScale;material.mainTextureOffset=original.mainTextureOffset;
                         material.color=Color.white;
@@ -126,7 +127,8 @@ internal static class ImportedShipMaterials
     {
         if(!wood)throw new InvalidOperationException("Boatyard materials requested before native materials.");
         var material=new Material(wood){name="Helmsman boatyard matte",color=color};
-        material.mainTexture=timber?ShipwrightAssets.Texture("hulls/planks-horizontal"):Texture2D.whiteTexture;
+        // Timber inherits the native material texture; source hull atlases are retired.
+        if(!timber)material.mainTexture=Texture2D.whiteTexture;
         material.mainTextureScale=Vector2.one;material.mainTextureOffset=Vector2.zero;
         foreach(var p in new[]{"_EmissionColor","_EmissiveColor","_NoiseGlowColor"})if(material.HasProperty(p))material.SetColor(p,Color.black);
         foreach(var p in new[]{"_Glossiness","_Metallic","_MetalGloss","_NoiseGlowEnabled"})if(material.HasProperty(p))material.SetFloat(p,0);
@@ -135,17 +137,17 @@ internal static class ImportedShipMaterials
         if(material.HasProperty("_AddSnow"))material.SetFloat("_AddSnow",0);
         material.globalIlluminationFlags=MaterialGlobalIlluminationFlags.EmissiveIsBlack;return material;
     }
-    internal static Material FleetMaterial(string label,Color authored)
+    internal static Material FleetMaterial(string label,Color authored,bool smallCraft=false)
     {
         string n=label.ToLowerInvariant();
-        bool fabric=n.Contains("sail")||n.Contains("wool")||n.Contains("sack")||n.Contains("wrapping")||n.Contains("hide")||n.Contains("fish scales")||n.Contains("net cloth");
+        bool fabric=(smallCraft&&n.Contains("tarred skin"))||n.Contains("sail")||n.Contains("wool")||n.Contains("sack")||n.Contains("wrapping")||n.Contains("hide")||n.Contains("fish scales")||n.Contains("net cloth");
         var mat=new Material(fabric?cloth!:wood!){name="Helmsman native "+label};
         // These meshes already contain both cloth faces and closed plank thickness.
         if(mat.HasProperty("_Cull"))mat.SetFloat("_Cull",2);
         foreach(var property in new[]{"_MoveableObject"})if(mat.HasProperty(property))mat.SetFloat(property,1);
         foreach(var property in new[]{"_AddSnow","_SwayDistance","_NoiseGlowEnabled"})if(mat.HasProperty(property))mat.SetFloat(property,0);
         Color tint=Color.white;
-        if(n.Contains("finewood dark inlay"))tint=new Color(.47f,.32f,.20f);
+        if(n.Contains("finewood dark inlay"))tint=smallCraft?new Color(.82f,.76f,.65f):new Color(.47f,.32f,.20f);
         else if(n.Contains("fish scales"))tint=new Color(.65f,.78f,.80f);
         else if(n.Contains("tarred skin"))tint=new Color(.30f,.32f,.32f);
         else if(n.Contains("iron")&&!n.Contains("oxide"))tint=new Color(.30f,.31f,.30f);
@@ -163,7 +165,7 @@ internal static class ImportedShipMaterials
             if(mat.HasProperty("_BumpMap"))mat.SetTexture("_BumpMap",null);
         }
         mat.color=tint;
-        mat.mainTextureScale=fabric?new Vector2(.3f,.3f):new Vector2(.35f,.5f);
+        mat.mainTextureScale=fabric?new Vector2(.3f,.3f):new Vector2(.35f,smallCraft?.28f:.5f);
         mat.mainTextureOffset=Vector2.zero;
         if(mat.HasProperty("_BumpMap"))mat.SetTextureScale("_BumpMap",mat.mainTextureScale);
         return mat;
@@ -176,39 +178,6 @@ internal static class ImportedShipMaterials
         ship.m_waterImpactEffect=nativeShip.m_waterImpactEffect;
     }
     private static bool IsFabric(string name)=>name.StartsWith("Sail",StringComparison.OrdinalIgnoreCase)||name.StartsWith("Vela",StringComparison.OrdinalIgnoreCase)||name=="Cloth"||name=="HerculeSail"||name=="Roman Sail";
-    private static Texture2D? Replacement(string source,string name,bool fabric)
-    {
-        if(fabric)return ShipwrightAssets.Texture("Sea flax","sails");
-        if((source=="RowingCanoe"||source=="DoubleRowingCanoe"||source=="LittleBoat")&&name.StartsWith("Viking_Ship",StringComparison.Ordinal))
-            return ShipwrightAssets.Texture("hulls/canoe");
-        if(source=="MercantShip"&&name=="ship")return ShipwrightAssets.Texture("hulls/merchant");
-        if(source=="CargoCaravel"&&name=="Hull")return ShipwrightAssets.Texture("hulls/caravel");
-        if(source=="CargoShip"&&(name=="main1"||name=="main2"||name=="main3") || source=="WarShip"&&name.StartsWith("WarShipTex",StringComparison.Ordinal))
-            return ShipwrightAssets.Texture("hulls/planks-vertical");
-        if(source=="BigCargoShip"&&name=="Wood01" || source=="HugeCargoShip"&&(name=="Hull"||name=="Mast Coat"||name=="Deck"))
-            return ShipwrightAssets.Texture("hulls/planks-horizontal");
-        if((source=="CargoAnimalShip"||source=="HerculeShip")&&(name=="Hull"||name=="Mast Coat"||name=="Deck"))return ShipwrightAssets.Texture("hulls/planks-horizontal");
-        if(source=="FastShipSkuldelev"&&(name=="Hull"||name=="HullRed"))return ShipwrightAssets.Texture("hulls/fast-skuldelev");
-        if(source=="FastShipSkuldelev"&&name=="Frames")return ShipwrightAssets.Texture("hulls/planks-vertical");
-        if(source=="GoblinShip")
-        {
-            if(name=="Hull_4K")return ShipwrightAssets.Texture("hulls/goblin");
-            if(name.StartsWith("Hullsupport",StringComparison.Ordinal)||name.StartsWith("Keel",StringComparison.Ordinal)||name.StartsWith("Mast_4K",StringComparison.Ordinal))return ShipwrightAssets.Texture("hulls/planks-vertical");
-        }
-        if(source=="TaurusWarShip")
-        {
-            if(name=="MarlthonFrontMat_Base_color")return ShipwrightAssets.Texture("hulls/taurus-front");
-            if(name=="MarlthonTailSideMat_Base_color")return ShipwrightAssets.Texture("hulls/taurus-tail");
-            if(name=="MarlthonSailSideMat_Base_color")return ShipwrightAssets.Texture("hulls/taurus-sail-support");
-            if(name=="Mast Coat")return ShipwrightAssets.Texture("hulls/planks-horizontal");
-        }
-        if(source=="Skuldelev")
-        {
-            if(name=="Viking Ship - 4-Material Blend")return ShipwrightAssets.Texture("hulls/skuldelev-painted");
-            if(name.Contains("Rawoak")||name.Contains("Tar")||name.Contains("linseed")||name=="Viking Ship - 4-Material Blend.001")return ShipwrightAssets.Texture("hulls/planks-horizontal");
-        }
-        return null;
-    }
     internal static Material Style(Material original,bool fabric)
     {
         string key="variant/"+original.GetInstanceID();if(owned.TryGetValue(key,out var cached))return cached;
