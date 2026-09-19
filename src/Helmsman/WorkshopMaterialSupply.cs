@@ -72,8 +72,10 @@ internal static class WorkshopMaterialSupply
         }
         return result;
     }
-    internal static void Collect(Player player,Shipyard bench,string recipe,string supplied,long creator,Action<string> save)
+    internal static void Collect(Player player,Shipyard bench,string recipe,string supplied,long creator,Action<string> save,bool freeBuild=false)
     {
+        // No-cost construction neither withdraws stock nor fabricates paid receipts.
+        if(freeBuild)return;
         // Display and collection share the exact ownership, ward, supply-setting
         // and world-level filters. Ghost icons never create inventory items.
         var sources=Sources(player,bench,creator);

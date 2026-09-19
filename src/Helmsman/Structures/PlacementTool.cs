@@ -42,29 +42,27 @@ namespace Helmsman.Structures
             {
                 if(new FileInfo(path).Length>12_000_000)throw new InvalidOperationException("File is larger than 12 MB.");
                 var build=Blueprint.Parse(File.ReadAllText(path));
-                build.ValidatePlacementSize();
-                var lookup=new Dictionary<string,GameObject>();var missing=new List<string>();var rejected=new List<string>();
+                var lookup=new Dictionary<string,GameObject>();var skippedNames=new List<string>();
                 foreach(var name in build.Pieces.Select(p=>p.Prefab).Distinct())
                 {
-                    var p=ZNetScene.instance.GetPrefab(name);
-                    if(!p){missing.Add(name);continue;}
-                    var components=p.GetComponentsInChildren<MonoBehaviour>(true);
-                    bool spawner=components.Any(c=>c&&(c.GetType().Name=="SpawnArea"||c.GetType().Name=="CreatureSpawner"||c.GetType().Name=="SpawnSystem"));
-                    string reason=PrefabPolicy.Rejection(p.GetComponent<ZNetView>()!=null,p.GetComponentInChildren<Character>(true)!=null,
-                        spawner,p.GetComponentInChildren<TerrainOp>(true)!=null||p.GetComponentInChildren<TerrainModifier>(true)!=null,p.GetComponent<ItemDrop>()!=null);
-                    if(reason!=null)rejected.Add(name+" ("+reason+")");
-                    else lookup.Add(name,p);
+                    var prefab=ZNetScene.instance.GetPrefab(name);
+                    if(StructureConstruction.SupportedPrefab(prefab))lookup.Add(name,prefab);
+                    else skippedNames.Add(name);
                 }
-                if(missing.Count>0||rejected.Count>0)
-                {
-                    var messages=new List<string>();
-                    if(missing.Count>0)messages.Add("Not found in the loaded game: "+string.Join(", ",missing.Take(15))+". These may require another mod or a different game version.");
-                    if(rejected.Count>0)messages.Add("Unsupported objects: "+string.Join(", ",rejected.Take(15))+".");
-                    throw new InvalidOperationException(string.Join("\n",messages)+" Nothing was placed.");
-                }
+                // Filter before sizing, preview, terrain work and material accounting so
+                // scenery or missing mod objects cannot enlarge or block the real build.
+                int skipped=build.RetainPieces(p=>lookup.ContainsKey(p.Prefab));
+                build.ValidatePlacementSize();
                 ghost?.Dispose();ghost=null;
                 int unsupported=build.Pieces.Count(p=>p.HasExtendedData||(p.Data.Length>0&&lookup[p.Prefab].GetComponent<TextReceiver>()==null));
-                dataWarning=unsupported>0?$"Geometry import: {unsupported} objects contain additional data (such as inventory or equipment) that is not restored.":"";
+                var warnings=new List<string>();
+                if(skipped>0)
+                {
+                    warnings.Add($"Skipped {skipped} unsupported or missing objects.");
+                    Helmsman.Plugin.Instance.Record("Skipped blueprint objects: "+string.Join(", ",skippedNames));
+                }
+                if(unsupported>0)warnings.Add($"Extra inventory/equipment data on {unsupported} pieces is not restored.");
+                dataWarning=string.Join(" ",warnings);
                 Ghost.FitFoundation(build,lookup);
                 ghost=new Ghost(build,lookup);blueprint=build;prefabs=lookup;
                 label=Path.GetFileName(path);yaw=0;height=0;terrainHeight=0;locked=false;hit=false;preview=true;browser=false;error="";SetInput(false);

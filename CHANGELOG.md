@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.41
+
+- Skip unsupported blueprint objects and allow construction orders anywhere within workshop coverage.
+- Honor no-cost building without requesting or withdrawing construction supplies.
+- Add a required-materials scrollbar, faster mouse-wheel scrolling and controller paging.
+- Fit dock approaches to ship size and clear water, with finer route searches through narrow river bends.
+
 ## 0.2.40
 
 - Build larger ships on a slipway with staged construction, arriving puffin crews, launching and reset animations; small boats remain instant builds.

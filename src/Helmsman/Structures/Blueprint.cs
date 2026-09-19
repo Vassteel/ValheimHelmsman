@@ -77,12 +77,25 @@ namespace Helmsman.Structures
                 }
             }
             if(result.Pieces.Count==0)throw new FormatException("No pieces in this file.");
+            result.Rebase();
+            return result;
+        }
+        public int RetainPieces(Func<BuildPiece,bool> supported)
+        {
+            int skipped=Pieces.RemoveAll(p=>!supported(p));
+            if(Pieces.Count==0)throw new FormatException("No supported building pieces remain in this file.");
+            Rebase();
+            return skipped;
+        }
+        private void Rebase()
+        {
+            var result=this;
+            result.Radius=0;
             float minX=result.Pieces.Min(p=>p.X),maxX=result.Pieces.Max(p=>p.X),minZ=result.Pieces.Min(p=>p.Z),maxZ=result.Pieces.Max(p=>p.Z),minY=result.Pieces.Min(p=>p.Y);
             result.Width=maxX-minX;result.Depth=maxZ-minZ;result.Height=result.Pieces.Max(p=>p.Y)-minY;
             foreach(var p in result.Pieces){p.X-=(minX+maxX)/2;p.Z-=(minZ+maxZ)/2;p.Y-=minY;result.Radius=Math.Max(result.Radius,(float)Math.Sqrt(p.X*p.X+p.Z*p.Z)+3);}
             // Occupied lower layer determines the foundation, not a circular radius.
             result.Hull=Geometry.Hull(result.Pieces.Where(p=>p.Y<=2f).SelectMany(p=>new[]{new Point(p.X-1.5f,p.Z-1.5f),new Point(p.X+1.5f,p.Z-1.5f),new Point(p.X-1.5f,p.Z+1.5f),new Point(p.X+1.5f,p.Z+1.5f)}));
-            return result;
         }
         private static float Number(string value,int line)
         {

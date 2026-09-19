@@ -504,6 +504,13 @@ public sealed partial class HelmsmanUI : MonoBehaviour
             slider.value+=horizontal*(slider.maxValue-slider.minValue)/100;
             ZInput.ResetButtonStatus("JoyDPadRight");ZInput.ResetButtonStatus("JoyDPadLeft");
         }
+        if(selected is Scrollbar scrollbar && horizontal!=0)
+        {
+            // Right advances down the list; left returns toward the first row.
+            float page=scrollbar.size/Mathf.Max(.001f,1-scrollbar.size);
+            scrollbar.value-=horizontal*Mathf.Min(1,page);
+            ZInput.ResetButtonStatus("JoyDPadRight");ZInput.ResetButtonStatus("JoyDPadLeft");
+        }
         if(ZInput.GetButtonDown("JoyButtonA") || Input.GetKeyDown(KeyCode.Return))
         {
             ZInput.ResetButtonStatus("JoyButtonA");

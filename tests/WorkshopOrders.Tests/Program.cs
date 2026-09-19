@@ -11,7 +11,11 @@ var counts=WorkshopMaterialSupply.Available(player,bench,1,new[]{"Wood"})["Wood"
 Check(counts==(8,4,3),"Ghost counts exclude locked/old-world stock, deduplicate Quartermaster and show the bench separately");
 Check(qm.Items.Items[0].m_stack==8&&storage.Items.Items[0].m_stack==4,"Reading ghost requirements never moves or creates items");
 Check(WorkshopMaterialSupply.Available(player,bench,999,new[]{"Wood"})["Wood"].carried==0,"Other players' carried materials are not offered");
-string paid="";WorkshopMaterialSupply.Collect(player,bench,"Wood:12","",1,s=>paid=s);
+string paid="Wood:2";int freeSaves=0;
+WorkshopMaterialSupply.Collect(player,bench,"Wood:12",paid,1,s=>{paid=s;freeSaves++;},true);
+Check(freeSaves==0&&paid=="Wood:2"&&qm.Items.Items[0].m_stack==8&&storage.Items.Items[0].m_stack==4&&player.Items.Items[0].m_stack==3,"No-cost construction leaves all supply sources and real escrow unchanged");
+Check(Helmsman.Core.ConstructionFunding.Supplied(paid)["Wood"]==2,"No-cost cancellation can refund only the actual prior deposit");
+paid="";WorkshopMaterialSupply.Collect(player,bench,"Wood:12","",1,s=>paid=s);
 Check(paid=="Wood:12"&&qm.Items.Items.Count==0&&storage.Items.Items.Count==0&&player.Items.Items[0].m_stack==3,"Auto collection uses exactly the displayed eligible Quartermaster then bench sources");
 Check(locked.Items.Items[0].m_stack==30&&wrongWorld.Items.Items[0].m_stack==20,"Inaccessible stock stays untouched");
 void Reset(out Slipway slip,out WorkstationLease lease){slip=new();lease=new();slip.components[typeof(WorkstationLease)]=lease;ItemDrop.Dropped=0;ItemDrop.BeforeDrop=null;bench.Nearby=true;}

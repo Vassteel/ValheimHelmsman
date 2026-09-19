@@ -17,6 +17,17 @@ Reject("wood_floor    1 1,000.5 2 3","Ambiguous locale rejected");
 Reject("wood_floor 0 1 2 3","Missing fields rejected");
 Reject("","Empty file rejected");
 bool oversizedRejected=false;try{Blueprint.Parse("wood_floor    1 0 0 0\nwood_floor    1 170 0 0").ValidatePlacementSize();}catch(FormatException){oversizedRejected=true;}Check(oversizedRejected,"Oversized footprint rejected at placement validation");
+// Missing scenery below and far outside the house must not affect its footprint.
+var filtered=Blueprint.Parse("wood_floor    1 10 4 20\nBush01    1 500 -100 500\nwood_wall    1 12 6 24");
+Check(filtered.RetainPieces(p=>p.Prefab!="Bush01")==1,"Unsupported scenery skipped");
+filtered.ValidatePlacementSize();
+Check(filtered.Pieces.Count==2&&filtered.Width==2&&filtered.Depth==4&&filtered.Height==2,"Only supported geometry sets placement limits");
+Check(filtered.Pieces[0].Y==0&&filtered.Pieces[1].Y==2&&filtered.Pieces[1].X-filtered.Pieces[0].X==2,"Filtering preserves relative geometry and rebases foundations");
+Check(filtered.Radius<6&&Geometry.Distance(new Point(0,0),filtered.Hull)==0,"Skipped scenery cannot enlarge terrain work");
+Check(filtered.RetainPieces(p=>true)==0&&filtered.Pieces[0].Y==0,"Repeated filtering is stable");
+var nothing=Blueprint.Parse("Bush01    1 0 0 0");
+bool noSupported=false;try{nothing.RetainPieces(p=>false);}catch(FormatException){noSupported=true;}
+Check(noSupported,"All unsupported file rejected before preview or terrain work");
 var hull=Geometry.Hull(new[]{new Point(-5,-3),new Point(5,-3),new Point(5,3),new Point(-5,3),new Point(0,0),new Point(-5,-3)});
 Check(hull.Length==4,"Hull ignores interior/duplicate points");
 Check(Geometry.Distance(new Point(0,0),hull)==0,"Footprint interior flat");

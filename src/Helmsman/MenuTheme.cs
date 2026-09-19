@@ -98,6 +98,28 @@ internal sealed class MenuTheme
         var hit=rect.gameObject.AddComponent<Image>();hit.color=Color.clear;
         NativeSlider(slider);return slider;
     }
+    internal Scrollbar VerticalScrollbar(Transform parent,float x,float y,float width,float height)
+    {
+        var rect=Rect("Materials scrollbar",parent,x,y,width,height);
+        var track=Panel(rect,InputColor);
+        var area=Rect("Sliding area",rect,2,-2,width-4,height-4);
+        var handle=Rect("Handle",area,0,0,0,0);
+        var image=Panel(handle,Gold);
+        var bar=rect.gameObject.AddComponent<HelmsmanMenuScrollbar>();
+        bar.handleRect=handle;bar.targetGraphic=image;bar.direction=Scrollbar.Direction.BottomToTop;
+        bar.navigation=new Navigation{mode=Navigation.Mode.None};bar.value=1;
+        var colors=bar.colors;colors.highlightedColor=new Color(1.4f,1.4f,1.4f);
+        colors.selectedColor=new Color(1.8f,1.6f,1.1f);bar.colors=colors;
+        var gui=InventoryGui.instance;
+        if(gui)foreach(var source in gui.GetComponentsInChildren<Scrollbar>(true))
+        {
+            if(source.direction!=Scrollbar.Direction.BottomToTop&&source.direction!=Scrollbar.Direction.TopToBottom)continue;
+            NativeMenuTheme.Control(bar,source);
+            NativeMenuTheme.Image(track,source.GetComponent<Image>());
+            break;
+        }
+        return bar;
+    }
     private static void NativeSlider(Slider slider)
     {
         var gui=InventoryGui.instance;var source=gui&&gui.m_splitDialog?gui.m_splitDialog.GetComponentInChildren<Slider>(true):null;
@@ -116,6 +138,10 @@ public sealed class HelmsmanMenuButton : Button
     public override void OnSubmit(BaseEventData eventData){}
 }
 public sealed class HelmsmanMenuSlider : Slider
+{
+    public override void OnMove(AxisEventData eventData){}
+}
+public sealed class HelmsmanMenuScrollbar : Scrollbar
 {
     public override void OnMove(AxisEventData eventData){}
 }

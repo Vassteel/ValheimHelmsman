@@ -37,4 +37,35 @@ Check(LocalDetour.Create(prior[0],prior,4,Passage)==null,"Distant rejoin falls b
 Check(LocalDetour.Create(prior[0],prior,9,Passage)==null,"Missing waypoint cannot fabricate a repair");
 var blocked=LocalDetour.Create(prior[0],prior,1,(a,b)=>false)!;while(blocked.Search.State==SearchState.Searching)blocked.Search.Step();Check(blocked.Search.State==SearchState.NoRoute,"No passage stays blocked instead of bypassing safety");
 bool rejected=false;try{blocked.Splice(prior);}catch(InvalidOperationException){rejected=true;}Check(rejected,"Failed detour cannot replace the existing route");
+var river=new AdaptiveRouteSearch(prior[0],prior[2],Passage);
+while(river.State==SearchState.Searching)river.Step();
+Check(river.Fine&&river.State==SearchState.Found,"Initial course retries a channel missed by the regional grid");
+Check(river.Route.Zip(river.Route.Skip(1),Passage).All(v=>v),"Fine initial course checks every edge through the river bends");
+var open=new AdaptiveRouteSearch(new(0,0),new(48,0),(a,b)=>true);while(open.State==SearchState.Searching)open.Step();
+Check(!open.Fine&&open.State==SearchState.Found,"Open water retains the cheaper regional search");
+var closed=new AdaptiveRouteSearch(new(0,0),new(48,0),(a,b)=>false);while(closed.State==SearchState.Searching)closed.Step();
+Check(closed.Fine&&closed.State==SearchState.NoRoute&&closed.Route.Count==0,"Fine fallback cannot create a passage through blocked water");
+
+var berthPoint=new Point(0,0);var forward=new Point(0,1);
+bool Straight(Point a,Point b)=>a.Y>=-30&&b.Y>=-30;
+Check(!Straight(new(0,-55),new(0,-35)),"Fixed 55 metre lead-in reproduces riverbank rejection");
+Check(DockApproach.TrySelect(berthPoint,forward,10,Straight,Straight,out var entry,out var lead),"Short ship fits a checked final corridor before the river bend");
+Check(Straight(lead,entry)&&Straight(entry,berthPoint)&&entry.Y<=-12.5&&entry.Y-lead.Y>=7.5,"Adaptive approach preserves hull-sized alignment and final-heading segments");
+Check(DockApproach.TrySelect(berthPoint,forward,10,(a,b)=>true,(a,b)=>true,out entry,out lead)&&entry.Y==-35&&lead.Y==-55,"Open dock keeps its original approach length");
+Check(!DockApproach.TrySelect(berthPoint,forward,30,Straight,Straight,out _,out _),"Large hull cannot borrow the short ship's cramped approach");
+Check(!DockApproach.TrySelect(berthPoint,forward,10,(a,b)=>false,(a,b)=>true,out _,out _),"Blocked final berth remains rejected");
+Check(!DockApproach.TrySelect(berthPoint,forward,10,(a,b)=>true,(a,b)=>false,out _,out _),"Clear berth without alignment space remains rejected");
+Check(DockApproach.TrySelect(new(100,50),new(1,0),10,(a,b)=>a.X>=70,(a,b)=>a.X>=70,out entry,out lead)&&entry.Y==50&&lead.X<entry.X&&entry.X<100,"Corridor shortening preserves a rotated and translated berth heading");
+
+Physics.Nearby=Array.Empty<Collider>();Physics.Cast=Array.Empty<RaycastHit>();
+var dock=new Berth{position=new(0,30,0),Approach=new(0,30,-35)};
+Check(chart.ValidateArrival(dock,new(0,30,-15),out _,false),"Chosen approach is revalidated with live hull clearance before docking");
+ZoneSystem.instance.Loaded=p=>p.z>=-25;
+Check(chart.ValidateArrival(dock,new(0,30,-15),out _,false)&&!chart.ValidateArrival(dock,out _,false),"Arrival revalidates the selected corridor rather than the obsolete 35 metre point");
+ZoneSystem.instance.Loaded=p=>false;
+Check(!chart.ValidateArrival(dock,new(0,30,-15),out _,false),"Adaptive arrival still waits for loaded terrain");
+ZoneSystem.instance.Loaded=p=>true;Heightmap.Ground=29.5f;
+Check(!chart.ValidateArrival(dock,new(0,30,-15),out _,false),"Adaptive arrival still rejects insufficient water depth");Heightmap.Ground=25;
+Physics.Nearby=new[]{Part<Ship>()};
+Check(!chart.ValidateArrival(dock,new(0,30,-15),out _,true),"Adaptive arrival never ignores another boat even with relaxed docks");
 Console.WriteLine($"PASS: {checks} production navigation and local-detour checks (host physics doubles).");

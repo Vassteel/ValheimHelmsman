@@ -36,6 +36,7 @@ public sealed class Voyage : MonoBehaviour
     private bool rerouting, slowingForTurn;
     private float nextDecision, modeSince, nextDestinationCheck, progressTime;
     private Vector3 progressPosition,lastReplanPosition;
+    private Vector3 arrivalApproach;
     private Ship.Speed command=Ship.Speed.Stop;
     private float rudder;
     private GullGuide? gull;
@@ -181,17 +182,28 @@ public sealed class Voyage : MonoBehaviour
         if(routeEffect)routeEffect.Clear();
         var approach=destination.Berth.Approach;
         var leadIn=approach-destination.Berth.Forward*20;
-        if(!chart.RegionalSegment(WaterChart.Point(leadIn),WaterChart.Point(approach)))
-        {Pause("No clear straight approach to that dock.");yield break;}
+        if(!destination.Temporary)
+        {
+            var berth=destination.Berth;
+            bool CorridorClear(Point a,Point b)=>chart.HullSegment(WaterChart.Vector(a),WaterChart.Vector(b),
+                Quaternion.Euler(0,berth.heading,0),false,out _,Relaxed);
+            if(!DockApproach.TrySelect(WaterChart.Point(berth.position),WaterChart.Point(berth.Forward),chart.Profile.Length,
+                CorridorClear,chart.RegionalSegment,out var entry,out var lead))
+            {Pause("Not enough clear water to align with that dock. Adjust the berth position or arrival heading.");yield break;}
+            approach=WaterChart.Vector(entry);leadIn=WaterChart.Vector(lead);
+        }
+        else if(!chart.RegionalSegment(WaterChart.Point(leadIn),WaterChart.Point(approach)))
+        {Pause("No clear approach to the whistle landing.");yield break;}
+        arrivalApproach=approach;
         float planStarted=Time.time;bool planningAnnounced=false;
-        var search=new RouteSearch(WaterChart.Point(start),WaterChart.Point(leadIn),chart.RegionalSegment);
+        var search=new AdaptiveRouteSearch(WaterChart.Point(start),WaterChart.Point(leadIn),chart.RegionalSegment);
         while(search.State==SearchState.Searching)
         {
             if(!planningAnnounced && Time.time-planStarted>=5)
             { planningAnnounced=true;if(gull)gull.Speak("Still finding us a safe course, Viking. Give me a moment."); }
             var watch=System.Diagnostics.Stopwatch.StartNew();
             do {search.Step(1);} while(search.State==SearchState.Searching && watch.ElapsedMilliseconds<3);
-            if(phase!=VoyagePhase.Boarding) Status="Plotting course — "+search.Expanded+" water cells checked";
+            if(phase!=VoyagePhase.Boarding) Status=(search.Fine?"Checking narrow passages — ":"Plotting course — ")+search.Expanded+" water cells checked";
             yield return null;
         }
         if(search.State!=SearchState.Found)
@@ -208,11 +220,14 @@ public sealed class Voyage : MonoBehaviour
         }
         planning=null;
         route.Add(approach);
+        // Keep the tighter waypoint tolerance through narrow channels so a six-metre
+        // grid step is not skipped while the hull is still entering the bend.
+        if(search.Fine)detourLastWaypoint=route.Count-1;
         if(routeEffect)routeEffect.SetRoute(route);
         // The first point is the departure endpoint/current ship position, already handled separately.
         waypoint=Math.Min(1,route.Count-1);
         if(planningAnnounced && gull)gull.Speak("Course found, Viking. On we go!",true);
-        Plugin.Instance.Record("Route ready: "+route.Count+" waypoints; "+search.Expanded+" cells examined.");
+        Plugin.Instance.Record("Route ready: "+route.Count+" waypoints; "+search.Expanded+" cells examined; fine search="+search.Fine+"; approach="+approach+"; lead-in="+leadIn+".");
         if(rerouting) {phase=VoyagePhase.Cruising;rerouting=false;ResetProgress();}
         else if(phase==VoyagePhase.Planning && departure!=null)
         {
@@ -360,7 +375,7 @@ public sealed class Voyage : MonoBehaviour
                 string reason;
                 bool clear=destination.Temporary
                     ? ShorelineArrival.Validate(destination.MarkerPosition,destination.Berth,chart,out reason)
-                    : chart.ValidateArrival(destination.Berth,out reason,Relaxed);
+                    : chart.ValidateArrival(destination.Berth,arrivalApproach,out reason,Relaxed);
                 if(!clear) {Pause("Destination unavailable: "+reason);return;}
                 phase=VoyagePhase.Approaching;ResetProgress();return;
             }

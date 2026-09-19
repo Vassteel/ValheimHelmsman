@@ -127,9 +127,12 @@ internal sealed class WaterChart
     }
 
     internal bool ValidateArrival(Berth berth,out string reason,bool allowDockPieces)
+        =>ValidateArrival(berth,berth.Approach,out reason,allowDockPieces);
+
+    internal bool ValidateArrival(Berth berth,Vector3 approach,out string reason,bool allowDockPieces)
     {
         if(!berth.ValidData){reason="Invalid berth settings.";return false;}
-        return HullSegment(berth.Approach,berth.position,Quaternion.Euler(0,berth.heading,0),true,out reason,allowDockPieces);
+        return HullSegment(approach,berth.position,Quaternion.Euler(0,berth.heading,0),true,out reason,allowDockPieces);
     }
 
     internal bool TurningArea(Vector3 center, out string reason)

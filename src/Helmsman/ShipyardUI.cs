@@ -69,9 +69,13 @@ public sealed partial class HelmsmanUI
         var statusScroller=statusScroll.gameObject.AddComponent<ScrollRect>();statusScroller.viewport=statusScroll;statusScroller.content=statusContent;statusScroller.horizontal=false;statusScroller.scrollSensitivity=20;
         theme.Text(rect,"Required materials · Quartermaster supplies are pulled automatically",24,-376,672,20,15,MenuTheme.Gold);
         var scroll=MenuTheme.Rect("Required materials",rect,24,-400,672,184);
-        MenuTheme.Panel(scroll,Color.clear);scroll.gameObject.AddComponent<RectMask2D>();
-        var content=MenuTheme.Rect("Resource slots",scroll,0,0,650,184);
-        var scroller=scroll.gameObject.AddComponent<ScrollRect>();scroller.viewport=scroll;scroller.content=content;scroller.horizontal=false;scroller.scrollSensitivity=28;
+        MenuTheme.Panel(scroll,Color.clear);
+        var viewport=MenuTheme.Rect("Viewport",scroll,0,0,650,184);viewport.gameObject.AddComponent<RectMask2D>();
+        var content=MenuTheme.Rect("Resource slots",viewport,0,0,650,184);
+        var scroller=scroll.gameObject.AddComponent<ScrollRect>();scroller.viewport=viewport;scroller.content=content;scroller.horizontal=false;
+        scroller.scrollSensitivity=124;scroller.movementType=ScrollRect.MovementType.Clamped;scroller.inertia=false;
+        var scrollbar=theme.VerticalScrollbar(scroll,656,0,16,184);
+        scroller.verticalScrollbar=scrollbar;controls.Add(scrollbar);
         var slots=new Dictionary<string,(Image icon,TMPro.TMP_Text need,TMPro.TMP_Text supply)>();
         void CreateSlots(WorkshopOrder? selected)
         {
@@ -91,6 +95,8 @@ public sealed partial class HelmsmanUI
             }
             if(i==0)theme.Text(content,selected==null?"Select a ship with the hammer or import a structure.":"No further materials required.",4,0,638,48,17,MenuTheme.Muted);
             content.sizeDelta=new Vector2(650,Mathf.Max(184,((i+1)/2)*62));
+            content.anchoredPosition=new Vector2(0,Mathf.Clamp(content.anchoredPosition.y,0,content.sizeDelta.y-184));
+            scrollbar.interactable=content.sizeDelta.y>184;
         }
         CreateSlots(job);float nextResources=0;
         refreshLabels.Add(()=>
@@ -113,7 +119,7 @@ public sealed partial class HelmsmanUI
                 row.Value.supply.text=need==0?"Ready for construction":"Bench "+source.bench+" · Carried "+source.carried;
             }
         });
-        theme.Text(rect,"D-pad: select   A: activate   B / Esc: close",24,-596,672,18,15,MenuTheme.Muted);
+        theme.Text(rect,"D-pad ↑↓: select   ←→: scroll materials   A: activate   B / Esc: close",24,-596,672,18,15,MenuTheme.Muted);
         nextLabels=0;FitModal();if(ZInput.IsGamepadActive()&&controls.Count>0)controls[0].Select();
     }
     private void BuildRefits()
