@@ -6,6 +6,7 @@ manifest=json.loads((root/'packaging/manifest.json').read_text())
 version=manifest['version_number']
 files={
  'README.md':root/'packaging/README.md',
+ 'CHANGELOG.md':root/'CHANGELOG.md',
  'icon.png':root/'dist/ValheimHelmsman/icon.png',
  'LICENSE.txt':root/'LICENSE.txt',
  'BepInEx/plugins/ValheimHelmsman/ValheimHelmsman.dll':root/'dist/ValheimHelmsman/ValheimHelmsman.dll',

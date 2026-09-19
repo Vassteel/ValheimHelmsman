@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.40
+
+- Build larger ships on a slipway with staged construction, arriving puffin crews, launching and reset animations; small boats remain instant builds.
+- Show required materials at the Carpenter’s Table and collect supplies through Quartermaster, with bench storage as a fallback.
+- Fix missing slipway construction ghosts, puffin arrivals and cancellation cleanup.
+- Add original workshop upgrades and animated harbor equipment, plus blueprint and vbuild construction through the puffin.
+- Improve kayak speed, turning and player paddling, including tandem assistance with rear-seat steering.
+- Reduce ship and workstation mesh complexity, repair the Currach keel and improve small-boat materials and workshop wear.
+- Remove remaining borrowed asset dependencies; use vanilla construction materials.
+
 ## 0.2.35
 
 - Add Dugout, Finewood Kayak and Tandem Finewood Kayak, with seated player paddling and reachable boarding grips.
